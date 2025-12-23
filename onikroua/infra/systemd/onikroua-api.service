@@ -1,0 +1,31 @@
+[Unit]
+Description=Onikroua API Backend
+Documentation=https://github.com/votre-repo/onikroua
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/onikroua/backend
+ExecStart=/usr/bin/node /var/www/onikroua/backend/index.js
+Restart=on-failure
+RestartSec=10
+
+# Variables d'environnement depuis fichier
+EnvironmentFile=/var/www/onikroua/backend/.env
+
+# Limites et sécurité
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=onikroua-api
+LimitNOFILE=65535
+
+# Sécurité supplémentaire
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/www/onikroua/backend
+
+[Install]
+WantedBy=multi-user.target
