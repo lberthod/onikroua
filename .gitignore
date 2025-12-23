@@ -16,6 +16,7 @@ pnpm-debug.log*
 *firebase-adminsdk*.json
 *.json.key
 service-account*.json
+firebase-credentials.json
 
 # Build outputs
 dist/
