@@ -7,7 +7,6 @@ const roomsRouter = require('./routes/rooms');
 const sessionsRouter = require('./routes/sessions');
 const aiRouter = require('./routes/ai');
 const { createRobotWebSocketServer } = require('./robotServer');
-const { createGeminiRobotWebSocketServer } = require('./robotServerGemini');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -49,5 +48,4 @@ server.listen(PORT, () => {
   console.log(`🚀 Serveur Onikroua démarré sur le port ${PORT}`);
   console.log(`   Health: http://localhost:${PORT}/health`);
   console.log(`   Robot WebSocket: ws://localhost:${PORT}/robot`);
-  console.log(`   Robot WebSocket Gemini: ws://localhost:${PORT}/robot-gemini`);
 });
