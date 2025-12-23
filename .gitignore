@@ -17,6 +17,8 @@ pnpm-debug.log*
 *.json.key
 service-account*.json
 firebase-credentials.json
+*firebase-credentials.json
+onikroua/backend/firebase-credentials.json
 
 # Build outputs
 dist/
