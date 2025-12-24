@@ -15,6 +15,8 @@ import AITutorView from '../views/AITutorView.vue'
 import FeedView from '../views/FeedView.vue'
 import RobotView from '../views/RobotView.vue'
 import RobotViewOptimized from '../views/RobotViewOptimized.vue'
+import GeminiChatView from '../views/GeminiChatView.vue'
+import GeminiLiveView from '../views/GeminiLiveView.vue'
 
 const routes = [
   {
@@ -109,6 +111,18 @@ const routes = [
     path: '/robot-old',
     name: 'robot-old',
     component: RobotView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/gemini-chat',
+    name: 'gemini-chat',
+    component: GeminiChatView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/gemini-live',
+    name: 'gemini-live',
+    component: GeminiLiveView,
     meta: { requiresAuth: true }
   }
 ]

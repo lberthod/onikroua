@@ -6,7 +6,9 @@ const http = require('http');
 const roomsRouter = require('./routes/rooms');
 const sessionsRouter = require('./routes/sessions');
 const aiRouter = require('./routes/ai');
+const geminiRouter = require('./routes/gemini');
 const { createRobotWebSocketServer } = require('./robotServer');
+const { createGeminiLiveWebSocketServer } = require('./geminiLiveServer');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -27,6 +29,7 @@ app.get('/health', (req, res) => {
 app.use('/api/rooms', roomsRouter);
 app.use('/api/sessions', sessionsRouter);
 app.use('/api/ai', aiRouter);
+app.use('/api/gemini', geminiRouter);
 
 // 404 handler
 app.use((req, res) => {
@@ -42,10 +45,11 @@ app.use((err, req, res, next) => {
 const server = http.createServer(app);
 
 createRobotWebSocketServer(server);
-// createGeminiRobotWebSocketServer(server); // ✅ Désactivé temporairement pour debug
+createGeminiLiveWebSocketServer(server);
 
 server.listen(PORT, () => {
   console.log(`🚀 Serveur Onikroua démarré sur le port ${PORT}`);
   console.log(`   Health: http://localhost:${PORT}/health`);
   console.log(`   Robot WebSocket: ws://localhost:${PORT}/robot`);
+  console.log(`   Gemini Live WebSocket: ws://localhost:${PORT}/gemini-live`);
 });
