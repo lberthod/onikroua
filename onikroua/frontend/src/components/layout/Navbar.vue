@@ -37,7 +37,7 @@ const navLinks = [
   { path: '/grammaire', label: 'Grammaire', icon: '📖' },
   { path: '/phonetique', label: 'Phonétique', icon: '🎵' },
   { path: '/feed', label: 'Feed', icon: '🎲' },
-  { path: '/ai-tutor', label: 'AI Tutor', icon: '🤖', highlight: true },
+  { path: '/gemini-live', label: 'Gemini Tutor', icon: '🤖', highlight: true },
   { path: '/lobby', label: 'Quiz Duo', icon: '🎯', highlight: true }
 ]
 </script>

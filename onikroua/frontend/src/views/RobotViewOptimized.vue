@@ -566,28 +566,6 @@ const stopSilenceCheck = () => {
   }
 }
 
-const triggerBargein = () => {
-  console.log('🛑 Barge-in triggered')
-  
-  playbackToken.value++
-  
-  if (currentSourceNode.value) {
-    try {
-      currentSourceNode.value.stop()
-      currentSourceNode.value = null
-    } catch (e) {
-      console.warn('Source already stopped')
-    }
-  }
-  
-  audioQueue.value = []
-  isPlaying.value = false
-  
-  if (ws.value?.readyState === WebSocket.OPEN) {
-    ws.value.send(JSON.stringify({ type: 'barge_in' }))
-  }
-}
-
 const handleServerMessage = async (message: any) => {
   switch (message.type) {
     case 'state':
