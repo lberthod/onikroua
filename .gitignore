@@ -41,3 +41,12 @@ Thumbs.db
 *.temp
 onikroua/backend/firebase-credentials.json
 onikroua/backend/firebase-credentials.json
+
+# Tokens et secrets
+TOKEN*.json
+**/TOKEN*.json
+*.token
+*.secret
+
+# Scripts de traduction avec API keys
+**/translateTop7000*.js

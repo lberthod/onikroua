@@ -9,7 +9,7 @@ const BATCH_SIZE = 100;
 const DELAY_MS = 1000;
 
 const openai = new OpenAI({
-  apiKey: "process.env.OPENAI_API_KEY"
+  apiKey: process.env.OPENAI_API_KEY
 });
 
 function sleep(ms) {

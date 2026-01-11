@@ -40,8 +40,10 @@ npm run android:bundle
 
 ## 📚 Documentation
 
+- **ANDROID_LOGIN_CHECKLIST.md** - ✅ Checklist login Android (COMMENCEZ ICI)
 - **DEMARRAGE_RAPIDE_ANDROID.md** - Guide de démarrage rapide
 - **ANDROID_SETUP.md** - Documentation complète
+- **GOOGLE_AUTH_ANDROID.md** - Configuration Google Sign-In
 - **generate-icons.md** - Créer les icônes de l'app
 
 ## 🔧 Prérequis
@@ -142,6 +144,9 @@ Modifier le port dans `vite.config.ts` (ligne 76)
 - ✅ Splash screen personnalisé
 - ✅ Status bar configurée
 - ✅ Icônes adaptatives
+- ✅ **Login adapté pour Android** :
+  - Email/Password : fonctionne nativement ✅
+  - Google Sign-In : détection automatique web/Android ✅
 
 ## 📖 Ressources
 
