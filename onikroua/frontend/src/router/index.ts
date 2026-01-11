@@ -17,6 +17,10 @@ import RobotView from '../views/RobotView.vue'
 import RobotViewOptimized from '../views/RobotViewOptimized.vue'
 import GeminiChatView from '../views/GeminiChatView.vue'
 import GeminiLiveView from '../views/GeminiLiveView.vue'
+import ImagesView from '../views/ImagesView.vue'
+import DictionaryView from '../views/DictionaryView.vue'
+import TatoebaView from '../views/TatoebaView.vue'
+import DuoQuizGameView from '../views/DuoQuizGameView.vue'
 
 const routes = [
   {
@@ -123,6 +127,30 @@ const routes = [
     path: '/gemini-live',
     name: 'gemini-live',
     component: GeminiLiveView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/images',
+    name: 'images',
+    component: ImagesView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/dictionary',
+    name: 'dictionary',
+    component: DictionaryView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/tatoeba',
+    name: 'tatoeba',
+    component: TatoebaView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/duo-quiz',
+    name: 'duo-quiz',
+    component: DuoQuizGameView,
     meta: { requiresAuth: true }
   }
 ]

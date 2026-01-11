@@ -67,3 +67,35 @@ node_modules/
 
 # dataconnect generated files
 .dataconnect
+
+# Vite build output
+dist
+dist-ssr
+*.local
+
+# PWA
+dev-dist
+sw.js
+sw.js.map
+workbox-*.js
+
+# Capacitor
+android/
+ios/
+.capacitor/
+
+# Keystore files (important: ne jamais commit!)
+*.keystore
+*.jks
+keystore.properties
+
+# Android specific
+*.iml
+.gradle
+local.properties
+.idea/
+.DS_Store
+build/
+captures/
+.externalNativeBuild
+.cxx

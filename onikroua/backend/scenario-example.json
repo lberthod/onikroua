@@ -1,0 +1,41 @@
+{
+  "id": "pizzeria",
+  "titre": "Commander une pizza",
+  "icone": "🍕",
+  "description": "Apprends à commander une pizza en italien",
+  "difficulte": "débutant",
+  "themeLieu": "Commander dans une pizzeria italienne",
+  "nombreEtapes": 4,
+  "vocabulaireAutorise": [
+    "Buongiorno .",
+    "una pizza margherita",
+    "una pizza quattro formaggi",
+    "per favore .",
+    "Grazie .",
+    "e",
+    "una coca cola"
+  ],
+  "etapes": [
+    {
+      "objectif": "Saluer",
+      "phraseCible": "Buongiorno .",
+      "validation": "Super . Continue ."
+    },
+    {
+      "objectif": "Commander la pizza",
+      "phraseCible": "una pizza margherita per favore .",
+      "validation": "Parfait . Étape 3 ."
+    },
+    {
+      "objectif": "Ajouter une boisson",
+      "phraseCible": "e una coca cola .",
+      "validation": "Très bien . Dernière étape ."
+    },
+    {
+      "objectif": "Remercier",
+      "phraseCible": "Grazie .",
+      "validation": "Top . Phrase finale maintenant ."
+    }
+  ],
+  "phraseFinale": "Buongiorno . Una pizza margherita per favore . E una coca cola . Grazie ."
+}

@@ -36,6 +36,9 @@ const navLinks = [
   { path: '/conversations', label: 'Dialogues', icon: '💬' },
   { path: '/grammaire', label: 'Grammaire', icon: '📖' },
   { path: '/phonetique', label: 'Phonétique', icon: '🎵' },
+  { path: '/images', label: 'Images', icon: '🖼️' },
+  { path: '/dictionary', label: 'Dictionnaire', icon: '📖' },
+  { path: '/tatoeba', label: 'Phrases', icon: '💬' },
   { path: '/feed', label: 'Feed', icon: '🎲' },
   { path: '/gemini-live', label: 'Gemini Tutor', icon: '🤖', highlight: true },
   { path: '/lobby', label: 'Quiz Duo', icon: '🎯', highlight: true }
@@ -104,22 +107,23 @@ const navLinks = [
 
 <style scoped>
 .navbar {
-  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  background: #2c3e50;
   color: white;
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .navbar-content {
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 60px;
+  height: 56px;
 }
 
 /* Logo */
@@ -132,13 +136,13 @@ const navLinks = [
 }
 
 .logo-icon {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
 }
 
 .logo-text {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.3px;
 }
 
 /* Hamburger */
@@ -181,33 +185,39 @@ const navLinks = [
 .nav {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.15rem;
+  flex: 1;
+  justify-content: center;
+  max-width: 900px;
 }
 
 .nav-link {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  color: rgba(255, 255, 255, 0.85);
+  gap: 0.3rem;
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  transition: all 0.2s;
-  font-size: 0.9rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 6px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.85rem;
   font-weight: 500;
   background: none;
   border: none;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .nav-link:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
   color: white;
+  transform: translateY(-1px);
 }
 
 .nav-link.router-link-active {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.18);
   color: white;
+  font-weight: 600;
 }
 
 .nav-link.highlight {
@@ -220,7 +230,7 @@ const navLinks = [
 }
 
 .nav-icon {
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
 .nav-user-mobile {
@@ -237,45 +247,47 @@ const navLinks = [
 .user-profile {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   text-decoration: none;
   color: rgba(255, 255, 255, 0.85);
-  padding: 0.4rem 0.75rem;
-  border-radius: 20px;
-  transition: all 0.2s;
-  background: rgba(255, 255, 255, 0.1);
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .user-profile:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
   color: white;
+  transform: translateY(-1px);
 }
 
 .user-avatar {
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .user-name {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
-  max-width: 120px;
+  max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .logout-btn-desktop {
-  background: rgba(231, 76, 60, 0.2);
+  background: rgba(231, 76, 60, 0.15);
   border: none;
-  padding: 0.4rem 0.6rem;
-  border-radius: 8px;
+  padding: 0.4rem 0.55rem;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 1rem;
-  transition: all 0.2s;
+  font-size: 0.95rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .logout-btn-desktop:hover {
-  background: rgba(231, 76, 60, 0.4);
+  background: rgba(231, 76, 60, 0.3);
+  transform: translateY(-1px);
 }
 
 /* Overlay */
@@ -284,21 +296,25 @@ const navLinks = [
 }
 
 /* Responsive */
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
   .nav-label {
     display: none;
   }
   
   .nav-link {
-    padding: 0.5rem;
+    padding: 0.45rem 0.5rem;
   }
   
   .nav-icon {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
   
   .user-name {
     display: none;
+  }
+  
+  .navbar-content {
+    padding: 0 1rem;
   }
 }
 

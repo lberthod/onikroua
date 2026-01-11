@@ -584,87 +584,238 @@ onUnmounted(() => {
 .gemini-live-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: calc(100vh - 56px);
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 2rem;
+  padding: 1.5rem;
 }
 
 /* Scenario Selection */
 .scenario-selection {
-  max-width: 1200px;
+  width: 100%;
+  max-width: 1600px;
   margin: 0 auto;
 }
 
 .selection-header {
   text-align: center;
   color: white;
-  margin-bottom: 3rem;
+  margin-bottom: 1.75rem;
+  padding: 0 1rem;
 }
 
 .selection-header h1 {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  font-size: 1.75rem;
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .scenarios-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  padding: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+  padding: 0 0.5rem;
+  width: 100%;
 }
 
 .scenario-card {
   background: white;
-  border-radius: 20px;
-  padding: 2rem;
+  border-radius: 10px;
+  padding: 1rem 0.85rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .scenario-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
+  border-color: rgba(102, 126, 234, 0.2);
 }
 
 .scenario-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
+  font-size: 2.25rem;
+  margin-bottom: 0.5rem;
+  filter: grayscale(0.1);
 }
 
 .scenario-card h3 {
-  color: #333;
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
+  color: #1a202c;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
 }
 
 .scenario-description {
-  color: #666;
-  font-size: 1rem;
-  margin-bottom: 1rem;
+  color: #64748b;
+  font-size: 0.75rem;
+  margin-bottom: 0.6rem;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .difficulty-badge {
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 5px;
+  font-size: 0.65rem;
+  font-weight: 500;
   margin-top: auto;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .difficulty-débutant {
-  background: #c8e6c9;
+  background: #e8f5e9;
   color: #2e7d32;
+  border: 1px solid #a5d6a7;
 }
 
 .difficulty-intermédiaire {
-  background: #fff9c4;
+  background: #fff8e1;
   color: #f57f17;
+  border: 1px solid #ffe082;
+}
+
+/* Responsive Design */
+@media (max-width: 1400px) {
+  .scenarios-grid {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  }
+}
+
+@media (max-width: 1200px) {
+  .gemini-live-container {
+    padding: 1.25rem;
+  }
+  
+  .scenarios-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.65rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .selection-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .scenarios-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .gemini-live-container {
+    padding: 1rem;
+  }
+  
+  .selection-header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .selection-header h1 {
+    font-size: 1.35rem;
+  }
+  
+  .scenarios-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.6rem;
+    padding: 0;
+  }
+  
+  .scenario-card {
+    padding: 0.85rem 0.7rem;
+  }
+  
+  .scenario-icon {
+    font-size: 2rem;
+  }
+  
+  .scenario-card h3 {
+    font-size: 0.85rem;
+  }
+  
+  .scenario-description {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .gemini-live-container {
+    padding: 0.75rem;
+  }
+  
+  .selection-header h1 {
+    font-size: 1.2rem;
+  }
+  
+  .selection-header .subtitle {
+    font-size: 0.85rem;
+  }
+  
+  .scenarios-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .scenario-card {
+    padding: 0.75rem 0.6rem;
+  }
+  
+  .scenario-icon {
+    font-size: 1.85rem;
+    margin-bottom: 0.4rem;
+  }
+  
+  .scenario-card h3 {
+    font-size: 0.8rem;
+    margin-bottom: 0.35rem;
+  }
+  
+  .scenario-description {
+    font-size: 0.68rem;
+    margin-bottom: 0.5rem;
+    -webkit-line-clamp: 2;
+  }
+  
+  .difficulty-badge {
+    font-size: 0.6rem;
+    padding: 0.18rem 0.45rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .scenarios-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .scenario-card {
+    padding: 0.9rem;
+  }
+  
+  .scenario-icon {
+    font-size: 2.2rem;
+  }
+  
+  .scenario-card h3 {
+    font-size: 0.9rem;
+  }
+  
+  .scenario-description {
+    font-size: 0.75rem;
+  }
 }
 
 /* Conversation View */
