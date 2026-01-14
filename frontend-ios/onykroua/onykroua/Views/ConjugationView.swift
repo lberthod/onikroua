@@ -2,7 +2,7 @@ import SwiftUI
 import AVFoundation
 
 struct ConjugationView: View {
-    @StateObject private var speechService = SpeechService()
+    @EnvironmentObject var env: AppEnvironment
     @State private var selectedTab = 0
     @State private var selectedVerb = "essere"
     @State private var selectedTense = "Présent"
@@ -67,23 +67,22 @@ struct ConjugationView: View {
             .padding()
             
             TabView(selection: $selectedTab) {
-                RulesTab(grammarData: grammarData, language: currentLanguage, speechService: speechService)
+                RulesTab(grammarData: grammarData, language: currentLanguage)
                     .tag(0)
                 VerbsTab(
                     grammarData: grammarData,
                     language: currentLanguage,
-                    speechService: speechService,
                     searchText: $searchText,
                     selectedFilter: $selectedFilter,
                     expandedVerbId: $expandedVerbId,
                     selectedTense: $selectedTense
                 )
                 .tag(1)
-                TensesTab(grammarData: grammarData, language: currentLanguage, speechService: speechService)
+                TensesTab(grammarData: grammarData, language: currentLanguage)
                     .tag(2)
-                PracticeTab(grammarData: grammarData, language: currentLanguage, speechService: speechService)
+                PracticeTab(grammarData: grammarData, language: currentLanguage)
                     .tag(3)
-                MoreTab(grammarData: grammarData, language: currentLanguage, speechService: speechService)
+                MoreTab(grammarData: grammarData, language: currentLanguage)
                     .tag(4)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))

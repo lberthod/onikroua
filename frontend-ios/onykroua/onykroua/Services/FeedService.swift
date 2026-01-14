@@ -6,15 +6,23 @@ class FeedService: ObservableObject {
     private var currentPage = 0
     private let itemsPerPage = 10
     private var allGeneratedItems: [FeedItem] = []
+    private var language = "it"
+    
+    private let vocabularyManager = VocabularyDataManager.shared
     
     init() {
         generateInitialContent()
     }
     
+    func setLanguage(_ lang: String) {
+        language = lang
+    }
+    
     private func generateInitialContent() {
         allGeneratedItems = []
         
-        for _ in 0..<50 {
+        // Générer un mix varié de contenu
+        for _ in 0..<100 {
             let type = FeedItemType.allCases.randomElement()!
             allGeneratedItems.append(generateItem(type: type))
         }
@@ -44,6 +52,7 @@ class FeedService: ObservableObject {
     func reset() {
         currentPage = 0
         items = []
+        allGeneratedItems = []
         generateInitialContent()
     }
     
@@ -63,27 +72,28 @@ class FeedService: ObservableObject {
     }
     
     private func generateVocabularyItem() -> FeedItem {
-        let words = [
-            ("Ciao", "Salut", "Ciao, come stai?"),
-            ("Grazie", "Merci", "Grazie mille!"),
-            ("Buongiorno", "Bonjour", "Buongiorno, signora."),
-            ("Amore", "Amour", "Ti voglio bene, amore mio."),
-            ("Famiglia", "Famille", "La mia famiglia è grande."),
-            ("Cibo", "Nourriture", "Il cibo italiano è delizioso."),
-            ("Bella", "Belle", "Che bella giornata!"),
-            ("Città", "Ville", "Roma è una città bellissima."),
-            ("Viaggiare", "Voyager", "Mi piace viaggiare in Italia."),
-            ("Musica", "Musique", "Ascolto la musica italiana.")
-        ]
+        // Utiliser le vrai vocabulaire
+        let allWords = vocabularyManager.getAllWords(language: language)
         
-        let word = words.randomElement()!
+        if !allWords.isEmpty, let word = allWords.randomElement() {
+            return FeedItem(
+                type: .vocabulary,
+                title: "📚 Mot du jour",
+                content: word.word,
+                translation: word.translation,
+                example: word.example,
+                audioText: word.word
+            )
+        }
+        
+        // Fallback
         return FeedItem(
             type: .vocabulary,
             title: "📚 Mot du jour",
-            content: word.0,
-            translation: word.1,
-            example: word.2,
-            audioText: word.0
+            content: "Ciao",
+            translation: "Salut",
+            example: "Ciao, come stai?",
+            audioText: "Ciao"
         )
     }
     

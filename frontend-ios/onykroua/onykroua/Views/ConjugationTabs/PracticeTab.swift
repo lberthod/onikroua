@@ -3,7 +3,7 @@ import SwiftUI
 public struct PracticeTab: View {
     public let grammarData: GrammarData
     public let language: String
-    @ObservedObject var speechService: SpeechService
+    @EnvironmentObject var env: AppEnvironment
     @State private var selectedQuizType = "conjugation"
     @State private var currentQuestion = 0
     @State private var score = 0
@@ -14,10 +14,9 @@ public struct PracticeTab: View {
     
     private var quizTypes = ["conjugation", "translation", "verb"]
     
-    public init(grammarData: GrammarData, language: String, speechService: SpeechService) {
+    public init(grammarData: GrammarData, language: String) {
         self.grammarData = grammarData
         self.language = language
-        self.speechService = speechService
     }
     
     private var questions: [QuizQuestion] {
@@ -65,7 +64,7 @@ public struct PracticeTab: View {
                                 checkAnswer()
                             }
                         },
-                        speechService: speechService,
+                        speechService: env.speechService,
                         language: language
                     )
                 }

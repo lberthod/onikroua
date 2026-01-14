@@ -2,34 +2,63 @@ import SwiftUI
 import AVFoundation
 
 struct FeedView: View {
-    @StateObject private var feedService = FeedService()
-    @StateObject private var speechService = SpeechService()
+    @EnvironmentObject var env: AppEnvironment
     @State private var currentIndex = 0
+    @State private var selectedLanguage = "it"
+    @State private var isLoadingMore = false
+    @State private var scrollOffset: CGFloat = 0
+    @State private var showAdvancedSearch = false
     
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
             
-            if feedService.items.isEmpty {
-                ProgressView()
-                    .tint(.white)
-            } else {
-                TabView(selection: $currentIndex) {
-                    ForEach(Array(feedService.items.enumerated()), id: \.element.id) { index, item in
-                        FeedCardView(
-                            item: item,
-                            speechService: speechService,
-                            onLike: { feedService.toggleLike(itemId: item.id) },
-                            onBookmark: { feedService.toggleBookmark(itemId: item.id) }
-                        )
-                        .tag(index)
-                    }
-                }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .indexViewStyle(.page(backgroundDisplayMode: .always))
-                .onChange(of: currentIndex) { _, newValue in
-                    if newValue >= feedService.items.count - 3 && feedService.hasMore() {
-                        _ = feedService.loadNextPage()
+            ErrorOverlay(errorManager: env.errorManager)
+            
+            VStack(spacing: 0) {
+                // Language selector
+                languageSelector
+                
+                if env.feedService.items.isEmpty {
+                    ProgressView()
+                        .tint(.white)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    // Vertical scroll feed with snap paging
+                    GeometryReader { geometry in
+                        ScrollViewReader { proxy in
+                            ScrollView(.vertical, showsIndicators: false) {
+                                LazyVStack(spacing: 0) {
+                                    ForEach(Array(env.feedService.items.enumerated()), id: \.element.id) { index, item in
+                                        FeedCardView(
+                                            item: item,
+                                            language: selectedLanguage,
+                                            speechService: env.speechService,
+                                            onLike: { env.feedService.toggleLike(itemId: item.id) },
+                                            onBookmark: { env.feedService.toggleBookmark(itemId: item.id) }
+                                        )
+                                        .frame(width: geometry.size.width, height: geometry.size.height)
+                                        .id(index)
+                                        .onAppear {
+                                            if index == currentIndex {
+                                                // Stop speech when changing item
+                                                env.speechService.stop()
+                                            }
+                                            // Load more items 5 before the end
+                                            if index >= env.feedService.items.count - 5 && env.feedService.hasMore() && !isLoadingMore {
+                                                loadMoreItems()
+                                            }
+                                        }
+                                    }
+                                    
+                                    if isLoadingMore {
+                                        ProgressView()
+                                            .tint(.white)
+                                            .frame(height: 100)
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -37,15 +66,92 @@ struct FeedView: View {
         .navigationTitle("📱 Feed")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            if feedService.items.isEmpty {
-                _ = feedService.loadNextPage()
+            env.vocabularyManager.ensureLoaded(language: selectedLanguage)
+            if env.feedService.items.isEmpty {
+                loadInitialFeed()
             }
+        }
+        .onChange(of: selectedLanguage) { newLanguage in
+            env.vocabularyManager.ensureLoaded(language: newLanguage)
+        }
+        .onChange(of: env.vocabularyManager.loadingError != nil) { hasError in
+            if hasError, let error = env.vocabularyManager.loadingError {
+                env.errorManager.handle(error) {
+                    env.vocabularyManager.loadVocabularyAsync(language: selectedLanguage)
+                }
+            }
+        }
+    }
+    
+    var languageSelector: some View {
+        HStack(spacing: 12) {
+            LanguageSelectorButton(flag: "🇮🇹", name: "Italien", isSelected: selectedLanguage == "it") {
+                selectedLanguage = "it"
+                reloadFeed()
+            }
+            
+            LanguageSelectorButton(flag: "🇪🇸", name: "Espagnol", isSelected: selectedLanguage == "es") {
+                selectedLanguage = "es"
+                reloadFeed()
+            }
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .background(Color.black.opacity(0.7))
+    }
+    
+    private func loadInitialFeed() {
+        // Load 2 pages initially for smooth experience (like Android)
+        _ = env.feedService.loadNextPage()
+        _ = env.feedService.loadNextPage()
+    }
+    
+    private func loadMoreItems() {
+        guard !isLoadingMore else { return }
+        
+        isLoadingMore = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            _ = env.feedService.loadNextPage()
+            isLoadingMore = false
+        }
+    }
+    
+    private func reloadFeed() {
+        currentIndex = 0
+        env.feedService.reset()
+        loadInitialFeed()
+    }
+}
+
+struct LanguageSelectorButton: View {
+    let flag: String
+    let name: String
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Text(flag)
+                    .font(.title3)
+                if isSelected {
+                    Text(name)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(isSelected ? Color.blue : Color.white.opacity(0.2))
+            .foregroundColor(.white)
+            .cornerRadius(20)
         }
     }
 }
 
 struct FeedCardView: View {
     let item: FeedItem
+    let language: String
     @ObservedObject var speechService: SpeechService
     let onLike: () -> Void
     let onBookmark: () -> Void
@@ -99,10 +205,13 @@ struct FeedCardView: View {
                             }
                             
                             if let audioText = item.audioText {
-                                Button(action: { speechService.speak(audioText) }) {
-                                    Image(systemName: "speaker.wave.3.fill")
+                                Button(action: { 
+                                    let lang = language == "it" ? "it-IT" : "es-ES"
+                                    speechService.speak(audioText, language: lang) 
+                                }) {
+                                    Image(systemName: speechService.isSpeaking ? "speaker.wave.3.fill" : "speaker.wave.2.fill")
                                         .font(.title2)
-                                        .foregroundColor(.white)
+                                        .foregroundColor(speechService.isSpeaking ? .yellow : .white)
                                 }
                             }
                         }

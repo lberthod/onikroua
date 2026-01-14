@@ -1,11 +1,19 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var env: AppEnvironment
     @State private var userEmail: String = "utilisateur@onykroua.com"
     @State private var showProfile = false
     
     var body: some View {
         NavigationView {
+            VStack(spacing: 0) {
+                // Offline banner
+                OfflineBanner(networkMonitor: env.networkMonitor)
+                
+                // Sync status
+                SyncStatusView(syncManager: env.syncManager, networkMonitor: env.networkMonitor)
+                
             ScrollView {
                 VStack(spacing: 24) {
                     HStack {
@@ -92,7 +100,19 @@ struct ContentView: View {
                     }
                     
                     Spacer(minLength: 40)
+                    
+                    // Version footer
+                    VStack(spacing: 4) {
+                        Text("onykroua")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        Text("Version 1.1 (8)")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.bottom, 20)
                 }
+            }
             }
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .navigationBarHidden(true)

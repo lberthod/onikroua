@@ -3,15 +3,14 @@ import SwiftUI
 public struct MoreTab: View {
     public let grammarData: GrammarData
     public let language: String
-    @ObservedObject var speechService: SpeechService
+    @EnvironmentObject var env: AppEnvironment
     @State private var selectedSection = "pronouns"
     
     private var sections = ["pronouns", "expressions", "tips"]
     
-    public init(grammarData: GrammarData, language: String, speechService: SpeechService) {
+    public init(grammarData: GrammarData, language: String) {
         self.grammarData = grammarData
         self.language = language
-        self.speechService = speechService
     }
     
     public var body: some View {
@@ -43,11 +42,11 @@ public struct MoreTab: View {
                 LazyVStack(spacing: 16) {
                     switch selectedSection {
                     case "pronouns":
-                        PronounsSection(grammarData: grammarData, language: language, speechService: speechService)
+                        PronounsSection(grammarData: grammarData, language: language, speechService: env.speechService)
                     case "expressions":
-                        ExpressionsSection(language: language, speechService: speechService)
+                        ExpressionsSection(language: language, speechService: env.speechService)
                     case "tips":
-                        TipsSection(language: language, speechService: speechService)
+                        TipsSection(language: language, speechService: env.speechService)
                     default:
                         EmptyView()
                     }

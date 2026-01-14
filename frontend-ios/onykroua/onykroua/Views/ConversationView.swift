@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ConversationView: View {
-    @StateObject private var speechService = SpeechService()
+    @EnvironmentObject var env: AppEnvironment
     @State private var selectedScenario: ConversationScenario?
     @State private var showScenarioPicker = true
     @State private var currentMessageIndex = 0
@@ -78,7 +78,7 @@ struct ConversationView: View {
             ScrollView {
                 VStack(spacing: 12) {
                     ForEach(Array(scenario.messages.prefix(currentMessageIndex + 1).enumerated()), id: \.element.id) { index, message in
-                        ConversationMessageBubble(message: message, speechService: speechService)
+                        ConversationMessageBubble(message: message, speechService: env.speechService)
                     }
                 }
                 .padding()
@@ -217,7 +217,7 @@ struct ConversationMessageBubble: View {
                         .foregroundColor(.blue)
                 }
                 
-                Button(action: { speechService.speak(message.text) }) {
+                Button(action: { speechService.speak(message.text, language: "it-IT") }) {
                     Image(systemName: "speaker.wave.2.fill")
                         .font(.caption)
                         .foregroundColor(.blue)

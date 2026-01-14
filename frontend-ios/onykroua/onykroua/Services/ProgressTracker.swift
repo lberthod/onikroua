@@ -1,18 +1,14 @@
 import Foundation
 import SwiftUI
 
+// MARK: - Progress Tracker
+
 class ProgressTracker: ObservableObject {
     @Published var wordsLearned: Set<String> = []
     @Published var favorites: Set<String> = []
     @Published var dailyStreak: Int = 0
     @Published var totalXP: Int = 0
     @Published var lastActivityDate: Date?
-    
-    private let wordsKey = "learned_words"
-    private let favKey = "favorites"
-    private let streakKey = "daily_streak"
-    private let xpKey = "total_xp"
-    private let lastActivityKey = "last_activity"
     
     static let shared = ProgressTracker()
     
@@ -22,24 +18,24 @@ class ProgressTracker: ObservableObject {
     }
     
     func save() {
-        UserDefaults.standard.set(Array(wordsLearned), forKey: wordsKey)
-        UserDefaults.standard.set(Array(favorites), forKey: favKey)
-        UserDefaults.standard.set(dailyStreak, forKey: streakKey)
-        UserDefaults.standard.set(totalXP, forKey: xpKey)
+        UserDefaults.standard.set(Array(wordsLearned), forKey: AppConstants.UserDefaultsKeys.learnedWords)
+        UserDefaults.standard.set(Array(favorites), forKey: AppConstants.UserDefaultsKeys.favorites)
+        UserDefaults.standard.set(dailyStreak, forKey: AppConstants.UserDefaultsKeys.dailyStreak)
+        UserDefaults.standard.set(totalXP, forKey: AppConstants.UserDefaultsKeys.totalXP)
         if let date = lastActivityDate {
-            UserDefaults.standard.set(date, forKey: lastActivityKey)
+            UserDefaults.standard.set(date, forKey: AppConstants.UserDefaultsKeys.lastActivity)
         }
     }
     
     func load() {
-        wordsLearned = Set(UserDefaults.standard.stringArray(forKey: wordsKey) ?? [])
-        favorites = Set(UserDefaults.standard.stringArray(forKey: favKey) ?? [])
-        dailyStreak = UserDefaults.standard.integer(forKey: streakKey)
-        totalXP = UserDefaults.standard.integer(forKey: xpKey)
-        lastActivityDate = UserDefaults.standard.object(forKey: lastActivityKey) as? Date
+        wordsLearned = Set(UserDefaults.standard.stringArray(forKey: AppConstants.UserDefaultsKeys.learnedWords) ?? [])
+        favorites = Set(UserDefaults.standard.stringArray(forKey: AppConstants.UserDefaultsKeys.favorites) ?? [])
+        dailyStreak = UserDefaults.standard.integer(forKey: AppConstants.UserDefaultsKeys.dailyStreak)
+        totalXP = UserDefaults.standard.integer(forKey: AppConstants.UserDefaultsKeys.totalXP)
+        lastActivityDate = UserDefaults.standard.object(forKey: AppConstants.UserDefaultsKeys.lastActivity) as? Date
     }
     
-    func markWordLearned(_ word: String, xp: Int = 10) {
+    func markWordLearned(_ word: String, xp: Int = AppConstants.Gamification.xpPerWord) {
         wordsLearned.insert(word)
         addXP(xp)
         save()
@@ -97,12 +93,12 @@ class ProgressTracker: ObservableObject {
     }
     
     func getUserLevel() -> Int {
-        return (totalXP / 100) + 1
+        return (totalXP / AppConstants.Gamification.xpPerLevel) + 1
     }
     
     func getProgressToNextLevel() -> Double {
-        let currentLevelXP = (getUserLevel() - 1) * 100
-        let nextLevelXP = getUserLevel() * 100
+        let currentLevelXP = (getUserLevel() - 1) * AppConstants.Gamification.xpPerLevel
+        let nextLevelXP = getUserLevel() * AppConstants.Gamification.xpPerLevel
         let progress = Double(totalXP - currentLevelXP) / Double(nextLevelXP - currentLevelXP)
         return max(0, min(1, progress))
     }

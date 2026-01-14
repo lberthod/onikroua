@@ -3,16 +3,15 @@ import SwiftUI
 public struct VerbsTab: View {
     public let grammarData: GrammarData
     public let language: String
-    @ObservedObject var speechService: SpeechService
+    @EnvironmentObject var env: AppEnvironment
     @Binding var searchText: String
     @Binding var selectedFilter: String
     @Binding var expandedVerbId: String?
     @Binding var selectedTense: String
     
-    public init(grammarData: GrammarData, language: String, speechService: SpeechService, searchText: Binding<String>, selectedFilter: Binding<String>, expandedVerbId: Binding<String?>, selectedTense: Binding<String>) {
+    public init(grammarData: GrammarData, language: String, searchText: Binding<String>, selectedFilter: Binding<String>, expandedVerbId: Binding<String?>, selectedTense: Binding<String>) {
         self.grammarData = grammarData
         self.language = language
-        self.speechService = speechService
         self._searchText = searchText
         self._selectedFilter = selectedFilter
         self._expandedVerbId = expandedVerbId
@@ -113,7 +112,7 @@ public struct VerbsTab: View {
                             verb: verb,
                             isExpanded: expandedVerbId == verb.id,
                             selectedTense: $selectedTense,
-                            speechService: speechService,
+                            speechService: env.speechService,
                             language: language
                         ) {
                             withAnimation(.spring()) {

@@ -33,6 +33,36 @@
 		E02D54FF2F16CBC300F31467 /* RulesTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54F92F16CBC300F31467 /* RulesTab.swift */; };
 		E02D55002F16CBC300F31467 /* PracticeTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54F82F16CBC300F31467 /* PracticeTab.swift */; };
 		E02D55012F16CBC300F31467 /* VerbsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54FB2F16CBC300F31467 /* VerbsTab.swift */; };
+		E02D55032F16D00400F31467 /* VerbData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55022F16D00400F31467 /* VerbData.swift */; };
+		E02D55092F16D2C800F31467 /* DictionaryTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55052F16D2C800F31467 /* DictionaryTab.swift */; };
+		E02D550A2F16D2C800F31467 /* CategoriesTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55042F16D2C800F31467 /* CategoriesTab.swift */; };
+		E02D550C2F16D2D400F31467 /* VocabularyDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D550B2F16D2D400F31467 /* VocabularyDataManager.swift */; };
+		E02D550E2F16D43600F31467 /* VocabularyPracticeTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D550D2F16D43600F31467 /* VocabularyPracticeTab.swift */; };
+		E02D55102F16D88600F31467 /* vocabulary_es.json in Resources */ = {isa = PBXBuildFile; fileRef = E02D550F2F16D88600F31467 /* vocabulary_es.json */; };
+		E02D55192F16DB7D00F31467 /* GrammarDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55182F16DB7D00F31467 /* GrammarDataManager.swift */; };
+		E02D551B2F16DB9B00F31467 /* GrammarModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D551A2F16DB9B00F31467 /* GrammarModels.swift */; };
+		E02D551F2F16DCB600F31467 /* QuickReferenceGrammarTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D551D2F16DCB600F31467 /* QuickReferenceGrammarTab.swift */; };
+		E02D55202F16DCB600F31467 /* RulesGrammarTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D551E2F16DCB600F31467 /* RulesGrammarTab.swift */; };
+		E02D55212F16DCB600F31467 /* CategoriesGrammarTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D551C2F16DCB600F31467 /* CategoriesGrammarTab.swift */; };
+		E02D55252F16E25500F31467 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55232F16E25500F31467 /* Extensions.swift */; };
+		E02D55262F16E25500F31467 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55222F16E25500F31467 /* Constants.swift */; };
+		E02D55292F16E4ED00F31467 /* SharedComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55272F16E4ED00F31467 /* SharedComponents.swift */; };
+		E02D552B2F18520700F31467 /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D552A2F18520700F31467 /* AppEnvironment.swift */; };
+		E02D552D2F18520B00F31467 /* ErrorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D552C2F18520B00F31467 /* ErrorManager.swift */; };
+		E02D552F2F18521400F31467 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D552E2F18521400F31467 /* ErrorView.swift */; };
+		E02D55312F18521800F31467 /* LoadingScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55302F18521800F31467 /* LoadingScreen.swift */; };
+		E02D55362F18565200F31467 /* VocabularyWord+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55342F18565200F31467 /* VocabularyWord+Model.swift */; };
+		E02D55372F18565200F31467 /* UserProgress+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55332F18565200F31467 /* UserProgress+Model.swift */; };
+		E02D55382F18565200F31467 /* GrammarRule+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55322F18565200F31467 /* GrammarRule+Model.swift */; };
+		E02D553A2F18566C00F31467 /* VocabularyPersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55392F18566C00F31467 /* VocabularyPersistenceManager.swift */; };
+		E02D553C2F18567200F31467 /* CrashReportingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D553B2F18567200F31467 /* CrashReportingService.swift */; };
+		E02D553E2F18568900F31467 /* ProgressPersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D553D2F18568900F31467 /* ProgressPersistenceManager.swift */; };
+		E02D55402F1856C800F31467 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D553F2F1856C800F31467 /* NetworkMonitor.swift */; };
+		E02D55422F1856D300F31467 /* OfflineSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55412F1856D300F31467 /* OfflineSyncManager.swift */; };
+		E02D55442F1857F700F31467 /* SyncStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55432F1857F700F31467 /* SyncStatusView.swift */; };
+		E02D55462F18597200F31467 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55452F18597200F31467 /* EmptyStateView.swift */; };
+		E02D55482F18597C00F31467 /* NetworkStatusViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55472F18597C00F31467 /* NetworkStatusViews.swift */; };
+		E02D554E2F1859AC00F31467 /* AdvancedSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D554C2F1859AC00F31467 /* AdvancedSearchView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,6 +93,36 @@
 		E02D54F92F16CBC300F31467 /* RulesTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesTab.swift; sourceTree = "<group>"; };
 		E02D54FA2F16CBC300F31467 /* TensesTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TensesTab.swift; sourceTree = "<group>"; };
 		E02D54FB2F16CBC300F31467 /* VerbsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerbsTab.swift; sourceTree = "<group>"; };
+		E02D55022F16D00400F31467 /* VerbData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerbData.swift; sourceTree = "<group>"; };
+		E02D55042F16D2C800F31467 /* CategoriesTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesTab.swift; sourceTree = "<group>"; };
+		E02D55052F16D2C800F31467 /* DictionaryTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryTab.swift; sourceTree = "<group>"; };
+		E02D550B2F16D2D400F31467 /* VocabularyDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyDataManager.swift; sourceTree = "<group>"; };
+		E02D550D2F16D43600F31467 /* VocabularyPracticeTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyPracticeTab.swift; sourceTree = "<group>"; };
+		E02D550F2F16D88600F31467 /* vocabulary_es.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = vocabulary_es.json; sourceTree = "<group>"; };
+		E02D55182F16DB7D00F31467 /* GrammarDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarDataManager.swift; sourceTree = "<group>"; };
+		E02D551A2F16DB9B00F31467 /* GrammarModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarModels.swift; sourceTree = "<group>"; };
+		E02D551C2F16DCB600F31467 /* CategoriesGrammarTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesGrammarTab.swift; sourceTree = "<group>"; };
+		E02D551D2F16DCB600F31467 /* QuickReferenceGrammarTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickReferenceGrammarTab.swift; sourceTree = "<group>"; };
+		E02D551E2F16DCB600F31467 /* RulesGrammarTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesGrammarTab.swift; sourceTree = "<group>"; };
+		E02D55222F16E25500F31467 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		E02D55232F16E25500F31467 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		E02D55272F16E4ED00F31467 /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
+		E02D552A2F18520700F31467 /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
+		E02D552C2F18520B00F31467 /* ErrorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorManager.swift; sourceTree = "<group>"; };
+		E02D552E2F18521400F31467 /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
+		E02D55302F18521800F31467 /* LoadingScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingScreen.swift; sourceTree = "<group>"; };
+		E02D55322F18565200F31467 /* GrammarRule+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GrammarRule+Model.swift"; sourceTree = "<group>"; };
+		E02D55332F18565200F31467 /* UserProgress+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserProgress+Model.swift"; sourceTree = "<group>"; };
+		E02D55342F18565200F31467 /* VocabularyWord+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VocabularyWord+Model.swift"; sourceTree = "<group>"; };
+		E02D55392F18566C00F31467 /* VocabularyPersistenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyPersistenceManager.swift; sourceTree = "<group>"; };
+		E02D553B2F18567200F31467 /* CrashReportingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportingService.swift; sourceTree = "<group>"; };
+		E02D553D2F18568900F31467 /* ProgressPersistenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressPersistenceManager.swift; sourceTree = "<group>"; };
+		E02D553F2F1856C800F31467 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
+		E02D55412F1856D300F31467 /* OfflineSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineSyncManager.swift; sourceTree = "<group>"; };
+		E02D55432F1857F700F31467 /* SyncStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusView.swift; sourceTree = "<group>"; };
+		E02D55452F18597200F31467 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
+		E02D55472F18597C00F31467 /* NetworkStatusViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkStatusViews.swift; sourceTree = "<group>"; };
+		E02D554C2F1859AC00F31467 /* AdvancedSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedSearchView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,8 +149,10 @@
 			children = (
 				A1000002000000000000001 /* onykrouaApp.swift */,
 				A1000004000000000000001 /* ContentView.swift */,
+				E02D550F2F16D88600F31467 /* vocabulary_es.json */,
 				E02D54662F16B22000F31467 /* vocabulary_it.json */,
 				A1000006000000000000001 /* Assets.xcassets */,
+				E02D55242F16E25500F31467 /* Utils */,
 				E02D54E32F16C41A00F31467 /* Views */,
 				E02D54D32F16BFD300F31467 /* Models */,
 				E02D54D72F16BFD500F31467 /* Services */,
@@ -109,8 +171,12 @@
 		E02D54D32F16BFD300F31467 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				E02D55352F18565200F31467 /* SwiftData */,
+				E02D55022F16D00400F31467 /* VerbData.swift */,
 				E02D54F52F16CBAF00F31467 /* GrammarData.swift */,
 				E02D54D22F16BFD300F31467 /* VocabularyModels.swift */,
+				E02D551A2F16DB9B00F31467 /* GrammarModels.swift */,
+				E02D550B2F16D2D400F31467 /* VocabularyDataManager.swift */,
 				E02D54EF2F16C9EF00F31467 /* ConversationModels.swift */,
 				E02D54F02F16C9EF00F31467 /* EmojiModels.swift */,
 				E02D54F12F16C9EF00F31467 /* FeedModels.swift */,
@@ -121,6 +187,14 @@
 		E02D54D72F16BFD500F31467 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				E02D553B2F18567200F31467 /* CrashReportingService.swift */,
+				E02D552C2F18520B00F31467 /* ErrorManager.swift */,
+				E02D552A2F18520700F31467 /* AppEnvironment.swift */,
+				E02D55412F1856D300F31467 /* OfflineSyncManager.swift */,
+				E02D55392F18566C00F31467 /* VocabularyPersistenceManager.swift */,
+				E02D553D2F18568900F31467 /* ProgressPersistenceManager.swift */,
+				E02D553F2F1856C800F31467 /* NetworkMonitor.swift */,
+				E02D55182F16DB7D00F31467 /* GrammarDataManager.swift */,
 				E02D54D52F16BFD500F31467 /* ProgressTracker.swift */,
 				E02D54D62F16BFD500F31467 /* SpeechService.swift */,
 				E02D54ED2F16C9E200F31467 /* FeedService.swift */,
@@ -131,6 +205,9 @@
 		E02D54E32F16C41A00F31467 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				E02D55282F16E4ED00F31467 /* Components */,
+				E02D55142F16DB7200F31467 /* GrammarTabs */,
+				E02D55072F16D2C800F31467 /* VocabularyTabs */,
 				E02D54FC2F16CBC300F31467 /* ConjugationTabs */,
 				E02D54DA2F16C41A00F31467 /* ConjugationView.swift */,
 				E02D54DB2F16C41A00F31467 /* ConversationView.swift */,
@@ -141,6 +218,7 @@
 				E02D54E02F16C41A00F31467 /* PhoneticView.swift */,
 				E02D54E12F16C41A00F31467 /* ProfileView.swift */,
 				E02D54E22F16C41A00F31467 /* VocabularyView.swift */,
+				E02D554D2F1859AC00F31467 /* Search */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -155,6 +233,66 @@
 				E02D54FB2F16CBC300F31467 /* VerbsTab.swift */,
 			);
 			path = ConjugationTabs;
+			sourceTree = "<group>";
+		};
+		E02D55072F16D2C800F31467 /* VocabularyTabs */ = {
+			isa = PBXGroup;
+			children = (
+				E02D55042F16D2C800F31467 /* CategoriesTab.swift */,
+				E02D55052F16D2C800F31467 /* DictionaryTab.swift */,
+				E02D550D2F16D43600F31467 /* VocabularyPracticeTab.swift */,
+			);
+			path = VocabularyTabs;
+			sourceTree = "<group>";
+		};
+		E02D55142F16DB7200F31467 /* GrammarTabs */ = {
+			isa = PBXGroup;
+			children = (
+				E02D551C2F16DCB600F31467 /* CategoriesGrammarTab.swift */,
+				E02D551D2F16DCB600F31467 /* QuickReferenceGrammarTab.swift */,
+				E02D551E2F16DCB600F31467 /* RulesGrammarTab.swift */,
+			);
+			path = GrammarTabs;
+			sourceTree = "<group>";
+		};
+		E02D55242F16E25500F31467 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				E02D55222F16E25500F31467 /* Constants.swift */,
+				E02D55232F16E25500F31467 /* Extensions.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		E02D55282F16E4ED00F31467 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				E02D55452F18597200F31467 /* EmptyStateView.swift */,
+				E02D552E2F18521400F31467 /* ErrorView.swift */,
+				E02D55472F18597C00F31467 /* NetworkStatusViews.swift */,
+				E02D55302F18521800F31467 /* LoadingScreen.swift */,
+				E02D55432F1857F700F31467 /* SyncStatusView.swift */,
+				E02D55272F16E4ED00F31467 /* SharedComponents.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		E02D55352F18565200F31467 /* SwiftData */ = {
+			isa = PBXGroup;
+			children = (
+				E02D55322F18565200F31467 /* GrammarRule+Model.swift */,
+				E02D55332F18565200F31467 /* UserProgress+Model.swift */,
+				E02D55342F18565200F31467 /* VocabularyWord+Model.swift */,
+			);
+			path = SwiftData;
+			sourceTree = "<group>";
+		};
+		E02D554D2F1859AC00F31467 /* Search */ = {
+			isa = PBXGroup;
+			children = (
+				E02D554C2F1859AC00F31467 /* AdvancedSearchView.swift */,
+			);
+			path = Search;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -217,6 +355,7 @@
 			files = (
 				A1000005000000000000001 /* Assets.xcassets in Resources */,
 				E02D54672F16B22000F31467 /* vocabulary_it.json in Resources */,
+				E02D55102F16D88600F31467 /* vocabulary_es.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -228,26 +367,55 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000003000000000000001 /* ContentView.swift in Sources */,
+				E02D55402F1856C800F31467 /* NetworkMonitor.swift in Sources */,
 				E02D54E42F16C41A00F31467 /* ConversationView.swift in Sources */,
 				E02D54F62F16CBAF00F31467 /* GrammarData.swift in Sources */,
+				E02D55032F16D00400F31467 /* VerbData.swift in Sources */,
 				E02D54E52F16C41A00F31467 /* EmojiView.swift in Sources */,
+				E02D552B2F18520700F31467 /* AppEnvironment.swift in Sources */,
 				E02D54E62F16C41A00F31467 /* GrammarView.swift in Sources */,
 				E02D54E72F16C41A00F31467 /* GeminiLiveView.swift in Sources */,
 				E02D54E82F16C41A00F31467 /* ProfileView.swift in Sources */,
 				E02D54E92F16C41A00F31467 /* FeedView.swift in Sources */,
+				E02D55252F16E25500F31467 /* Extensions.swift in Sources */,
+				E02D55262F16E25500F31467 /* Constants.swift in Sources */,
 				E02D54EA2F16C41A00F31467 /* ConjugationView.swift in Sources */,
+				E02D553E2F18568900F31467 /* ProgressPersistenceManager.swift in Sources */,
+				E02D55482F18597C00F31467 /* NetworkStatusViews.swift in Sources */,
 				E02D54EB2F16C41A00F31467 /* PhoneticView.swift in Sources */,
 				E02D54F22F16C9EF00F31467 /* ConversationModels.swift in Sources */,
+				E02D552F2F18521400F31467 /* ErrorView.swift in Sources */,
+				E02D552D2F18520B00F31467 /* ErrorManager.swift in Sources */,
+				E02D55092F16D2C800F31467 /* DictionaryTab.swift in Sources */,
+				E02D550A2F16D2C800F31467 /* CategoriesTab.swift in Sources */,
 				E02D54F32F16C9EF00F31467 /* FeedModels.swift in Sources */,
+				E02D55192F16DB7D00F31467 /* GrammarDataManager.swift in Sources */,
 				E02D54FD2F16CBC300F31467 /* MoreTab.swift in Sources */,
+				E02D553A2F18566C00F31467 /* VocabularyPersistenceManager.swift in Sources */,
 				E02D54FE2F16CBC300F31467 /* TensesTab.swift in Sources */,
+				E02D55292F16E4ED00F31467 /* SharedComponents.swift in Sources */,
 				E02D54FF2F16CBC300F31467 /* RulesTab.swift in Sources */,
+				E02D55362F18565200F31467 /* VocabularyWord+Model.swift in Sources */,
+				E02D55442F1857F700F31467 /* SyncStatusView.swift in Sources */,
+				E02D55372F18565200F31467 /* UserProgress+Model.swift in Sources */,
+				E02D553C2F18567200F31467 /* CrashReportingService.swift in Sources */,
+				E02D55382F18565200F31467 /* GrammarRule+Model.swift in Sources */,
+				E02D550C2F16D2D400F31467 /* VocabularyDataManager.swift in Sources */,
+				E02D550E2F16D43600F31467 /* VocabularyPracticeTab.swift in Sources */,
+				E02D554E2F1859AC00F31467 /* AdvancedSearchView.swift in Sources */,
+				E02D551F2F16DCB600F31467 /* QuickReferenceGrammarTab.swift in Sources */,
+				E02D55422F1856D300F31467 /* OfflineSyncManager.swift in Sources */,
+				E02D55202F16DCB600F31467 /* RulesGrammarTab.swift in Sources */,
+				E02D55212F16DCB600F31467 /* CategoriesGrammarTab.swift in Sources */,
+				E02D55462F18597200F31467 /* EmptyStateView.swift in Sources */,
 				E02D55002F16CBC300F31467 /* PracticeTab.swift in Sources */,
 				E02D55012F16CBC300F31467 /* VerbsTab.swift in Sources */,
 				E02D54F42F16C9EF00F31467 /* EmojiModels.swift in Sources */,
+				E02D551B2F16DB9B00F31467 /* GrammarModels.swift in Sources */,
 				E02D54EC2F16C41A00F31467 /* VocabularyView.swift in Sources */,
 				A1000001000000000000001 /* onykrouaApp.swift in Sources */,
 				E02D54D42F16BFD300F31467 /* VocabularyModels.swift in Sources */,
+				E02D55312F18521800F31467 /* LoadingScreen.swift in Sources */,
 				E02D54D82F16BFD500F31467 /* ProgressTracker.swift in Sources */,
 				E02D54D92F16BFD500F31467 /* SpeechService.swift in Sources */,
 				E02D54EE2F16C9E200F31467 /* FeedService.swift in Sources */,

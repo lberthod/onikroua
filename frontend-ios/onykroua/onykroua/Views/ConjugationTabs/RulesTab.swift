@@ -3,16 +3,15 @@ import SwiftUI
 public struct RulesTab: View {
     public let grammarData: GrammarData
     public let language: String
-    @ObservedObject var speechService: SpeechService
+    @EnvironmentObject var env: AppEnvironment
     @State private var selectedCategory = "Groupes"
     
-    public init(grammarData: GrammarData, language: String, speechService: SpeechService) {
+    public init(grammarData: GrammarData, language: String) {
         self.grammarData = grammarData
         self.language = language
-        self.speechService = speechService
     }
     
-    private var rules: [GrammarRule] {
+    private var rules: [ConjugationGrammarRule] {
         grammarData.getGrammarRules(language: language)
     }
     
@@ -20,7 +19,7 @@ public struct RulesTab: View {
         Array(Set(rules.map { $0.category })).sorted()
     }
     
-    private var filteredRules: [GrammarRule] {
+    private var filteredRules: [ConjugationGrammarRule] {
         rules.filter { $0.category == selectedCategory }
     }
     
@@ -52,7 +51,7 @@ public struct RulesTab: View {
             ScrollView {
                 LazyVStack(spacing: 16) {
                     ForEach(filteredRules) { rule in
-                        RuleCard(rule: rule, speechService: speechService)
+                        RuleCard(rule: rule, speechService: env.speechService)
                     }
                 }
                 .padding()
@@ -62,7 +61,7 @@ public struct RulesTab: View {
 }
 
 public struct RuleCard: View {
-    let rule: GrammarRule
+    let rule: ConjugationGrammarRule
     @ObservedObject var speechService: SpeechService
     
     public var body: some View {

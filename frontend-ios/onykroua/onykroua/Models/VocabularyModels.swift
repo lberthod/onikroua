@@ -1,58 +1,63 @@
 import Foundation
 
-// MARK: - Vocabulary JSON Models
+// MARK: - Vocabulary Models (matching Android VocabularyModels.kt)
 
-struct VocabularyCategory: Codable, Identifiable {
-    let id = UUID()
-    let name: String
-    let icon: String
-    let words: [VocabularyWord]
+public struct VocabWord: Codable, Identifiable {
+    public let id = UUID()
+    public let word: String
+    public let translation: String
+    public let gender: String?
+    public let example: String?
+    public let exampleTranslation: String?
+    public let category: String?
+    public let categoryIcon: String?
+    public let mainCategory: String?
+    public let subCategory: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case word, translation, gender, example, exampleTranslation
+        case category, categoryIcon, mainCategory = "main_category", subCategory = "sub_category"
+    }
+    
+    public init(word: String, translation: String, gender: String? = nil, example: String? = nil, 
+                exampleTranslation: String? = nil, category: String? = nil, categoryIcon: String? = nil,
+                mainCategory: String? = nil, subCategory: String? = nil) {
+        self.word = word
+        self.translation = translation
+        self.gender = gender
+        self.example = example
+        self.exampleTranslation = exampleTranslation
+        self.category = category
+        self.categoryIcon = categoryIcon
+        self.mainCategory = mainCategory
+        self.subCategory = subCategory
+    }
+}
+
+public struct VocabCategory: Codable, Identifiable {
+    public let id = UUID()
+    public let name: String
+    public let icon: String
+    public let words: [VocabWord]
+    public let mainCategory: String?
+    public let subCategory: String?
     
     enum CodingKeys: String, CodingKey {
         case name, icon, words
+        case mainCategory = "main_category"
+        case subCategory = "sub_category"
+    }
+    
+    public init(name: String, icon: String, words: [VocabWord], mainCategory: String? = nil, subCategory: String? = nil) {
+        self.name = name
+        self.icon = icon
+        self.words = words
+        self.mainCategory = mainCategory
+        self.subCategory = subCategory
     }
 }
 
-struct VocabularyWord: Codable, Identifiable {
-    let id = UUID()
-    let word: String
-    let translation: String
-    let example: String
-    let exampleTranslation: String
-    
-    enum CodingKeys: String, CodingKey {
-        case word, translation, example, exampleTranslation
-    }
-}
+// Legacy support for old VocabularyWord name
+public typealias VocabularyWord = VocabWord
+public typealias VocabularyCategory = VocabCategory
 
-// MARK: - Vocabulary Loader
-
-class VocabularyLoader {
-    static func loadVocabulary() -> [VocabularyCategory] {
-        guard let url = Bundle.main.url(forResource: "vocabulary_it", withExtension: "json") else {
-            print("❌ Fichier vocabulary_it.json introuvable")
-            return []
-        }
-        
-        do {
-            let data = try Data(contentsOf: url)
-            let decoder = JSONDecoder()
-            let categories = try decoder.decode([VocabularyCategory].self, from: data)
-            print("✅ Chargé \(categories.count) catégories avec \(categories.reduce(0) { $0 + $1.words.count }) mots")
-            return categories
-        } catch {
-            print("❌ Erreur de chargement: \(error)")
-            return []
-        }
-    }
-    
-    static func getAllWords() -> [VocabularyWord] {
-        return loadVocabulary().flatMap { $0.words }
-    }
-    
-    static func getWords(forCategory category: String) -> [VocabularyWord] {
-        return loadVocabulary()
-            .first { $0.name == category }?
-            .words ?? []
-    }
-}

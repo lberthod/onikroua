@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct PhoneticView: View {
-    @StateObject private var speechService = SpeechService()
+    @EnvironmentObject var env: AppEnvironment
     
     let phoneticData = [
         PhoneticData(letter: "A E I O U", pronunciation: "Voyelles - prononciation claire", example: "amore, vero, vino"),
@@ -69,7 +69,7 @@ struct PhoneticCard: View {
             
             Spacer()
             
-            Button(action: { speechService.speak(data.example) }) {
+            Button(action: { speechService.speak(data.example, language: "it-IT") }) {
                 Image(systemName: "speaker.wave.2.fill")
                     .font(.system(size: 20))
                     .foregroundColor(.pink)

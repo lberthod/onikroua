@@ -3,12 +3,11 @@ import SwiftUI
 public struct TensesTab: View {
     public let grammarData: GrammarData
     public let language: String
-    @ObservedObject var speechService: SpeechService
+    @EnvironmentObject var env: AppEnvironment
     
-    public init(grammarData: GrammarData, language: String, speechService: SpeechService) {
+    public init(grammarData: GrammarData, language: String) {
         self.grammarData = grammarData
         self.language = language
-        self.speechService = speechService
     }
     
     private var tenses: [TenseInfo] {
@@ -19,7 +18,7 @@ public struct TensesTab: View {
         ScrollView {
             LazyVStack(spacing: 16) {
                 ForEach(tenses) { tense in
-                    TenseCard(tense: tense, speechService: speechService, language: language)
+                    TenseCard(tense: tense, speechService: env.speechService, language: language)
                 }
             }
             .padding()

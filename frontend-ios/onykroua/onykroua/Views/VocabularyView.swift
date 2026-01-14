@@ -1,29 +1,22 @@
 import SwiftUI
 import AVFoundation
 
+// MARK: - VocabularyView (matching Android VocabularyActivity)
+
 struct VocabularyView: View {
-    @StateObject private var speechService = SpeechService()
-    @StateObject private var progressTracker = ProgressTracker.shared
+    @EnvironmentObject var env: AppEnvironment
     @State private var selectedTab = 0
-    @State private var selectedCategory = "Tous"
-    @State private var searchText = ""
+    @State private var currentLanguage = "it"
+    @State private var showAdvancedSearch = false
     
-    let vocabularyCategories: [VocabularyCategory] = VocabularyLoader.loadVocabulary()
-    
-    var allWords: [VocabularyWord] {
-        vocabularyCategories.flatMap { $0.words }
-    }
-    
-    var filteredWords: [VocabularyWord] {
-        let words = selectedCategory == "Tous" ? allWords : vocabularyCategories.first { $0.name == selectedCategory }?.words ?? []
-        if searchText.isEmpty {
-            return words
-        }
-        return words.filter { $0.word.localizedCaseInsensitiveContains(searchText) || $0.translation.localizedCaseInsensitiveContains(searchText) }
+    private var totalWords: Int {
+        env.vocabularyManager.getAllWords(language: currentLanguage).count
     }
     
     var body: some View {
-        VStack(spacing: 0) {
+        ZStack {
+            VStack(spacing: 0) {
+            // Tab Picker
             Picker("", selection: $selectedTab) {
                 Text("📖 Dictionnaire").tag(0)
                 Text("🗂️ Catégories").tag(1)
@@ -32,92 +25,69 @@ struct VocabularyView: View {
             .pickerStyle(.segmented)
             .padding()
             
-            if selectedTab == 0 {
-                dictionaryTab
-            } else if selectedTab == 1 {
-                categoriesTab
-            } else {
-                practiceTab
+            // Tab Content
+            TabView(selection: $selectedTab) {
+                DictionaryTab(language: currentLanguage)
+                    .tag(0)
+                
+                CategoriesTab(language: currentLanguage)
+                    .tag(1)
+                
+                VocabularyPracticeTab(language: currentLanguage)
+                    .tag(2)
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+        }
+        .navigationTitle("📚 Vocabulaire (\(totalWords))")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Menu {
+                    Button(action: { currentLanguage = "it" }) {
+                        Label("Italien", systemImage: currentLanguage == "it" ? "checkmark" : "")
+                    }
+                    Button(action: { currentLanguage = "es" }) {
+                        Label("Espagnol", systemImage: currentLanguage == "es" ? "checkmark" : "")
+                    }
+                } label: {
+                    Text(currentLanguage == "it" ? "🇮🇹" : "🇪🇸")
+                        .font(.title2)
+                }
             }
         }
-        .navigationTitle("📚 Vocabulaire (\(allWords.count))")
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
-    }
-    
-    var dictionaryTab: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(.secondary)
-                TextField("Rechercher...", text: $searchText)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: { showAdvancedSearch = true }) {
+                    Image(systemName: "magnifyingglass.circle.fill")
+                        .font(.title3)
+                }
             }
-            .padding()
-            .background(Color(.systemBackground))
+        }
+        .sheet(isPresented: $showAdvancedSearch) {
+            AdvancedSearchView()
+        }
             
-            ScrollView {
-                LazyVStack(spacing: 12) {
-                    ForEach(filteredWords) { item in
-                        DictionaryRow(item: item, speechService: speechService)
-                    }
-                }
-                .padding()
-            }
-        }
-    }
-    
-    var categoriesTab: some View {
-        VStack(spacing: 0) {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
-                    CategoryButton(name: "Tous", icon: "🌍", isSelected: selectedCategory == "Tous") {
-                        withAnimation { selectedCategory = "Tous" }
-                    }
-                    
-                    ForEach(vocabularyCategories) { category in
-                        CategoryButton(name: category.name, icon: category.icon, isSelected: selectedCategory == category.name) {
-                            withAnimation { selectedCategory = category.name }
-                        }
-                    }
-                }
-                .padding()
-            }
-            .background(Color(.systemBackground))
+            LoadingOverlay(isLoading: env.vocabularyManager.isLoading, message: "Chargement du vocabulaire...")
             
-            ScrollView {
-                LazyVStack(spacing: 16) {
-                    ForEach(filteredWords) { item in
-                        VocabularyCard(item: item, speechService: speechService)
-                    }
-                }
-                .padding()
-            }
+            ErrorOverlay(errorManager: env.errorManager)
         }
-    }
-    
-    var practiceTab: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                Text("🎯 Mode Pratique")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                
-                Text("Flashcards pour mémoriser")
-                    .foregroundColor(.secondary)
-                
-                LazyVStack(spacing: 16) {
-                    ForEach(allWords.shuffled().prefix(10)) { item in
-                        FlashCard(item: item, speechService: speechService)
-                    }
+        .onAppear {
+            env.vocabularyManager.ensureLoaded(language: currentLanguage)
+        }
+        .onChange(of: currentLanguage) { newLanguage in
+            env.vocabularyManager.ensureLoaded(language: newLanguage)
+        }
+        .onChange(of: env.vocabularyManager.loadingError != nil) { hasError in
+            if hasError, let error = env.vocabularyManager.loadingError {
+                env.errorManager.handle(error) {
+                    env.vocabularyManager.loadVocabularyAsync(language: currentLanguage)
                 }
             }
-            .padding()
         }
-    }
-    
-    func getCategoryIcon(_ name: String) -> String {
-        ""
     }
 }
+
+// MARK: - Legacy Components (kept for backward compatibility)
 
 struct DictionaryRow: View {
     let item: VocabularyWord
@@ -137,7 +107,7 @@ struct DictionaryRow: View {
             
             Spacer()
             
-            Button(action: { speechService.speak(item.word) }) {
+            Button(action: { speechService.speak(item.word, language: "it-IT") }) {
                 Image(systemName: "speaker.wave.2.fill")
                     .font(.title3)
                     .foregroundColor(.blue)
@@ -157,13 +127,12 @@ struct FlashCard: View {
     
     var body: some View {
         ZStack {
-            // Face avant
             VStack(spacing: 16) {
                 Text(item.word)
                     .font(.system(size: 36, weight: .bold))
                     .foregroundColor(.primary)
                 
-                Button(action: { speechService.speak(item.word) }) {
+                Button(action: { speechService.speak(item.word, language: "it-IT") }) {
                     Image(systemName: "speaker.wave.3.fill")
                         .font(.title2)
                         .foregroundColor(.blue)
@@ -184,18 +153,19 @@ struct FlashCard: View {
                 axis: (x: 0, y: 1, z: 0)
             )
             
-            // Face arrière (avec rotation inverse pour corriger le miroir)
             VStack(spacing: 12) {
                 Text(item.translation)
                     .font(.system(size: 28, weight: .semibold))
                     .foregroundColor(.blue)
                 
-                Text(item.example)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .italic()
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
+                if let example = item.example, !example.isEmpty {
+                    Text(example)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .italic()
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
             }
             .frame(maxWidth: .infinity)
             .frame(height: 200)
@@ -219,12 +189,23 @@ struct FlashCard: View {
 struct VocabularyCard: View {
     let item: VocabularyWord
     @ObservedObject var speechService: SpeechService
-    @State private var isFlipped = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        if let icon = item.categoryIcon {
+                            Text(icon)
+                                .font(.body)
+                        }
+                        if let category = item.category {
+                            Text(category)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
                     Text(item.word)
                         .font(.title3)
                         .fontWeight(.bold)
@@ -237,15 +218,15 @@ struct VocabularyCard: View {
                 
                 Spacer()
                 
-                Button(action: { speechService.speak(item.word) }) {
+                Button(action: { speechService.speak(item.word, language: "it-IT") }) {
                     Image(systemName: "speaker.wave.2.fill")
                         .font(.title2)
                         .foregroundColor(.blue)
                 }
             }
             
-            if !item.example.isEmpty {
-                Text(item.example)
+            if let example = item.example, !example.isEmpty {
+                Text(example)
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .italic()
@@ -255,6 +236,30 @@ struct VocabularyCard: View {
         .background(Color(.systemBackground))
         .cornerRadius(16)
         .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+    }
+}
+
+struct CategoryButton: View {
+    let name: String
+    let icon: String
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Text(icon)
+                    .font(.title2)
+                Text(name)
+                    .font(.caption)
+                    .fontWeight(.medium)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(isSelected ? Color.blue : Color(.systemGray6))
+            .foregroundColor(isSelected ? .white : .primary)
+            .cornerRadius(12)
+        }
     }
 }
 

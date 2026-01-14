@@ -2,7 +2,7 @@ import SwiftUI
 import AVFoundation
 
 struct EmojiView: View {
-    @StateObject private var speechService = SpeechService()
+    @EnvironmentObject var env: AppEnvironment
     @State private var selectedCategory: String = "Tous"
     
     let emojiCategories: [EmojiCategoryModel] = EmojiDataSource.getAllCategories()
@@ -18,12 +18,12 @@ struct EmojiView: View {
         VStack(spacing: 0) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
-                    CategoryButton(name: "Tous", icon: "🌍", isSelected: selectedCategory == "Tous") {
+                    EmojiCategoryButton(name: "Tous", icon: "🌍", isSelected: selectedCategory == "Tous") {
                         withAnimation { selectedCategory = "Tous" }
                     }
                     
                     ForEach(emojiCategories) { category in
-                        CategoryButton(name: category.name, icon: category.icon, isSelected: selectedCategory == category.name) {
+                        EmojiCategoryButton(name: category.name, icon: category.icon, isSelected: selectedCategory == category.name) {
                             withAnimation { selectedCategory = category.name }
                         }
                     }
@@ -35,7 +35,7 @@ struct EmojiView: View {
             ScrollView {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
                     ForEach(filteredEmojis) { data in
-                        EmojiCard(data: data, speechService: speechService)
+                        EmojiCard(data: data, speechService: env.speechService)
                     }
                 }
                 .padding()
@@ -46,7 +46,7 @@ struct EmojiView: View {
     }
 }
 
-struct CategoryButton: View {
+struct EmojiCategoryButton: View {
     let name: String
     let icon: String
     let isSelected: Bool
@@ -106,7 +106,7 @@ struct EmojiCard: View {
         .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
         .onTapGesture {
             isPressed = true
-            speechService.speak(data.italian)
+            speechService.speak(data.italian, language: "it-IT")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 isPressed = false
             }
