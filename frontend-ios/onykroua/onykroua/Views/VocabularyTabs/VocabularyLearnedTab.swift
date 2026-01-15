@@ -94,31 +94,57 @@ struct VocabularyLearnedTab: View {
 struct LearnedWordRow: View {
     let word: VocabWord
     @EnvironmentObject var env: AppEnvironment
+    @State private var showDetail = false
+    @State private var isLearned = true // Par définition dans cet onglet
     
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(word.word)
-                    .font(.headline)
-                Text(word.translation)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+        Button(action: { showDetail = true }) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(word.word)
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    Text(word.translation)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
+                Button(action: {
+                    let lang = word.category == "it" ? "it-IT" : "es-ES"
+                    // Appliquer le formatage pour le TTS si c'est de l'italien
+                    let speechText = formatForSpeech(word.word)
+                    env.speechService.speak(speechText, language: lang)
+                }) {
+                    Image(systemName: "speaker.wave.2.fill")
+                        .foregroundColor(.blue)
+                }
+                .buttonStyle(PlainButtonStyle())
             }
-            
-            Spacer()
-            
-            Button(action: {
-                let lang = word.category == "it" ? "it-IT" : "es-ES"
-                env.speechService.speak(word.word, language: lang)
-            }) {
-                Image(systemName: "speaker.wave.2.fill")
-                    .foregroundColor(.blue)
+            .padding()
+            .background(Color(.systemBackground))
+            .cornerRadius(10)
+            .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .sheet(isPresented: $showDetail) {
+            WordDetailView(word: word, isLearned: $isLearned, gamificationManager: nil)
+        }
+    }
+    
+    private func formatForSpeech(_ text: String) -> String {
+        let pattern = "^(.+?)\\s*\\((il|la|lo|l'|i|le|gli)\\)$"
+        if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
+           let match = regex.firstMatch(in: text, options: [], range: NSRange(text.startIndex..., in: text)) {
+            if let motRange = Range(match.range(at: 1), in: text),
+               let detRange = Range(match.range(at: 2), in: text) {
+                let mot = String(text[motRange]).trimmingCharacters(in: .whitespaces)
+                let determinant = String(text[detRange])
+                return "\(determinant) \(mot)"
             }
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(10)
-        .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+        return text
     }
 }
 

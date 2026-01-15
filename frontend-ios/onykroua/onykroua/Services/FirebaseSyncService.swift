@@ -18,7 +18,7 @@ class FirebaseSyncService: ObservableObject {
         setupRealtimeSync()
         
         // Listen for auth changes to re-setup sync
-        Auth.auth().addStateDidChangeListener { [weak self] _, user in
+        _ = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             if user != nil {
                 Task { @MainActor in
                     self?.setupRealtimeSync()

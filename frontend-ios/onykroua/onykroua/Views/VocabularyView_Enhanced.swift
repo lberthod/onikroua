@@ -83,13 +83,13 @@ struct VocabularyView_Enhanced: View {
             ErrorOverlay(errorManager: env.errorManager)
         }
         .onAppear {
-            env.vocabularyManager.ensureLoaded(language: currentLanguage)
+            env.vocabularyManager.loadVocabularyAsync(language: currentLanguage)
             if gamificationManager == nil {
                 gamificationManager = GamificationManager(modelContext: modelContext)
             }
         }
         .onChange(of: currentLanguage) { _, newLanguage in
-            env.vocabularyManager.ensureLoaded(language: newLanguage)
+            env.vocabularyManager.loadVocabularyAsync(language: newLanguage)
         }
     }
     
@@ -176,6 +176,9 @@ struct EnhancedDictionaryTab: View {
     
     @EnvironmentObject var env: AppEnvironment
     @State private var searchText = ""
+    @State private var randomWord: VocabularyWord? = nil
+    @State private var showRandomDetail = false
+    @State private var isRandomWordLearned = false
     
     private var uniqueSortedWords: [VocabularyWord] {
         // Obtenir tous les mots, supprimer les doublons par texte de mot, et trier A-Z
@@ -208,8 +211,41 @@ struct EnhancedDictionaryTab: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            SearchBar(text: $searchText)
-                .padding()
+            HStack(spacing: 12) {
+                SearchBar(text: $searchText)
+                
+                Button(action: {
+                    if let word = uniqueSortedWords.randomElement() {
+                        randomWord = word
+                        // Calculer l'état isLearned pour le mot aléatoire
+                        let safeWord = word.word.replacingOccurrences(of: ".", with: "_")
+                            .replacingOccurrences(of: "$", with: "_")
+                            .replacingOccurrences(of: "#", with: "_")
+                            .replacingOccurrences(of: "[", with: "_")
+                            .replacingOccurrences(of: "]", with: "_")
+                            .replacingOccurrences(of: "/", with: "_")
+                        
+                        let safeTranslation = word.translation.replacingOccurrences(of: ".", with: "_")
+                            .replacingOccurrences(of: "$", with: "_")
+                            .replacingOccurrences(of: "#", with: "_")
+                            .replacingOccurrences(of: "[", with: "_")
+                            .replacingOccurrences(of: "]", with: "_")
+                            .replacingOccurrences(of: "/", with: "_")
+                        
+                        let wordId = "\(safeWord)_\(safeTranslation)"
+                        isRandomWordLearned = env.learnedWordsManager.isWordLearned(wordId: wordId)
+                        showRandomDetail = true
+                    }
+                }) {
+                    Image(systemName: "shuffle")
+                        .font(.title3)
+                        .foregroundColor(.white)
+                        .padding(10)
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                }
+            }
+            .padding()
             
             if searchResults.isEmpty {
                 emptyState
@@ -225,6 +261,38 @@ struct EnhancedDictionaryTab: View {
                     }
                     .padding()
                 }
+            }
+        }
+        .sheet(isPresented: $showRandomDetail) {
+            if let word = randomWord {
+                WordDetailView(
+                    word: word,
+                    isLearned: $isRandomWordLearned,
+                    gamificationManager: gamificationManager,
+                    onNextRandom: {
+                        if let nextWord = uniqueSortedWords.randomElement() {
+                            randomWord = nextWord
+                            
+                            // Calculer l'état isLearned pour le nouveau mot
+                            let safeWord = nextWord.word.replacingOccurrences(of: ".", with: "_")
+                                .replacingOccurrences(of: "$", with: "_")
+                                .replacingOccurrences(of: "#", with: "_")
+                                .replacingOccurrences(of: "[", with: "_")
+                                .replacingOccurrences(of: "]", with: "_")
+                                .replacingOccurrences(of: "/", with: "_")
+                            
+                            let safeTranslation = nextWord.translation.replacingOccurrences(of: ".", with: "_")
+                                .replacingOccurrences(of: "$", with: "_")
+                                .replacingOccurrences(of: "#", with: "_")
+                                .replacingOccurrences(of: "[", with: "_")
+                                .replacingOccurrences(of: "]", with: "_")
+                                .replacingOccurrences(of: "/", with: "_")
+                            
+                            let wordId = "\(safeWord)_\(safeTranslation)"
+                            isRandomWordLearned = env.learnedWordsManager.isWordLearned(wordId: wordId)
+                        }
+                    }
+                )
             }
         }
     }
@@ -256,6 +324,39 @@ struct EnhancedDictionaryRow: View {
     @EnvironmentObject var env: AppEnvironment
     @State private var isLearned = false
     @State private var showDetail = false
+    
+    private func updateLearnedState() {
+        let safeWord = word.word.replacingOccurrences(of: ".", with: "_")
+            .replacingOccurrences(of: "$", with: "_")
+            .replacingOccurrences(of: "#", with: "_")
+            .replacingOccurrences(of: "[", with: "_")
+            .replacingOccurrences(of: "]", with: "_")
+            .replacingOccurrences(of: "/", with: "_")
+        
+        let safeTranslation = word.translation.replacingOccurrences(of: ".", with: "_")
+            .replacingOccurrences(of: "$", with: "_")
+            .replacingOccurrences(of: "#", with: "_")
+            .replacingOccurrences(of: "[", with: "_")
+            .replacingOccurrences(of: "]", with: "_")
+            .replacingOccurrences(of: "/", with: "_")
+        
+        let wordId = "\(safeWord)_\(safeTranslation)"
+        isLearned = env.learnedWordsManager.isWordLearned(wordId: wordId)
+    }
+    
+    private func formatForSpeech(_ text: String) -> String {
+        let pattern = "^(.+?)\\s*\\((il|la|lo|l'|i|le|gli)\\)$"
+        if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
+           let match = regex.firstMatch(in: text, options: [], range: NSRange(text.startIndex..., in: text)) {
+            if let motRange = Range(match.range(at: 1), in: text),
+               let detRange = Range(match.range(at: 2), in: text) {
+                let mot = String(text[motRange]).trimmingCharacters(in: .whitespaces)
+                let determinant = String(text[detRange])
+                return "\(determinant) \(mot)"
+            }
+        }
+        return text
+    }
     
     var body: some View {
         Button(action: { showDetail = true }) {
@@ -295,7 +396,8 @@ struct EnhancedDictionaryRow: View {
                 
                 HStack(spacing: 12) {
                     Button(action: { 
-                        env.speechService.speak(word.word, language: "it-IT")
+                        let speechText = formatForSpeech(word.word)
+                        env.speechService.speak(speechText, language: "it-IT")
                     }) {
                         Image(systemName: "speaker.wave.2.fill")
                             .font(.title3)
@@ -354,161 +456,296 @@ struct EnhancedDictionaryRow: View {
         .sheet(isPresented: $showDetail) {
             WordDetailView(word: word, isLearned: $isLearned, gamificationManager: gamificationManager)
         }
+        .onAppear {
+            updateLearnedState()
+        }
+        .onChange(of: env.learnedWordsManager.learnedWordIds) { _, _ in
+            updateLearnedState()
+        }
     }
 }
 
 struct WordDetailView: View {
-    let word: VocabularyWord
+    @State var word: VocabularyWord
     @Binding var isLearned: Bool
     let gamificationManager: GamificationManager?
+    var onNextRandom: (() -> Void)? = nil
     
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var env: AppEnvironment
     
-    var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 24) {
-                    VStack(spacing: 16) {
-                        if let icon = word.categoryIcon {
-                            Text(icon)
-                                .font(.system(size: 60))
+    private func formatForSpeech(_ text: String) -> String {
+        let pattern = "^(.+?)\\s*\\((il|la|lo|l'|i|le|gli)\\)$"
+        if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
+           let match = regex.firstMatch(in: text, options: [], range: NSRange(text.startIndex..., in: text)) {
+            if let motRange = Range(match.range(at: 1), in: text),
+               let detRange = Range(match.range(at: 2), in: text) {
+                let mot = String(text[motRange]).trimmingCharacters(in: .whitespaces)
+                let determinant = String(text[detRange])
+                return "\(determinant) \(mot)"
+            }
+        }
+                            let speechText = formatForSpeech(word.word)
+                            env.speechService.speak(speechText, language: "it-IT")
+                        }) {
+                            Image(systemName: "speaker.wave.2.fill")
+                                .font(.title3)
+                                .foregroundColor(.blue)
                         }
-                        
-                        Text(word.word)
-                            .font(.system(size: 36, weight: .bold))
                         
                         Button(action: {
-                            env.speechService.speak(word.word, language: "it-IT")
-                        }) {
-                            HStack {
-                                Image(systemName: "speaker.wave.2.fill")
-                                Text("Écouter")
-                            }
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 10)
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(20)
-                        }
-                    }
-                    
-                    Divider()
-                    
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("Traduction", systemImage: "text.bubble")
-                            .font(.headline)
-                        
-                        Text(word.translation)
-                            .font(.title3)
-                            .foregroundColor(.blue)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(12)
-                    
-                    if let example = word.example, !example.isEmpty {
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack {
-                                Label("Exemple", systemImage: "quote.bubble")
-                                    .font(.headline)
-                                Spacer()
-                                Button(action: {
-                                    env.speechService.speak(example, language: "it-IT")
-                                }) {
-                                    Image(systemName: "speaker.wave.2.circle.fill")
-                                        .font(.title3)
-                                        .foregroundColor(.blue)
+                            let newLearnedState = !isLearned
+                            
+                            // Calcul manuel de l'ID Firebase
+                            let safeWord = word.word.replacingOccurrences(of: ".", with: "_")
+                                .replacingOccurrences(of: "$", with: "_")
+                                .replacingOccurrences(of: "#", with: "_")
+                                .replacingOccurrences(of: "[", with: "_")
+                                .replacingOccurrences(of: "]", with: "_")
+                                .replacingOccurrences(of: "/", with: "_")
+                            
+                            let safeTranslation = word.translation.replacingOccurrences(of: ".", with: "_")
+                                .replacingOccurrences(of: "$", with: "_")
+                                .replacingOccurrences(of: "#", with: "_")
+                                .replacingOccurrences(of: "[", with: "_")
+                                .replacingOccurrences(of: "]", with: "_")
+                                .replacingOccurrences(of: "/", with: "_")
+                            
+                            let wordId = "\(safeWord)_\(safeTranslation)"
+                            
+                            Task {
+                                if newLearnedState {
+                                    gamificationManager?.recordWordLearned()
+                                    await env.learnedWordsManager.markWordAsLearned(
+                                        wordId: wordId,
+                                        word: word.word,
+                                        translation: word.translation
+                                    )
+                                } else {
+                                    await env.learnedWordsManager.unmarkWordAsLearned(
+                                        wordId: wordId,
+                                        word: word.word
+                                    )
                                 }
+                                isLearned = newLearnedState
                             }
-                            
-                            Text(example)
-                                .font(.body)
-                                .italic()
-                            
-                            if let exampleTranslation = word.exampleTranslation, !exampleTranslation.isEmpty {
-                                Text(exampleTranslation)
-                                    .font(.body)
-                                    .foregroundColor(.secondary)
-                            }
+                        }) {
+                            Image(systemName: isLearned ? "checkmark.circle.fill" : "circle")
+                                .font(.title3)
+                                .foregroundColor(isLearned ? .green : .gray)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(12)
-                    }
-                    
-                    if let category = word.category {
-                        HStack {
-                            Image(systemName: "folder.fill")
-                                .foregroundColor(.orange)
-                            Text("Catégorie: \(category)")
-                                .font(.subheadline)
-                            Spacer()
-                        }
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(12)
-                    }
-                    
-                    Button(action: {
-                        let newLearnedState = !isLearned
-                        
-                        // Calcul manuel de l'ID Firebase
-                        let safeWord = word.word.replacingOccurrences(of: ".", with: "_")
-                            .replacingOccurrences(of: "$", with: "_")
-                            .replacingOccurrences(of: "#", with: "_")
-                            .replacingOccurrences(of: "[", with: "_")
-                            .replacingOccurrences(of: "]", with: "_")
-                            .replacingOccurrences(of: "/", with: "_")
-                        
-                        let safeTranslation = word.translation.replacingOccurrences(of: ".", with: "_")
-                            .replacingOccurrences(of: "$", with: "_")
-                            .replacingOccurrences(of: "#", with: "_")
-                            .replacingOccurrences(of: "[", with: "_")
-                            .replacingOccurrences(of: "]", with: "_")
-                            .replacingOccurrences(of: "/", with: "_")
-                        
-                        let wordId = "\(safeWord)_\(safeTranslation)"
-                        
-                        Task {
-                            if newLearnedState {
-                                gamificationManager?.recordWordLearned()
-                                await env.learnedWordsManager.markWordAsLearned(
-                                    wordId: wordId,
-                                    word: word.word,
-                                    translation: word.translation
-                                )
-                            } else {
-                                await env.learnedWordsManager.unmarkWordAsLearned(
-                                    wordId: wordId,
-                                    word: word.word
-                                )
-                            }
-                            isLearned = newLearnedState
-                        }
-                        dismiss()
-                    }) {
-                        HStack {
-                            Image(systemName: isLearned ? "checkmark.circle.fill" : "book.fill")
-                            Text(isLearned ? "Ajouté à l'Apprentissage" : "Ajouter à l'Apprentissage")
-                        }
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(isLearned ? Color.green : Color.blue)
-                        .cornerRadius(12)
                     }
                 }
                 .padding()
+                .background(Color(.systemBackground))
+                .cornerRadius(12)
+                .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
             }
-            .navigationTitle("Détails")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Fermer") {
+            .buttonStyle(.plain)
+            .sheet(isPresented: $showDetail) {
+                WordDetailView(word: word, isLearned: $isLearned, gamificationManager: gamificationManager)
+            }
+            .onAppear {
+                updateLearnedState()
+            }
+            .onChange(of: env.learnedWordsManager.learnedWordIds) { _, _ in
+                updateLearnedState()
+            }
+        }
+    }
+    
+    struct WordDetailView: View {
+        @State var word: VocabularyWord
+        @Binding var isLearned: Bool
+        let gamificationManager: GamificationManager?
+        var onNextRandom: (() -> Void)? = nil
+        
+        @Environment(\.dismiss) private var dismiss
+        @EnvironmentObject var env: AppEnvironment
+        
+        private func formatForSpeech(_ text: String) -> String {
+            let pattern = "^(.+?)\\s*\\((il|la|lo|l'|i|le|gli)\\)$"
+            if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
+               let match = regex.firstMatch(in: text, options: [], range: NSRange(text.startIndex..., in: text)) {
+                if let motRange = Range(match.range(at: 1), in: text),
+                   let detRange = Range(match.range(at: 2), in: text) {
+                    let mot = String(text[motRange]).trimmingCharacters(in: .whitespaces)
+                    let determinant = String(text[detRange])
+                    return "\(determinant) \(mot)"
+                }
+            }
+            return text
+        }
+        
+        var body: some View {
+            NavigationStack {
+                VStack(spacing: 0) {
+                    ScrollView {
+                        VStack(spacing: 24) {
+                            VStack(spacing: 16) {
+                                if let icon = word.categoryIcon {
+                                    Text(icon)
+                                        .font(.system(size: 60))
+                                }
+                                
+                                Text(word.word)
+                                    .font(.system(size: 36, weight: .bold))
+                                
+                                Button(action: {
+                                    let speechText = formatForSpeech(word.word)
+                                    env.speechService.speak(speechText, language: "it-IT")
+                                }) {
+                                    HStack {
+                                        Image(systemName: "speaker.wave.2.fill")
+                                        Text("Écouter")
+                                    }
+                                    .padding(.horizontal, 20)
+                                    .padding(.vertical, 10)
+                                    .background(Color.blue)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(20)
+                                }
+                            }
+                            
+                            Divider()
+                            
+                            VStack(alignment: .leading, spacing: 12) {
+                                Label("Traduction", systemImage: "text.bubble")
+                                    .font(.headline)
+                                
+                                Text(word.translation)
+                                    .font(.title3)
+                                    .foregroundColor(.blue)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding()
+                            .background(Color(.systemGray6))
+                            .cornerRadius(12)
+                            
+                            if let example = word.example, !example.isEmpty {
+                                VStack(alignment: .leading, spacing: 12) {
+                                    HStack {
+                                        Label("Exemple", systemImage: "quote.bubble")
+                                            .font(.headline)
+                                        Spacer()
+                                        Button(action: {
+                                            env.speechService.speak(example, language: "it-IT")
+                                        }) {
+                                            Image(systemName: "speaker.wave.2.circle.fill")
+                                                .font(.title3)
+                                                .foregroundColor(.blue)
+                                        }
+                                    }
+                                    
+                                    Text(example)
+                                        .font(.body)
+                                        .italic()
+                                    
+                                    if let exampleTranslation = word.exampleTranslation, !exampleTranslation.isEmpty {
+                                        Text(exampleTranslation)
+                                            .font(.body)
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding()
+                                .background(Color(.systemGray6))
+                                .cornerRadius(12)
+                            }
+                            
+                            if let category = word.category {
+                                HStack {
+                                    Label("Catégorie", systemImage: "tag")
+                                        .font(.headline)
+                                    Spacer()
+                                    Text(category)
+                                        .font(.subheadline)
+                                }
+                                .padding()
+                                .background(Color(.systemGray6))
+                                .cornerRadius(12)
+                            }
+                        }
+                        .padding()
+                    }
+                    
+                    // Barre d'actions fixe en bas
+                    VStack(spacing: 12) {
+                        Button(action: {
+                            let newLearnedState = !isLearned
+                            
+                            let safeWord = word.word.replacingOccurrences(of: ".", with: "_")
+                                .replacingOccurrences(of: "$", with: "_")
+                                .replacingOccurrences(of: "#", with: "_")
+                                .replacingOccurrences(of: "[", with: "_")
+                                .replacingOccurrences(of: "]", with: "_")
+                                .replacingOccurrences(of: "/", with: "_")
+                            
+                            let safeTranslation = word.translation.replacingOccurrences(of: ".", with: "_")
+                                .replacingOccurrences(of: "$", with: "_")
+                                .replacingOccurrences(of: "#", with: "_")
+                                .replacingOccurrences(of: "[", with: "_")
+                                .replacingOccurrences(of: "]", with: "_")
+                                .replacingOccurrences(of: "/", with: "_")
+                            
+                            let wordId = "\(safeWord)_\(safeTranslation)"
+                            
+                            Task {
+                                if newLearnedState {
+                                    gamificationManager?.recordWordLearned()
+                                    await env.learnedWordsManager.markWordAsLearned(
+                                        wordId: wordId,
+                                        word: word.word,
+                                        translation: word.translation
+                                    )
+                                } else {
+                                    await env.learnedWordsManager.unmarkWordAsLearned(
+                                        wordId: wordId,
+                                        word: word.word
+                                    )
+                                }
+                                isLearned = newLearnedState
+                            }
+                            // On ne ferme plus la vue ici
+                        }) {
+                            HStack {
+                                Image(systemName: isLearned ? "checkmark.circle.fill" : "book.fill")
+                                Text(isLearned ? "Ajouté à l'Apprentissage" : "Ajouter à l'Apprentissage")
+                            }
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(isLearned ? Color.green : Color.blue)
+                            .cornerRadius(12)
+                        }
+                        
+                        if let onNext = onNextRandom {
+                            Button(action: onNext) {
+                                HStack {
+                                    Image(systemName: "shuffle")
+                                    Text("Mot aléatoire suivant")
+                                }
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.orange)
+                                .cornerRadius(12)
+                            }
+                        }
+                    }
+                    .padding()
+                    .background(Color(.systemBackground))
+                    .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: -2)
+                }
+                .navigationTitle("Détails")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button("Fermer") {
+                            dismiss()
+                        }
                         dismiss()
                     }
                 }
