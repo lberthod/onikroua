@@ -4,8 +4,8 @@ import SwiftData
 struct EnhancedContentView: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject var env: AppEnvironment
+    @EnvironmentObject var firebaseManager: FirebaseManager
     
-    @State private var userEmail: String = "utilisateur@onykroua.com"
     @State private var showProfile = false
     @State private var gamificationManager: GamificationManager?
     @State private var analyticsService: AnalyticsService?
@@ -63,7 +63,7 @@ struct EnhancedContentView: View {
                 Text("Ciao!")
                     .font(.title)
                     .fontWeight(.bold)
-                Text(userEmail)
+                Text(firebaseManager.userEmail ?? firebaseManager.userId ?? "Invité")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }

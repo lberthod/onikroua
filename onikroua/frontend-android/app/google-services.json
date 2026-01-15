@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "1038211179192",
+    "firebase_url": "https://onikroua-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "onikroua",
+    "storage_bucket": "onikroua.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1038211179192:android:0d8f8a0d5a0ff758caca4d",
+        "android_client_info": {
+          "package_name": "com.loicberthod.onykroua"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1038211179192-0kege0gdtsub9fsu68c1kmmcugl2le5u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.loicberthod.onykroua",
+            "certificate_hash": "D20F46A4425072C98588982AB793533FB0C61F31"
+          }
+        },
+        {
+          "client_id": "1038211179192-ckj7rsad3jgd9t81roouuodb7tiqem3j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.loicberthod.onykroua",
+            "certificate_hash": "E11A4A69C29A65D167F8577D951C7168EC1459EF"
+          }
+        },
+        {
+          "client_id": "1038211179192-jtj1ard889mdvs26u9lhl7qpssnl3t5d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-XQ-izRY_CRQ_sA_JfTmIxlMLzYN1gMk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1038211179192-jtj1ard889mdvs26u9lhl7qpssnl3t5d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

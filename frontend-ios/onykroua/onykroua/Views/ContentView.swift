@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var env: AppEnvironment
-    @State private var userEmail: String = "utilisateur@onykroua.com"
+    @EnvironmentObject var firebaseManager: FirebaseManager
     @State private var showProfile = false
     
     var body: some View {
@@ -21,7 +21,7 @@ struct ContentView: View {
                             Text("Ciao!")
                                 .font(.title)
                                 .fontWeight(.bold)
-                            Text(userEmail)
+                            Text(firebaseManager.userEmail ?? firebaseManager.userId ?? "Invité")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }

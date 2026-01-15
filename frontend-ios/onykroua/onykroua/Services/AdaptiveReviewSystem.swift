@@ -1,0 +1,420 @@
+import Foundation
+import SwiftData
+
+// MARK: - Adaptive Review System
+
+class AdaptiveReviewSystem: ObservableObject {
+    static let shared = AdaptiveReviewSystem()
+    
+    @Published var reviewQueue: [ReviewItem] = []
+    @Published var dailyReviewCount: Int = 0
+    @Published var reviewStreak: Int = 0
+    
+    private let modelContext: ModelContext?
+    
+    init(modelContext: ModelContext? = nil) {
+        self.modelContext = modelContext
+    }
+    
+    // MARK: - Review Item
+    
+    struct ReviewItem: Identifiable, Codable {
+        let id: UUID
+        let type: ReviewType
+        let content: ReviewContent
+        var difficulty: DifficultyLevel
+        var lastReviewed: Date
+        var nextReview: Date
+        var reviewCount: Int
+        var correctCount: Int
+        var incorrectCount: Int
+        var easeFactor: Double
+        var interval: Int
+        
+        enum ReviewType: String, Codable {
+            case vocabulary
+            case conjugation
+            case grammar
+            case conversation
+        }
+        
+        struct ReviewContent: Codable {
+            let question: String
+            let answer: String
+            let hint: String?
+            let example: String?
+        }
+        
+        enum DifficultyLevel: Int, Codable {
+            case veryEasy = 1
+            case easy = 2
+            case medium = 3
+            case hard = 4
+            case veryHard = 5
+            
+            var color: String {
+                switch self {
+                case .veryEasy: return "green"
+                case .easy: return "blue"
+                case .medium: return "yellow"
+                case .hard: return "orange"
+                case .veryHard: return "red"
+                }
+            }
+            
+            var multiplier: Double {
+                switch self {
+                case .veryEasy: return 2.5
+                case .easy: return 2.0
+                case .medium: return 1.5
+                case .hard: return 1.0
+                case .veryHard: return 0.8
+                }
+            }
+        }
+        
+        init(type: ReviewType, content: ReviewContent, difficulty: DifficultyLevel = .medium) {
+            self.id = UUID()
+            self.type = type
+            self.content = content
+            self.difficulty = difficulty
+            self.lastReviewed = Date()
+            self.nextReview = Date()
+            self.reviewCount = 0
+            self.correctCount = 0
+            self.incorrectCount = 0
+            self.easeFactor = 2.5
+            self.interval = 0
+        }
+        
+        var successRate: Double {
+            guard reviewCount > 0 else { return 0 }
+            return Double(correctCount) / Double(reviewCount)
+        }
+        
+        var isDueForReview: Bool {
+            return nextReview <= Date()
+        }
+        
+        var mastery: MasteryLevel {
+            if successRate >= 0.9 && reviewCount >= 10 {
+                return .mastered
+            } else if successRate >= 0.75 && reviewCount >= 5 {
+                return .proficient
+            } else if successRate >= 0.5 && reviewCount >= 3 {
+                return .learning
+            } else {
+                return .new
+            }
+        }
+        
+        enum MasteryLevel: String {
+            case new = "Nouveau"
+            case learning = "En apprentissage"
+            case proficient = "Compétent"
+            case mastered = "Maîtrisé"
+            
+            var icon: String {
+                switch self {
+                case .new: return "🌱"
+                case .learning: return "📚"
+                case .proficient: return "⭐"
+                case .mastered: return "🏆"
+                }
+            }
+        }
+    }
+    
+    // MARK: - Adaptive Algorithm (SuperMemo SM-2 Modified)
+    
+    func calculateNextReview(item: ReviewItem, quality: Int) -> (interval: Int, easeFactor: Double, nextReview: Date) {
+        var newEaseFactor = item.easeFactor
+        var newInterval = item.interval
+        
+        // Update ease factor based on quality (0-5 scale)
+        // 0-1: Again, 2: Hard, 3: Good, 4-5: Easy
+        if quality >= 3 {
+            newEaseFactor = item.easeFactor + (0.1 - Double(5 - quality) * (0.08 + Double(5 - quality) * 0.02))
+        } else {
+            newEaseFactor = max(1.3, item.easeFactor - 0.2)
+        }
+        
+        newEaseFactor = max(1.3, min(2.5, newEaseFactor))
+        
+        // Calculate interval
+        if quality < 3 {
+            // Reset if answered incorrectly
+            newInterval = 1
+        } else {
+            if item.interval == 0 {
+                newInterval = 1
+            } else if item.interval == 1 {
+                newInterval = 6
+            } else {
+                newInterval = Int(Double(item.interval) * newEaseFactor)
+            }
+        }
+        
+        // Apply difficulty multiplier
+        let difficultyMultiplier = item.difficulty.multiplier
+        newInterval = Int(Double(newInterval) * difficultyMultiplier)
+        
+        // Calculate next review date
+        let nextReview = Calendar.current.date(byAdding: .day, value: newInterval, to: Date()) ?? Date()
+        
+        return (newInterval, newEaseFactor, nextReview)
+    }
+    
+    // MARK: - Review Item Management
+    
+    func recordReview(item: inout ReviewItem, wasCorrect: Bool, difficulty: ReviewItem.DifficultyLevel? = nil) {
+        item.reviewCount += 1
+        item.lastReviewed = Date()
+        
+        if wasCorrect {
+            item.correctCount += 1
+        } else {
+            item.incorrectCount += 1
+        }
+        
+        if let difficulty = difficulty {
+            item.difficulty = difficulty
+        }
+        
+        // Calculate quality score (0-5)
+        let quality: Int
+        if wasCorrect {
+            switch item.difficulty {
+            case .veryEasy: quality = 5
+            case .easy: quality = 4
+            case .medium: quality = 3
+            case .hard: quality = 2
+            case .veryHard: quality = 1
+            }
+        } else {
+            quality = 0
+        }
+        
+        let result = calculateNextReview(item: item, quality: quality)
+        item.interval = result.interval
+        item.easeFactor = result.easeFactor
+        item.nextReview = result.nextReview
+    }
+    
+    // MARK: - Queue Management
+    
+    func getDueItems(limit: Int = 20) -> [ReviewItem] {
+        return reviewQueue
+            .filter { $0.isDueForReview }
+            .sorted { item1, item2 in
+                // Prioritize by: overdue time, then difficulty, then success rate
+                if item1.nextReview != item2.nextReview {
+                    return item1.nextReview < item2.nextReview
+                }
+                if item1.difficulty != item2.difficulty {
+                    return item1.difficulty.rawValue > item2.difficulty.rawValue
+                }
+                return item1.successRate < item2.successRate
+            }
+            .prefix(limit)
+            .map { $0 }
+    }
+    
+    func getNewItems(limit: Int = 10) -> [ReviewItem] {
+        return reviewQueue
+            .filter { $0.reviewCount == 0 }
+            .shuffled()
+            .prefix(limit)
+            .map { $0 }
+    }
+    
+    func getLearningItems(limit: Int = 15) -> [ReviewItem] {
+        return reviewQueue
+            .filter { $0.mastery == .learning || $0.mastery == .new }
+            .sorted { $0.successRate < $1.successRate }
+            .prefix(limit)
+            .map { $0 }
+    }
+    
+    func getWeakItems(limit: Int = 10) -> [ReviewItem] {
+        return reviewQueue
+            .filter { $0.reviewCount >= 3 && $0.successRate < 0.6 }
+            .sorted { $0.successRate < $1.successRate }
+            .prefix(limit)
+            .map { $0 }
+    }
+    
+    // MARK: - Statistics
+    
+    func getStatistics() -> ReviewStatistics {
+        let totalItems = reviewQueue.count
+        let dueItems = reviewQueue.filter { $0.isDueForReview }.count
+        let masteredItems = reviewQueue.filter { $0.mastery == .mastered }.count
+        let learningItems = reviewQueue.filter { $0.mastery == .learning }.count
+        let newItems = reviewQueue.filter { $0.reviewCount == 0 }.count
+        
+        let totalReviews = reviewQueue.reduce(0) { $0 + $1.reviewCount }
+        let totalCorrect = reviewQueue.reduce(0) { $0 + $1.correctCount }
+        
+        let averageSuccessRate = totalReviews > 0 ? Double(totalCorrect) / Double(totalReviews) : 0
+        
+        return ReviewStatistics(
+            totalItems: totalItems,
+            dueItems: dueItems,
+            masteredItems: masteredItems,
+            learningItems: learningItems,
+            newItems: newItems,
+            totalReviews: totalReviews,
+            averageSuccessRate: averageSuccessRate,
+            dailyReviewCount: dailyReviewCount,
+            reviewStreak: reviewStreak
+        )
+    }
+    
+    struct ReviewStatistics {
+        let totalItems: Int
+        let dueItems: Int
+        let masteredItems: Int
+        let learningItems: Int
+        let newItems: Int
+        let totalReviews: Int
+        let averageSuccessRate: Double
+        let dailyReviewCount: Int
+        let reviewStreak: Int
+        
+        var progressPercentage: Double {
+            guard totalItems > 0 else { return 0 }
+            return Double(masteredItems) / Double(totalItems) * 100
+        }
+    }
+    
+    // MARK: - Data Generation
+    
+    func generateReviewItemsFromVocabulary(language: String, limit: Int = 100) -> [ReviewItem] {
+        let words = VocabularyDataManager.shared.getAllWords(language: language).shuffled().prefix(limit)
+        
+        return words.map { word in
+            ReviewItem(
+                type: .vocabulary,
+                content: ReviewItem.ReviewContent(
+                    question: word.word,
+                    answer: word.translation,
+                    hint: word.category,
+                    example: word.example
+                )
+            )
+        }
+    }
+    
+    func generateReviewItemsFromConjugation(language: String, limit: Int = 50) -> [ReviewItem] {
+        let verbs = language == "it" ? VerbData.getItalianVerbs() : VerbData.getSpanishVerbs()
+        let tenses = ["Présent", "Passé composé", "Futur"]
+        let pronouns = ["io", "tu", "lui/lei", "noi", "voi", "loro"]
+        
+        var items: [ReviewItem] = []
+        
+        for verb in verbs.shuffled().prefix(limit / 6) {
+            for _ in 0..<6 {
+                guard let tense = tenses.randomElement(),
+                      let pronoun = pronouns.randomElement(),
+                      let conjugation = verb.conjugations[tense],
+                      let form = conjugation[pronoun] else {
+                    continue
+                }
+                
+                items.append(ReviewItem(
+                    type: .conjugation,
+                    content: ReviewItem.ReviewContent(
+                        question: "\(verb.infinitive) - \(tense) - \(pronoun)",
+                        answer: form,
+                        hint: verb.translation,
+                        example: "\(pronoun) \(form)"
+                    )
+                ))
+            }
+        }
+        
+        return items
+    }
+    
+    func generateReviewItemsFromGrammar(language: String, limit: Int = 30) -> [ReviewItem] {
+        let rules = GrammarData.getGrammarRules(for: language).shuffled().prefix(limit)
+        
+        return rules.compactMap { rule -> ReviewItem? in
+            guard let example = rule.examples.randomElement() else { return nil }
+            
+            return ReviewItem(
+                type: .grammar,
+                content: ReviewItem.ReviewContent(
+                    question: rule.title,
+                    answer: example,
+                    hint: rule.category,
+                    example: rule.description
+                )
+            )
+        }
+    }
+    
+    // MARK: - Daily Review Session
+    
+    func generateDailyReviewSession(targetCount: Int = 30) -> [ReviewItem] {
+        var session: [ReviewItem] = []
+        
+        // 50% due items (high priority)
+        let dueCount = Int(Double(targetCount) * 0.5)
+        session.append(contentsOf: getDueItems(limit: dueCount))
+        
+        // 25% weak items (need reinforcement)
+        let weakCount = Int(Double(targetCount) * 0.25)
+        session.append(contentsOf: getWeakItems(limit: weakCount))
+        
+        // 15% new items (introduce new content)
+        let newCount = Int(Double(targetCount) * 0.15)
+        session.append(contentsOf: getNewItems(limit: newCount))
+        
+        // 10% random learning items (variety)
+        let learningCount = targetCount - session.count
+        session.append(contentsOf: getLearningItems(limit: learningCount))
+        
+        return session.shuffled()
+    }
+}
+
+// MARK: - Leitner System (Alternative Algorithm)
+
+class LeitnerSystem {
+    static let boxIntervals = [1, 2, 4, 8, 16, 32] // days
+    
+    struct LeitnerCard {
+        var item: AdaptiveReviewSystem.ReviewItem
+        var box: Int = 0
+        var lastReviewed: Date = Date()
+        
+        var nextReview: Date {
+            let interval = LeitnerSystem.boxIntervals[box]
+            return Calendar.current.date(byAdding: .day, value: interval, to: lastReviewed) ?? Date()
+        }
+        
+        var isDue: Bool {
+            return nextReview <= Date()
+        }
+        
+        mutating func moveToNextBox() {
+            box = min(box + 1, LeitnerSystem.boxIntervals.count - 1)
+            lastReviewed = Date()
+        }
+        
+        mutating func moveToFirstBox() {
+            box = 0
+            lastReviewed = Date()
+        }
+        
+        mutating func recordAnswer(correct: Bool) {
+            if correct {
+                moveToNextBox()
+            } else {
+                moveToFirstBox()
+            }
+        }
+    }
+}

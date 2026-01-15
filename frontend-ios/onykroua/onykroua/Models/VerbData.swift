@@ -295,6 +295,644 @@ public class VerbData {
                 ],
                 group: "-IRE",
                 isIrregular: false
+            ),
+            
+            // MOUVEMENT ADDITIONNELS
+            Verb(
+                id: "it-tornare",
+                verb: "tornare",
+                translation: "revenir / retourner",
+                conjugations: [
+                    "Présent": ["io": "torno", "tu": "torni", "lui/lei": "torna", "noi": "torniamo", "voi": "tornate", "loro": "tornano"],
+                    "Passato prossimo": ["io": "sono tornato", "tu": "sei tornato", "lui/lei": "è tornato", "noi": "siamo tornati", "voi": "siete tornati", "loro": "sono tornati"]
+                ],
+                group: "Mouvement",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-arrivare",
+                verb: "arrivare",
+                translation: "arriver",
+                conjugations: [
+                    "Présent": ["io": "arrivo", "tu": "arrivi", "lui/lei": "arriva", "noi": "arriviamo", "voi": "arrivate", "loro": "arrivano"],
+                    "Passato prossimo": ["io": "sono arrivato", "tu": "sei arrivato", "lui/lei": "è arrivato", "noi": "siamo arrivati", "voi": "siete arrivati", "loro": "sono arrivati"]
+                ],
+                group: "Mouvement",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-entrare",
+                verb: "entrare",
+                translation: "entrer",
+                conjugations: [
+                    "Présent": ["io": "entro", "tu": "entri", "lui/lei": "entra", "noi": "entriamo", "voi": "entrate", "loro": "entrano"],
+                    "Passato prossimo": ["io": "sono entrato", "tu": "sei entrato", "lui/lei": "è entrato", "noi": "siamo entrati", "voi": "siete entrati", "loro": "sono entrati"]
+                ],
+                group: "Mouvement",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-scendere",
+                verb: "scendere",
+                translation: "descendre",
+                conjugations: [
+                    "Présent": ["io": "scendo", "tu": "scendi", "lui/lei": "scende", "noi": "scendiamo", "voi": "scendete", "loro": "scendono"],
+                    "Passato prossimo": ["io": "sono sceso", "tu": "sei sceso", "lui/lei": "è sceso", "noi": "siamo scesi", "voi": "siete scesi", "loro": "sono scesi"]
+                ],
+                group: "Mouvement",
+                isIrregular: true
+            ),
+            Verb(
+                id: "it-salire",
+                verb: "salire",
+                translation: "monter",
+                conjugations: [
+                    "Présent": ["io": "salgo", "tu": "sali", "lui/lei": "sale", "noi": "saliamo", "voi": "salite", "loro": "salgono"],
+                    "Passato prossimo": ["io": "sono salito", "tu": "sei salito", "lui/lei": "è salito", "noi": "siamo saliti", "voi": "siete saliti", "loro": "sono saliti"]
+                ],
+                group: "Mouvement",
+                isIrregular: true
+            ),
+            Verb(
+                id: "it-correre",
+                verb: "correre",
+                translation: "courir",
+                conjugations: [
+                    "Présent": ["io": "corro", "tu": "corri", "lui/lei": "corre", "noi": "corriamo", "voi": "correte", "loro": "corrono"],
+                    "Passato prossimo": ["io": "ho corso", "tu": "hai corso", "lui/lei": "ha corso", "noi": "abbiamo corso", "voi": "avete corso", "loro": "hanno corso"]
+                ],
+                group: "Mouvement",
+                isIrregular: false
+            ),
+            
+            // COMMUNICATION
+            Verb(
+                id: "it-raccontare",
+                verb: "raccontare",
+                translation: "raconter",
+                conjugations: [
+                    "Présent": ["io": "racconto", "tu": "racconti", "lui/lei": "racconta", "noi": "raccontiamo", "voi": "raccontate", "loro": "raccontano"],
+                    "Passato prossimo": ["io": "ho raccontato", "tu": "hai raccontato", "lui/lei": "ha raccontato", "noi": "abbiamo raccontato", "voi": "avete raccontato", "loro": "hanno raccontato"]
+                ],
+                group: "Communication",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-chiedere",
+                verb: "chiedere",
+                translation: "demander",
+                conjugations: [
+                    "Présent": ["io": "chiedo", "tu": "chiedi", "lui/lei": "chiede", "noi": "chiediamo", "voi": "chiedete", "loro": "chiedono"],
+                    "Passato prossimo": ["io": "ho chiesto", "tu": "hai chiesto", "lui/lei": "ha chiesto", "noi": "abbiamo chiesto", "voi": "avete chiesto", "loro": "hanno chiesto"]
+                ],
+                group: "Communication",
+                isIrregular: true
+            ),
+            Verb(
+                id: "it-rispondere",
+                verb: "rispondere",
+                translation: "répondre",
+                conjugations: [
+                    "Présent": ["io": "rispondo", "tu": "rispondi", "lui/lei": "risponde", "noi": "rispondiamo", "voi": "rispondete", "loro": "rispondono"],
+                    "Passato prossimo": ["io": "ho risposto", "tu": "hai risposto", "lui/lei": "ha risposto", "noi": "abbiamo risposto", "voi": "avete risposto", "loro": "hanno risposto"]
+                ],
+                group: "Communication",
+                isIrregular: true
+            ),
+            Verb(
+                id: "it-telefonare",
+                verb: "telefonare",
+                translation: "téléphoner",
+                conjugations: [
+                    "Présent": ["io": "telefono", "tu": "telefoni", "lui/lei": "telefona", "noi": "telefoniamo", "voi": "telefonate", "loro": "telefonano"],
+                    "Passato prossimo": ["io": "ho telefonato", "tu": "hai telefonato", "lui/lei": "ha telefonato", "noi": "abbiamo telefonato", "voi": "avete telefonato", "loro": "hanno telefonato"]
+                ],
+                group: "Communication",
+                isIrregular: false
+            ),
+            
+            // PERCEPTION
+            Verb(
+                id: "it-sentire",
+                verb: "sentire",
+                translation: "entendre / sentir",
+                conjugations: [
+                    "Présent": ["io": "sento", "tu": "senti", "lui/lei": "sente", "noi": "sentiamo", "voi": "sentite", "loro": "sentono"],
+                    "Passato prossimo": ["io": "ho sentito", "tu": "hai sentito", "lui/lei": "ha sentito", "noi": "abbiamo sentito", "voi": "avete sentito", "loro": "hanno sentito"]
+                ],
+                group: "Perception",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-ascoltare",
+                verb: "ascoltare",
+                translation: "écouter",
+                conjugations: [
+                    "Présent": ["io": "ascolto", "tu": "ascolti", "lui/lei": "ascolta", "noi": "ascoltiamo", "voi": "ascoltate", "loro": "ascoltano"],
+                    "Passato prossimo": ["io": "ho ascoltato", "tu": "hai ascoltato", "lui/lei": "ha ascoltato", "noi": "abbiamo ascoltato", "voi": "avete ascoltato", "loro": "hanno ascoltato"]
+                ],
+                group: "Perception",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-guardare",
+                verb: "guardare",
+                translation: "regarder",
+                conjugations: [
+                    "Présent": ["io": "guardo", "tu": "guardi", "lui/lei": "guarda", "noi": "guardiamo", "voi": "guardate", "loro": "guardano"],
+                    "Passato prossimo": ["io": "ho guardato", "tu": "hai guardato", "lui/lei": "ha guardato", "noi": "abbiamo guardato", "voi": "avete guardato", "loro": "hanno guardato"]
+                ],
+                group: "Perception",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-toccare",
+                verb: "toccare",
+                translation: "toucher",
+                conjugations: [
+                    "Présent": ["io": "tocco", "tu": "tocchi", "lui/lei": "tocca", "noi": "tocchiamo", "voi": "toccate", "loro": "toccano"],
+                    "Passato prossimo": ["io": "ho toccato", "tu": "hai toccato", "lui/lei": "ha toccato", "noi": "abbiamo toccato", "voi": "avete toccato", "loro": "hanno toccato"]
+                ],
+                group: "Perception",
+                isIrregular: false
+            ),
+            
+            // VIE QUOTIDIENNE
+            Verb(
+                id: "it-svegliarsi",
+                verb: "svegliarsi",
+                translation: "se réveiller",
+                conjugations: [
+                    "Présent": ["io": "mi sveglio", "tu": "ti svegli", "lui/lei": "si sveglia", "noi": "ci svegliamo", "voi": "vi svegliate", "loro": "si svegliano"],
+                    "Passato prossimo": ["io": "mi sono svegliato", "tu": "ti sei svegliato", "lui/lei": "si è svegliato", "noi": "ci siamo svegliati", "voi": "vi siete svegliati", "loro": "si sono svegliati"]
+                ],
+                group: "Vie quotidienne",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-alzarsi",
+                verb: "alzarsi",
+                translation: "se lever",
+                conjugations: [
+                    "Présent": ["io": "mi alzo", "tu": "ti alzi", "lui/lei": "si alza", "noi": "ci alziamo", "voi": "vi alzate", "loro": "si alzano"],
+                    "Passato prossimo": ["io": "mi sono alzato", "tu": "ti sei alzato", "lui/lei": "si è alzato", "noi": "ci siamo alzati", "voi": "vi siete alzati", "loro": "si sono alzati"]
+                ],
+                group: "Vie quotidienne",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-lavarsi",
+                verb: "lavarsi",
+                translation: "se laver",
+                conjugations: [
+                    "Présent": ["io": "mi lavo", "tu": "ti lavi", "lui/lei": "si lava", "noi": "ci laviamo", "voi": "vi lavate", "loro": "si lavano"],
+                    "Passato prossimo": ["io": "mi sono lavato", "tu": "ti sei lavato", "lui/lei": "si è lavato", "noi": "ci siamo lavati", "voi": "vi siete lavati", "loro": "si sono lavati"]
+                ],
+                group: "Vie quotidienne",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-vestirsi",
+                verb: "vestirsi",
+                translation: "s'habiller",
+                conjugations: [
+                    "Présent": ["io": "mi vesto", "tu": "ti vesti", "lui/lei": "si veste", "noi": "ci vestiamo", "voi": "vi vestite", "loro": "si vestono"],
+                    "Passato prossimo": ["io": "mi sono vestito", "tu": "ti sei vestito", "lui/lei": "si è vestito", "noi": "ci siamo vestiti", "voi": "vi siete vestiti", "loro": "si sono vestiti"]
+                ],
+                group: "Vie quotidienne",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-cucinare",
+                verb: "cucinare",
+                translation: "cuisiner",
+                conjugations: [
+                    "Présent": ["io": "cucino", "tu": "cucini", "lui/lei": "cucina", "noi": "cuciniamo", "voi": "cucinate", "loro": "cucinano"],
+                    "Passato prossimo": ["io": "ho cucinato", "tu": "hai cucinato", "lui/lei": "ha cucinato", "noi": "abbiamo cucinato", "voi": "avete cucinato", "loro": "hanno cucinato"]
+                ],
+                group: "Vie quotidienne",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-pulire",
+                verb: "pulire",
+                translation: "nettoyer",
+                conjugations: [
+                    "Présent": ["io": "pulisco", "tu": "pulisci", "lui/lei": "pulisce", "noi": "puliamo", "voi": "pulite", "loro": "puliscono"],
+                    "Passato prossimo": ["io": "ho pulito", "tu": "hai pulito", "lui/lei": "ha pulito", "noi": "abbiamo pulito", "voi": "avete pulito", "loro": "hanno pulito"]
+                ],
+                group: "Vie quotidienne",
+                isIrregular: false
+            ),
+            
+            // TRAVAIL & ÉTUDE
+            Verb(
+                id: "it-lavorare",
+                verb: "lavorare",
+                translation: "travailler",
+                conjugations: [
+                    "Présent": ["io": "lavoro", "tu": "lavori", "lui/lei": "lavora", "noi": "lavoriamo", "voi": "lavorate", "loro": "lavorano"],
+                    "Passato prossimo": ["io": "ho lavorato", "tu": "hai lavorato", "lui/lei": "ha lavorato", "noi": "abbiamo lavorato", "voi": "avete lavorato", "loro": "hanno lavorato"]
+                ],
+                group: "Travail",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-studiare",
+                verb: "studiare",
+                translation: "étudier",
+                conjugations: [
+                    "Présent": ["io": "studio", "tu": "studi", "lui/lei": "studia", "noi": "studiamo", "voi": "studiate", "loro": "studiano"],
+                    "Passato prossimo": ["io": "ho studiato", "tu": "hai studiato", "lui/lei": "ha studiato", "noi": "abbiamo studiato", "voi": "avete studiato", "loro": "hanno studiato"]
+                ],
+                group: "Travail",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-imparare",
+                verb: "imparare",
+                translation: "apprendre",
+                conjugations: [
+                    "Présent": ["io": "imparo", "tu": "impari", "lui/lei": "impara", "noi": "impariamo", "voi": "imparate", "loro": "imparano"],
+                    "Passato prossimo": ["io": "ho imparato", "tu": "hai imparato", "lui/lei": "ha imparato", "noi": "abbiamo imparato", "voi": "avete imparato", "loro": "hanno imparato"]
+                ],
+                group: "Travail",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-insegnare",
+                verb: "insegnare",
+                translation: "enseigner",
+                conjugations: [
+                    "Présent": ["io": "insegno", "tu": "insegni", "lui/lei": "insegna", "noi": "insegniamo", "voi": "insegnate", "loro": "insegnano"],
+                    "Passato prossimo": ["io": "ho insegnato", "tu": "hai insegnato", "lui/lei": "ha insegnato", "noi": "abbiamo insegnato", "voi": "avete insegnato", "loro": "hanno insegnato"]
+                ],
+                group: "Travail",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-guadagnare",
+                verb: "guadagnare",
+                translation: "gagner (argent)",
+                conjugations: [
+                    "Présent": ["io": "guadagno", "tu": "guadagni", "lui/lei": "guadagna", "noi": "guadagniamo", "voi": "guadagnate", "loro": "guadagnano"],
+                    "Passato prossimo": ["io": "ho guadagnato", "tu": "hai guadagnato", "lui/lei": "ha guadagnato", "noi": "abbiamo guadagnato", "voi": "avete guadagnato", "loro": "hanno guadagnato"]
+                ],
+                group: "Travail",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-perdere",
+                verb: "perdere",
+                translation: "perdre",
+                conjugations: [
+                    "Présent": ["io": "perdo", "tu": "perdi", "lui/lei": "perde", "noi": "perdiamo", "voi": "perdete", "loro": "perdono"],
+                    "Passato prossimo": ["io": "ho perso", "tu": "hai perso", "lui/lei": "ha perso", "noi": "abbiamo perso", "voi": "avete perso", "loro": "hanno perso"]
+                ],
+                group: "Travail",
+                isIrregular: true
+            ),
+            Verb(
+                id: "it-vincere",
+                verb: "vincere",
+                translation: "gagner (victoire)",
+                conjugations: [
+                    "Présent": ["io": "vinco", "tu": "vinci", "lui/lei": "vince", "noi": "vinciamo", "voi": "vincete", "loro": "vincono"],
+                    "Passato prossimo": ["io": "ho vinto", "tu": "hai vinto", "lui/lei": "ha vinto", "noi": "abbiamo vinto", "voi": "avete vinto", "loro": "hanno vinto"]
+                ],
+                group: "Travail",
+                isIrregular: true
+            ),
+            
+            // ÉMOTIONS
+            Verb(
+                id: "it-amare",
+                verb: "amare",
+                translation: "aimer",
+                conjugations: [
+                    "Présent": ["io": "amo", "tu": "ami", "lui/lei": "ama", "noi": "amiamo", "voi": "amate", "loro": "amano"],
+                    "Passato prossimo": ["io": "ho amato", "tu": "hai amato", "lui/lei": "ha amato", "noi": "abbiamo amato", "voi": "avete amato", "loro": "hanno amato"]
+                ],
+                group: "Émotions",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-odiare",
+                verb: "odiare",
+                translation: "détester",
+                conjugations: [
+                    "Présent": ["io": "odio", "tu": "odi", "lui/lei": "odia", "noi": "odiamo", "voi": "odiate", "loro": "odiano"],
+                    "Passato prossimo": ["io": "ho odiato", "tu": "hai odiato", "lui/lei": "ha odiato", "noi": "abbiamo odiato", "voi": "avete odiato", "loro": "hanno odiato"]
+                ],
+                group: "Émotions",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-preferire",
+                verb: "preferire",
+                translation: "préférer",
+                conjugations: [
+                    "Présent": ["io": "preferisco", "tu": "preferisci", "lui/lei": "preferisce", "noi": "preferiamo", "voi": "preferite", "loro": "preferiscono"],
+                    "Passato prossimo": ["io": "ho preferito", "tu": "hai preferito", "lui/lei": "ha preferito", "noi": "abbiamo preferito", "voi": "avete preferito", "loro": "hanno preferito"]
+                ],
+                group: "Émotions",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-piacere",
+                verb: "piacere",
+                translation: "plaire",
+                conjugations: [
+                    "Présent": ["mi": "piace/piacciono", "ti": "piace/piacciono", "gli/le": "piace/piacciono", "ci": "piace/piacciono", "vi": "piace/piacciono", "loro": "piace/piacciono"],
+                    "Passato prossimo": ["mi": "è piaciuto/a", "ti": "è piaciuto/a", "gli/le": "è piaciuto/a", "ci": "è piaciuto/a", "vi": "è piaciuto/a", "loro": "è piaciuto/a"]
+                ],
+                group: "Émotions",
+                isIrregular: true
+            ),
+            Verb(
+                id: "it-sperare",
+                verb: "sperare",
+                translation: "espérer",
+                conjugations: [
+                    "Présent": ["io": "spero", "tu": "speri", "lui/lei": "spera", "noi": "speriamo", "voi": "sperate", "loro": "sperano"],
+                    "Passato prossimo": ["io": "ho sperato", "tu": "hai sperato", "lui/lei": "ha sperato", "noi": "abbiamo sperato", "voi": "avete sperato", "loro": "hanno sperato"]
+                ],
+                group: "Émotions",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-temere",
+                verb: "temere",
+                translation: "craindre",
+                conjugations: [
+                    "Présent": ["io": "temo", "tu": "temi", "lui/lei": "teme", "noi": "temiamo", "voi": "temete", "loro": "temono"],
+                    "Passato prossimo": ["io": "ho temuto", "tu": "hai temuto", "lui/lei": "ha temuto", "noi": "abbiamo temuto", "voi": "avete temuto", "loro": "hanno temuto"]
+                ],
+                group: "Émotions",
+                isIrregular: false
+            ),
+            
+            // ACTIONS
+            Verb(
+                id: "it-portare",
+                verb: "portare",
+                translation: "porter / apporter",
+                conjugations: [
+                    "Présent": ["io": "porto", "tu": "porti", "lui/lei": "porta", "noi": "portiamo", "voi": "portate", "loro": "portano"],
+                    "Passato prossimo": ["io": "ho portato", "tu": "hai portato", "lui/lei": "ha portato", "noi": "abbiamo portato", "voi": "avete portato", "loro": "hanno portato"]
+                ],
+                group: "Actions",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-mettere",
+                verb: "mettere",
+                translation: "mettre",
+                conjugations: [
+                    "Présent": ["io": "metto", "tu": "metti", "lui/lei": "mette", "noi": "mettiamo", "voi": "mettete", "loro": "mettono"],
+                    "Passato prossimo": ["io": "ho messo", "tu": "hai messo", "lui/lei": "ha messo", "noi": "abbiamo messo", "voi": "avete messo", "loro": "hanno messo"]
+                ],
+                group: "Actions",
+                isIrregular: true
+            ),
+            Verb(
+                id: "it-aprire",
+                verb: "aprire",
+                translation: "ouvrir",
+                conjugations: [
+                    "Présent": ["io": "apro", "tu": "apri", "lui/lei": "apre", "noi": "apriamo", "voi": "aprite", "loro": "aprono"],
+                    "Passato prossimo": ["io": "ho aperto", "tu": "hai aperto", "lui/lei": "ha aperto", "noi": "abbiamo aperto", "voi": "avete aperto", "loro": "hanno aperto"]
+                ],
+                group: "Actions",
+                isIrregular: true
+            ),
+            Verb(
+                id: "it-chiudere",
+                verb: "chiudere",
+                translation: "fermer",
+                conjugations: [
+                    "Présent": ["io": "chiudo", "tu": "chiudi", "lui/lei": "chiude", "noi": "chiudiamo", "voi": "chiudete", "loro": "chiudono"],
+                    "Passato prossimo": ["io": "ho chiuso", "tu": "hai chiuso", "lui/lei": "ha chiuso", "noi": "abbiamo chiuso", "voi": "avete chiuso", "loro": "hanno chiuso"]
+                ],
+                group: "Actions",
+                isIrregular: true
+            ),
+            Verb(
+                id: "it-comprare",
+                verb: "comprare",
+                translation: "acheter",
+                conjugations: [
+                    "Présent": ["io": "compro", "tu": "compri", "lui/lei": "compra", "noi": "compriamo", "voi": "comprate", "loro": "comprano"],
+                    "Passato prossimo": ["io": "ho comprato", "tu": "hai comprato", "lui/lei": "ha comprato", "noi": "abbiamo comprato", "voi": "avete comprato", "loro": "hanno comprato"]
+                ],
+                group: "Actions",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-vendere",
+                verb: "vendere",
+                translation: "vendre",
+                conjugations: [
+                    "Présent": ["io": "vendo", "tu": "vendi", "lui/lei": "vende", "noi": "vendiamo", "voi": "vendete", "loro": "vendono"],
+                    "Passato prossimo": ["io": "ho venduto", "tu": "hai venduto", "lui/lei": "ha venduto", "noi": "abbiamo venduto", "voi": "avete venduto", "loro": "hanno venduto"]
+                ],
+                group: "Actions",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-pagare",
+                verb: "pagare",
+                translation: "payer",
+                conjugations: [
+                    "Présent": ["io": "pago", "tu": "paghi", "lui/lei": "paga", "noi": "paghiamo", "voi": "pagate", "loro": "pagano"],
+                    "Passato prossimo": ["io": "ho pagato", "tu": "hai pagato", "lui/lei": "ha pagato", "noi": "abbiamo pagato", "voi": "avete pagato", "loro": "hanno pagato"]
+                ],
+                group: "Actions",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-trovare",
+                verb: "trovare",
+                translation: "trouver",
+                conjugations: [
+                    "Présent": ["io": "trovo", "tu": "trovi", "lui/lei": "trova", "noi": "troviamo", "voi": "trovate", "loro": "trovano"],
+                    "Passato prossimo": ["io": "ho trovato", "tu": "hai trovato", "lui/lei": "ha trovato", "noi": "abbiamo trovato", "voi": "avete trovato", "loro": "hanno trovato"]
+                ],
+                group: "Actions",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-cercare",
+                verb: "cercare",
+                translation: "chercher",
+                conjugations: [
+                    "Présent": ["io": "cerco", "tu": "cerchi", "lui/lei": "cerca", "noi": "cerchiamo", "voi": "cercate", "loro": "cercano"],
+                    "Passato prossimo": ["io": "ho cercato", "tu": "hai cercato", "lui/lei": "ha cercato", "noi": "abbiamo cercato", "voi": "avete cercato", "loro": "hanno cercato"]
+                ],
+                group: "Actions",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-lasciare",
+                verb: "lasciare",
+                translation: "laisser",
+                conjugations: [
+                    "Présent": ["io": "lascio", "tu": "lasci", "lui/lei": "lascia", "noi": "lasciamo", "voi": "lasciate", "loro": "lasciano"],
+                    "Passato prossimo": ["io": "ho lasciato", "tu": "hai lasciato", "lui/lei": "ha lasciato", "noi": "abbiamo lasciato", "voi": "avete lasciato", "loro": "hanno lasciato"]
+                ],
+                group: "Actions",
+                isIrregular: false
+            ),
+            
+            // COGNITIF
+            Verb(
+                id: "it-pensare",
+                verb: "pensare",
+                translation: "penser",
+                conjugations: [
+                    "Présent": ["io": "penso", "tu": "pensi", "lui/lei": "pensa", "noi": "pensiamo", "voi": "pensate", "loro": "pensano"],
+                    "Passato prossimo": ["io": "ho pensato", "tu": "hai pensato", "lui/lei": "ha pensato", "noi": "abbiamo pensato", "voi": "avete pensato", "loro": "hanno pensato"]
+                ],
+                group: "Cognitif",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-credere",
+                verb: "credere",
+                translation: "croire",
+                conjugations: [
+                    "Présent": ["io": "credo", "tu": "credi", "lui/lei": "crede", "noi": "crediamo", "voi": "credete", "loro": "credono"],
+                    "Passato prossimo": ["io": "ho creduto", "tu": "hai creduto", "lui/lei": "ha creduto", "noi": "abbiamo creduto", "voi": "avete creduto", "loro": "hanno creduto"]
+                ],
+                group: "Cognitif",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-ricordare",
+                verb: "ricordare",
+                translation: "se souvenir",
+                conjugations: [
+                    "Présent": ["io": "ricordo", "tu": "ricordi", "lui/lei": "ricorda", "noi": "ricordiamo", "voi": "ricordate", "loro": "ricordano"],
+                    "Passato prossimo": ["io": "ho ricordato", "tu": "hai ricordato", "lui/lei": "ha ricordato", "noi": "abbiamo ricordato", "voi": "avete ricordato", "loro": "hanno ricordato"]
+                ],
+                group: "Cognitif",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-dimenticare",
+                verb: "dimenticare",
+                translation: "oublier",
+                conjugations: [
+                    "Présent": ["io": "dimentico", "tu": "dimentichi", "lui/lei": "dimentica", "noi": "dimentichiamo", "voi": "dimenticate", "loro": "dimenticano"],
+                    "Passato prossimo": ["io": "ho dimenticato", "tu": "hai dimenticato", "lui/lei": "ha dimenticato", "noi": "abbiamo dimenticato", "voi": "avete dimenticato", "loro": "hanno dimenticato"]
+                ],
+                group: "Cognitif",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-decidere",
+                verb: "decidere",
+                translation: "décider",
+                conjugations: [
+                    "Présent": ["io": "decido", "tu": "decidi", "lui/lei": "decide", "noi": "decidiamo", "voi": "decidete", "loro": "decidono"],
+                    "Passato prossimo": ["io": "ho deciso", "tu": "hai deciso", "lui/lei": "ha deciso", "noi": "abbiamo deciso", "voi": "avete deciso", "loro": "hanno deciso"]
+                ],
+                group: "Cognitif",
+                isIrregular: true
+            ),
+            
+            // SOCIAL
+            Verb(
+                id: "it-incontrare",
+                verb: "incontrare",
+                translation: "rencontrer",
+                conjugations: [
+                    "Présent": ["io": "incontro", "tu": "incontri", "lui/lei": "incontra", "noi": "incontriamo", "voi": "incontrate", "loro": "incontrano"],
+                    "Passato prossimo": ["io": "ho incontrato", "tu": "hai incontrato", "lui/lei": "ha incontrato", "noi": "abbiamo incontrato", "voi": "avete incontrato", "loro": "hanno incontrato"]
+                ],
+                group: "Social",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-salutare",
+                verb: "salutare",
+                translation: "saluer",
+                conjugations: [
+                    "Présent": ["io": "saluto", "tu": "saluti", "lui/lei": "saluta", "noi": "salutiamo", "voi": "salutate", "loro": "salutano"],
+                    "Passato prossimo": ["io": "ho salutato", "tu": "hai salutato", "lui/lei": "ha salutato", "noi": "abbiamo salutato", "voi": "avete salutato", "loro": "hanno salutato"]
+                ],
+                group: "Social",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-aiutare",
+                verb: "aiutare",
+                translation: "aider",
+                conjugations: [
+                    "Présent": ["io": "aiuto", "tu": "aiuti", "lui/lei": "aiuta", "noi": "aiutiamo", "voi": "aiutate", "loro": "aiutano"],
+                    "Passato prossimo": ["io": "ho aiutato", "tu": "hai aiutato", "lui/lei": "ha aiutato", "noi": "abbiamo aiutato", "voi": "avete aiutato", "loro": "hanno aiutato"]
+                ],
+                group: "Social",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-ringraziare",
+                verb: "ringraziare",
+                translation: "remercier",
+                conjugations: [
+                    "Présent": ["io": "ringrazio", "tu": "ringrazi", "lui/lei": "ringrazia", "noi": "ringraziamo", "voi": "ringraziate", "loro": "ringraziano"],
+                    "Passato prossimo": ["io": "ho ringraziato", "tu": "hai ringraziato", "lui/lei": "ha ringraziato", "noi": "abbiamo ringraziato", "voi": "avete ringraziato", "loro": "hanno ringraziato"]
+                ],
+                group: "Social",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-invitare",
+                verb: "invitare",
+                translation: "inviter",
+                conjugations: [
+                    "Présent": ["io": "invito", "tu": "inviti", "lui/lei": "invita", "noi": "invitiamo", "voi": "invitate", "loro": "invitano"],
+                    "Passato prossimo": ["io": "ho invitato", "tu": "hai invitato", "lui/lei": "ha invitato", "noi": "abbiamo invitato", "voi": "avete invitato", "loro": "hanno invitato"]
+                ],
+                group: "Social",
+                isIrregular: false
+            ),
+            
+            // MÉTÉO
+            Verb(
+                id: "it-piovere",
+                verb: "piovere",
+                translation: "pleuvoir",
+                conjugations: [
+                    "Présent": ["": "piove"],
+                    "Passato prossimo": ["": "è piovuto"]
+                ],
+                group: "Météo",
+                isIrregular: false
+            ),
+            Verb(
+                id: "it-nevicare",
+                verb: "nevicare",
+                translation: "neiger",
+                conjugations: [
+                    "Présent": ["": "nevica"],
+                    "Passato prossimo": ["": "è nevicato"]
+                ],
+                group: "Météo",
+                isIrregular: false
+            ),
+            
+            // MODAL ADDITIONNEL
+            Verb(
+                id: "it-sapere-modal",
+                verb: "sapere",
+                translation: "savoir / pouvoir",
+                conjugations: [
+                    "Présent": ["io": "so", "tu": "sai", "lui/lei": "sa", "noi": "sappiamo", "voi": "sapete", "loro": "sanno"],
+                    "Passato prossimo": ["io": "ho saputo", "tu": "hai saputo", "lui/lei": "ha saputo", "noi": "abbiamo saputo", "voi": "avete saputo", "loro": "hanno saputo"]
+                ],
+                group: "Modal",
+                isIrregular: true
             )
         ]
     }

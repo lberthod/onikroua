@@ -1,0 +1,273 @@
+package com.loicberthod.onykroua
+
+data class Verb(
+    val id: String,
+    val verb: String,
+    val translation: String,
+    val language: String,
+    val type: String = "regular",
+    val conjugations: Map<String, Map<String, String>>
+)
+
+object VerbData {
+    fun getVerbsByLanguage(language: String): List<Verb> {
+        return if (language == "it") getItalianVerbs() else getSpanishVerbs()
+    }
+    
+    fun getItalianVerbs(): List<Verb> {
+        return listOf(
+            Verb(
+                id = "it-essere",
+                verb = "essere --",
+                translation = "être",
+                language = "it",
+                type = "auxiliaire",
+                conjugations = mapOf(
+                    "Présent" to mapOf(
+                        "ioooo" to "sono",
+                        "tu" to "sei",
+                        "lui/lei" to "è",
+                        "noi" to "siamo",
+                        "voi" to "siete",
+                        "loro" to "sono"
+                    ),
+                    "Imparfait" to mapOf(
+                        "io" to "ero",
+                        "tu" to "eri",
+                        "lui/lei" to "era",
+                        "noi" to "eravamo",
+                        "voi" to "eravate",
+                        "loro" to "erano"
+                    ),
+                    "Futur" to mapOf(
+                        "io" to "sarò",
+                        "tu" to "sarai",
+                        "lui/lei" to "sarà",
+                        "noi" to "saremo",
+                        "voi" to "sarete",
+                        "loro" to "saranno"
+                    )
+                )
+            ),
+            Verb(
+                id = "it-avere",
+                verb = "avere",
+                translation = "avoir",
+                language = "it",
+                type = "auxiliaire",
+                conjugations = mapOf(
+                    "Présent" to mapOf(
+                        "io" to "ho",
+                        "tu" to "hai",
+                        "lui/lei" to "ha",
+                        "noi" to "abbiamo",
+                        "voi" to "avete",
+                        "loro" to "hanno"
+                    ),
+                    "Imparfait" to mapOf(
+                        "io" to "avevo",
+                        "tu" to "avevi",
+                        "lui/lei" to "aveva",
+                        "noi" to "avevamo",
+                        "voi" to "avevate",
+                        "loro" to "avevano"
+                    ),
+                    "Futur" to mapOf(
+                        "io" to "avrò",
+                        "tu" to "avrai",
+                        "lui/lei" to "avrà",
+                        "noi" to "avremo",
+                        "voi" to "avrete",
+                        "loro" to "avranno"
+                    )
+                )
+            ),
+            Verb(
+                id = "it-andare",
+                verb = "andare",
+                translation = "aller",
+                language = "it",
+                type = "mouvement",
+                conjugations = mapOf(
+                    "Présent" to mapOf(
+                        "io" to "vado",
+                        "tu" to "vai",
+                        "lui/lei" to "va",
+                        "noi" to "andiamo",
+                        "voi" to "andate",
+                        "loro" to "vanno"
+                    ),
+                    "Futur" to mapOf(
+                        "io" to "andrò",
+                        "tu" to "andrai",
+                        "lui/lei" to "andrà",
+                        "noi" to "andremo",
+                        "voi" to "andrete",
+                        "loro" to "andranno"
+                    )
+                )
+            ),
+            Verb(
+                id = "it-fare",
+                verb = "fare",
+                translation = "faire",
+                language = "it",
+                conjugations = mapOf(
+                    "Présent" to mapOf(
+                        "io" to "faccio",
+                        "tu" to "fai",
+                        "lui/lei" to "fa",
+                        "noi" to "facciamo",
+                        "voi" to "fate",
+                        "loro" to "fanno"
+                    )
+                )
+            ),
+            Verb(
+                id = "it-parlare",
+                verb = "parlare",
+                translation = "parler",
+                language = "it",
+                conjugations = mapOf(
+                    "Présent" to mapOf(
+                        "io" to "parlo",
+                        "tu" to "parli",
+                        "lui/lei" to "parla",
+                        "noi" to "parliamo",
+                        "voi" to "parlate",
+                        "loro" to "parlano"
+                    )
+                )
+            )
+        )
+    }
+    
+    fun getSpanishVerbs(): List<Verb> {
+        return listOf(
+            Verb(
+                id = "es-ser",
+                verb = "ser",
+                translation = "être (permanent)",
+                language = "es",
+                type = "verbe clé",
+                conjugations = mapOf(
+                    "Presente" to mapOf(
+                        "yo" to "soy",
+                        "tú" to "eres",
+                        "él/ella" to "es",
+                        "nosotros" to "somos",
+                        "vosotros" to "sois",
+                        "ellos" to "son"
+                    ),
+                    "Pretérito perfecto" to mapOf(
+                        "yo" to "he sido",
+                        "tú" to "has sido",
+                        "él/ella" to "ha sido",
+                        "nosotros" to "hemos sido",
+                        "vosotros" to "habéis sido",
+                        "ellos" to "han sido"
+                    ),
+                    "Imparfait" to mapOf(
+                        "yo" to "era",
+                        "tú" to "eras",
+                        "él/ella" to "era",
+                        "nosotros" to "éramos",
+                        "vosotros" to "erais",
+                        "ellos" to "eran"
+                    )
+                )
+            ),
+            Verb(
+                id = "es-estar",
+                verb = "estar",
+                translation = "être (temporaire)",
+                language = "es",
+                type = "verbe clé",
+                conjugations = mapOf(
+                    "Presente" to mapOf(
+                        "yo" to "estoy",
+                        "tú" to "estás",
+                        "él/ella" to "está",
+                        "nosotros" to "estamos",
+                        "vosotros" to "estáis",
+                        "ellos" to "están"
+                    ),
+                    "Pretérito perfecto" to mapOf(
+                        "yo" to "he estado",
+                        "tú" to "has estado",
+                        "él/ella" to "ha estado",
+                        "nosotros" to "hemos estado",
+                        "vosotros" to "habéis estado",
+                        "ellos" to "han estado"
+                    )
+                )
+            ),
+            Verb(
+                id = "es-ir",
+                verb = "ir",
+                translation = "aller",
+                language = "es",
+                type = "mouvement",
+                conjugations = mapOf(
+                    "Presente" to mapOf(
+                        "yo" to "voy",
+                        "tú" to "vas",
+                        "él/ella" to "va",
+                        "nosotros" to "vamos",
+                        "vosotros" to "vais",
+                        "ellos" to "van"
+                    ),
+                    "Pretérito perfecto" to mapOf(
+                        "yo" to "he ido",
+                        "tú" to "has ido",
+                        "él/ella" to "ha ido",
+                        "nosotros" to "hemos ido",
+                        "vosotros" to "habéis ido",
+                        "ellos" to "han ido"
+                    )
+                )
+            ),
+            Verb(
+                id = "es-haber",
+                verb = "haber",
+                translation = "avoir (auxiliaire)",
+                language = "es",
+                type = "verbe clé",
+                conjugations = mapOf(
+                    "Presente" to mapOf(
+                        "yo" to "he",
+                        "tú" to "has",
+                        "él/ella" to "ha",
+                        "nosotros" to "hemos",
+                        "vosotros" to "habéis",
+                        "ellos" to "han"
+                    )
+                )
+            ),
+            Verb(
+                id = "es-tener",
+                verb = "tener",
+                translation = "avoir (posséder)",
+                language = "es",
+                conjugations = mapOf(
+                    "Presente" to mapOf(
+                        "yo" to "tengo",
+                        "tú" to "tienes",
+                        "él/ella" to "tiene",
+                        "nosotros" to "tenemos",
+                        "vosotros" to "tenéis",
+                        "ellos" to "tienen"
+                    ),
+                    "Pretérito perfecto" to mapOf(
+                        "yo" to "he tenido",
+                        "tú" to "has tenido",
+                        "él/ella" to "ha tenido",
+                        "nosotros" to "hemos tenido",
+                        "vosotros" to "habéis tenido",
+                        "ellos" to "han tenido"
+                    )
+                )
+            )
+        )
+    }
+}

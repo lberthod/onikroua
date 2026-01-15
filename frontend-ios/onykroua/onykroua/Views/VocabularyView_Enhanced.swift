@@ -34,8 +34,9 @@ struct VocabularyView_Enhanced: View {
                 
                 Picker("", selection: $selectedTab) {
                     Text("📖 Dictionnaire").tag(0)
-                    Text("🗂️ Catégories").tag(1)
-                    Text("🎯 Pratique").tag(2)
+                    Text("🎓 Apprentissage").tag(1)
+                    Text("🗂️ Catégories").tag(2)
+                    Text("🎯 Pratique").tag(3)
                 }
                 .pickerStyle(.segmented)
                 .padding()
@@ -48,11 +49,14 @@ struct VocabularyView_Enhanced: View {
                     )
                     .tag(0)
                     
-                    CategoriesTab(language: currentLanguage)
+                    VocabularyLearnedTab(language: currentLanguage)
                         .tag(1)
                     
-                    VocabularyPracticeTab(language: currentLanguage)
+                    CategoriesTab(language: currentLanguage)
                         .tag(2)
+                    
+                    VocabularyPracticeTab(language: currentLanguage)
+                        .tag(3)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
             }
@@ -173,11 +177,29 @@ struct EnhancedDictionaryTab: View {
     @EnvironmentObject var env: AppEnvironment
     @State private var searchText = ""
     
+    private var uniqueSortedWords: [VocabularyWord] {
+        // Obtenir tous les mots, supprimer les doublons par texte de mot, et trier A-Z
+        let allWords = words
+        var seenWords = Set<String>()
+        var uniqueWords = [VocabularyWord]()
+        
+        for word in allWords {
+            let normalizedWord = word.word.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+            if !seenWords.contains(normalizedWord) {
+                seenWords.insert(normalizedWord)
+                uniqueWords.append(word)
+            }
+        }
+        
+        return uniqueWords.sorted { $0.word.lowercased() < $1.word.lowercased() }
+    }
+    
     private var searchResults: [VocabularyWord] {
+        let baseWords = uniqueSortedWords
         if searchText.isEmpty {
-            return words
+            return baseWords
         } else {
-            return words.filter { word in
+            return baseWords.filter { word in
                 word.word.localizedCaseInsensitiveContains(searchText) ||
                 word.translation.localizedCaseInsensitiveContains(searchText)
             }
@@ -281,9 +303,40 @@ struct EnhancedDictionaryRow: View {
                     }
                     
                     Button(action: {
-                        isLearned.toggle()
-                        if isLearned {
-                            gamificationManager?.recordWordLearned()
+                        let newLearnedState = !isLearned
+                        
+                        // Calcul manuel de l'ID Firebase
+                        let safeWord = word.word.replacingOccurrences(of: ".", with: "_")
+                            .replacingOccurrences(of: "$", with: "_")
+                            .replacingOccurrences(of: "#", with: "_")
+                            .replacingOccurrences(of: "[", with: "_")
+                            .replacingOccurrences(of: "]", with: "_")
+                            .replacingOccurrences(of: "/", with: "_")
+                        
+                        let safeTranslation = word.translation.replacingOccurrences(of: ".", with: "_")
+                            .replacingOccurrences(of: "$", with: "_")
+                            .replacingOccurrences(of: "#", with: "_")
+                            .replacingOccurrences(of: "[", with: "_")
+                            .replacingOccurrences(of: "]", with: "_")
+                            .replacingOccurrences(of: "/", with: "_")
+                        
+                        let wordId = "\(safeWord)_\(safeTranslation)"
+                        
+                        Task {
+                            if newLearnedState {
+                                gamificationManager?.recordWordLearned()
+                                await env.learnedWordsManager.markWordAsLearned(
+                                    wordId: wordId,
+                                    word: word.word,
+                                    translation: word.translation
+                                )
+                            } else {
+                                await env.learnedWordsManager.unmarkWordAsLearned(
+                                    wordId: wordId,
+                                    word: word.word
+                                )
+                            }
+                            isLearned = newLearnedState
                         }
                     }) {
                         Image(systemName: isLearned ? "checkmark.circle.fill" : "circle")
@@ -357,8 +410,18 @@ struct WordDetailView: View {
                     
                     if let example = word.example, !example.isEmpty {
                         VStack(alignment: .leading, spacing: 12) {
-                            Label("Exemple", systemImage: "quote.bubble")
-                                .font(.headline)
+                            HStack {
+                                Label("Exemple", systemImage: "quote.bubble")
+                                    .font(.headline)
+                                Spacer()
+                                Button(action: {
+                                    env.speechService.speak(example, language: "it-IT")
+                                }) {
+                                    Image(systemName: "speaker.wave.2.circle.fill")
+                                        .font(.title3)
+                                        .foregroundColor(.blue)
+                                }
+                            }
                             
                             Text(example)
                                 .font(.body)
@@ -390,15 +453,46 @@ struct WordDetailView: View {
                     }
                     
                     Button(action: {
-                        isLearned.toggle()
-                        if isLearned {
-                            gamificationManager?.recordWordLearned()
+                        let newLearnedState = !isLearned
+                        
+                        // Calcul manuel de l'ID Firebase
+                        let safeWord = word.word.replacingOccurrences(of: ".", with: "_")
+                            .replacingOccurrences(of: "$", with: "_")
+                            .replacingOccurrences(of: "#", with: "_")
+                            .replacingOccurrences(of: "[", with: "_")
+                            .replacingOccurrences(of: "]", with: "_")
+                            .replacingOccurrences(of: "/", with: "_")
+                        
+                        let safeTranslation = word.translation.replacingOccurrences(of: ".", with: "_")
+                            .replacingOccurrences(of: "$", with: "_")
+                            .replacingOccurrences(of: "#", with: "_")
+                            .replacingOccurrences(of: "[", with: "_")
+                            .replacingOccurrences(of: "]", with: "_")
+                            .replacingOccurrences(of: "/", with: "_")
+                        
+                        let wordId = "\(safeWord)_\(safeTranslation)"
+                        
+                        Task {
+                            if newLearnedState {
+                                gamificationManager?.recordWordLearned()
+                                await env.learnedWordsManager.markWordAsLearned(
+                                    wordId: wordId,
+                                    word: word.word,
+                                    translation: word.translation
+                                )
+                            } else {
+                                await env.learnedWordsManager.unmarkWordAsLearned(
+                                    wordId: wordId,
+                                    word: word.word
+                                )
+                            }
+                            isLearned = newLearnedState
                         }
                         dismiss()
                     }) {
                         HStack {
-                            Image(systemName: isLearned ? "checkmark.circle.fill" : "circle")
-                            Text(isLearned ? "Marqué comme appris" : "Marquer comme appris")
+                            Image(systemName: isLearned ? "checkmark.circle.fill" : "book.fill")
+                            Text(isLearned ? "Ajouté à l'Apprentissage" : "Ajouter à l'Apprentissage")
                         }
                         .font(.headline)
                         .foregroundColor(.white)

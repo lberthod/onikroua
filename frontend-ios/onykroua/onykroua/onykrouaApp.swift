@@ -56,19 +56,23 @@ struct onykrouaApp: App {
 
 struct MainAppView: View {
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject var firebaseManager: FirebaseManager
     @Query private var onboardingEntries: [OnboardingData]
     @State private var forceRefresh = false
     
     var body: some View {
         Group {
-            if shouldShowMainContent {
-                EnhancedContentView()
-            } else {
+            if !shouldShowMainContent {
                 OnboardingContainerView()
+            } else if !firebaseManager.isSignedIn {
+                AuthSelectionView()
+            } else {
+                EnhancedContentView()
             }
         }
         .id(forceRefresh)
         .animation(.easeInOut, value: shouldShowMainContent)
+        .animation(.easeInOut, value: firebaseManager.isSignedIn)
         .onAppear {
             checkOnboardingStatus()
         }
@@ -76,25 +80,76 @@ struct MainAppView: View {
     
     private var shouldShowMainContent: Bool {
         if let firstEntry = onboardingEntries.first {
-            print("📊 Onboarding entry found in SwiftData: completed = \(firstEntry.hasCompletedOnboarding)")
             return firstEntry.hasCompletedOnboarding
         }
-        
-        // Fallback sur UserDefaults si SwiftData échoue
-        let userDefaultsCompleted = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
-        if userDefaultsCompleted {
-            print("📊 No SwiftData entry, but UserDefaults shows onboarding completed")
-            return true
-        }
-        
-        print("📊 No onboarding entry found in SwiftData or UserDefaults")
-        return false
+        return UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
     }
     
     private func checkOnboardingStatus() {
-        print("📊 Total onboarding entries: \(onboardingEntries.count)")
-        if let entry = onboardingEntries.first {
-            print("📊 First entry completed: \(entry.hasCompletedOnboarding)")
+        print("📊 Auth State: \(firebaseManager.isSignedIn ? "Signed In" : "Signed Out")")
+    }
+}
+
+struct AuthSelectionView: View {
+    @EnvironmentObject var firebaseManager: FirebaseManager
+    @State private var showEmailSignIn = false
+    
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 24) {
+                Spacer()
+                
+                Image(systemName: "person.circle.fill")
+                    .font(.system(size: 100))
+                    .foregroundColor(.blue)
+                
+                VStack(spacing: 8) {
+                    Text("Connectez-vous")
+                        .font(.largeTitle.bold())
+                    Text("Synchronisez vos progrès sur tous vos appareils")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.horizontal)
+                
+                VStack(spacing: 16) {
+                    SignInWithAppleButton {
+                        // Action déjà gérée dans le bouton
+                    }
+                    
+                    Button(action: { showEmailSignIn = true }) {
+                        Label("Continuer avec Email", systemImage: "envelope.fill")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(Color.blue)
+                            .cornerRadius(16)
+                    }
+                    
+                    Button(action: {
+                        Task {
+                            try? await firebaseManager.signInAnonymously()
+                        }
+                    }) {
+                        Label("Continuer en invité", systemImage: "person.fill.questionmark")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(Color(.systemGray6))
+                            .cornerRadius(16)
+                    }
+                }
+                .padding(.horizontal, 32)
+                
+                Spacer()
+            }
+            .sheet(isPresented: $showEmailSignIn) {
+                EmailSignInView()
+                    .environmentObject(firebaseManager)
+            }
         }
     }
 }

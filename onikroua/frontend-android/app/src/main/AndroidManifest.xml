@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+        <package android:name="com.google.android.googlequicksearchbox" />
+        <package android:name="com.google.android.as" />
+    </queries>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.Onykroua">
+        
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        
+        <activity
+            android:name=".ConjugationActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+        
+        <activity
+            android:name=".VocabularyActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+        
+        <activity
+            android:name=".EmojiActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+        
+        <activity
+            android:name=".ConversationActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+        
+        <activity
+            android:name=".GrammarActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+        
+        <activity
+            android:name=".PhoneticActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+        
+        <activity
+            android:name=".FeedActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+        
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+        
+        <activity
+            android:name=".GeminiLiveActivity"
+            android:exported="true"
+            android:parentActivityName=".MainActivity" />
+            
+    </application>
+
+</manifest>

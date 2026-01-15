@@ -256,6 +256,10 @@ final class GamificationManager {
         achievements.filter { !$0.isUnlocked }
     }
     
+    // MARK: - Firebase Sync (To be implemented with proper async context)
+    // Note: Firebase sync methods removed to fix Swift 6 compilation errors
+    // These should be implemented in a separate @MainActor service or with proper Sendable conformance
+    
     func getAchievementProgress(for type: AchievementType) -> Double {
         guard let progress = currentProgress else { return 0 }
         

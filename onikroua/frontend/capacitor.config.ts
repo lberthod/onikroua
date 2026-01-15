@@ -1,7 +1,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.onikroua.app',
+  appId: 'com.loicberthod.onykroua',
   appName: 'Onikroua',
   webDir: 'dist',
   server: {

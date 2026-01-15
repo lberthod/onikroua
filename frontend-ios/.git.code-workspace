@@ -1,0 +1,27 @@
+{
+	"folders": [
+		{
+			"name": ".git",
+			"path": "../.git"
+		},
+		{
+			"name": ".vscode",
+			"path": "../.vscode"
+		},
+		{
+			"name": "app",
+			"path": "../app"
+		},
+		{
+			"name": "onikroua",
+			"path": "../onikroua"
+		},
+		{
+			"name": "frontend-ios",
+			"path": "."
+		}
+	],
+	"settings": {
+		"java.configuration.updateBuildConfiguration": "automatic"
+	}
+}

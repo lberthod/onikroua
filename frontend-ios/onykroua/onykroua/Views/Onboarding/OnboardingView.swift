@@ -90,48 +90,16 @@ struct OnboardingView: View {
                 // Navigation buttons
                 VStack(spacing: 16) {
                     if currentPage == pages.count {
-                        // Sign In with Apple button
-                        SignInWithAppleButton {
-                            completeOnboarding()
-                        }
-                        
-                        // Email Sign In button
-                        Button(action: { showEmailSignIn = true }) {
-                            HStack {
-                                Image(systemName: "envelope.fill")
-                                    .font(.title3)
-                                Text("Continuer avec Email")
-                                    .font(.headline)
-                            }
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .background(Color.blue)
-                            .cornerRadius(16)
-                        }
-                        
-                        // Anonymous Sign In button
-                        Button(action: signInAnonymously) {
-                            HStack {
-                                Image(systemName: "person.fill.questionmark")
-                                    .font(.title3)
-                                Text("Continuer en mode invité")
-                                    .font(.headline)
-                            }
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .background(Color.gray)
-                            .cornerRadius(16)
-                        }
-                        
-                        // Skip button
+                        // Bouton final de l'onboarding
                         Button(action: completeOnboarding) {
-                            Text("Passer")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
+                            Text("Commencer")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 56)
+                                .background(Color.blue)
+                                .cornerRadius(16)
                         }
-                        .padding(.top, 8)
                     } else {
                         // Next button
                         Button(action: nextPage) {

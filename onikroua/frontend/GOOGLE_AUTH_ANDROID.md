@@ -54,7 +54,7 @@ Entrez le mot de passe, puis copiez le **SHA1**.
 3. Allez dans **Paramètres du projet** (icône engrenage) → **Général**
 4. Descendez à **Vos applications** → trouvez votre app Android
 5. Si pas d'app Android, cliquez **Ajouter une application** → **Android**
-   - Package name : `com.onikroua.app`
+   - Package name : `com.loicberthod.onykroua`
    - Téléchargez `google-services.json`
 6. Dans **Empreintes digitales du certificat SHA**, cliquez **Ajouter une empreinte digitale**
 7. Collez votre **SHA-1** (faites-le pour debug ET release)
@@ -166,7 +166,7 @@ La connexion Google ouvrira un popup (méthode web standard).
 **Cause** : Le package name dans Firebase ne correspond pas
 
 **Solution** :
-- Package name doit être : `com.onikroua.app`
+- Package name doit être : `com.loicberthod.onykroua`
 - Vérifiez dans `capacitor.config.ts` → `appId`
 - Vérifiez dans Firebase Console → App Android
 

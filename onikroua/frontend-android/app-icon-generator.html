@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur d'icône Onykroua</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        .icon-container {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        #iconCanvas {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        #iconCanvas:hover {
+            transform: scale(1.05);
+        }
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+            align-items: center;
+        }
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+        .color-option.selected {
+            border-color: #333;
+            box-shadow: 0 0 0 2px white, 0 0 0 4px #333;
+        }
+        .info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+        .info h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .info p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Générateur d'icône Onykroua</h1>
+        
+        <div class="info">
+            <h3>📐 Spécifications Play Store</h3>
+            <p>✅ Format : PNG</p>
+            <p>✅ Taille : 512 × 512 pixels</p>
+            <p>✅ Poids : < 1 Mo</p>
+            <p>✅ Conforme aux directives Google Play</p>
+        </div>
+
+        <div class="icon-container">
+            <canvas id="iconCanvas" width="512" height="512"></canvas>
+        </div>
+
+        <div class="color-picker">
+            <span>Style :</span>
+            <div class="color-option selected" data-theme="purple" style="background: linear-gradient(135deg, #667eea, #764ba2)"></div>
+            <div class="color-option" data-theme="blue" style="background: linear-gradient(135deg, #2196F3, #1976D2)"></div>
+            <div class="color-option" data-theme="green" style="background: linear-gradient(135deg, #4CAF50, #388E3C)"></div>
+            <div class="color-option" data-theme="orange" style="background: linear-gradient(135deg, #FF9800, #F57C00)"></div>
+            <div class="color-option" data-theme="red" style="background: linear-gradient(135deg, #f44336, #d32f2f)"></div>
+        </div>
+
+        <div class="controls">
+            <button onclick="generateIcon()">🔄 Générer nouvelle icône</button>
+            <button onclick="downloadIcon()">💾 Télécharger PNG</button>
+            <button onclick="copyToClipboard()">📋 Copier dans presse-papiers</button>
+        </div>
+
+        <div class="info">
+            <h3>💡 Conseils pour le Play Store</h3>
+            <p>• L'icône est distinctive et professionnelle</p>
+            <p>• Respecte les directives de conception Google Play</p>
+            <p>• Fonctionne bien sur tous les appareils</p>
+            <p>• Format PNG avec transparence optimisée</p>
+        </div>
+    </div>
+
+    <script>
+        let currentTheme = 'purple';
+        const canvas = document.getElementById('iconCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const themes = {
+            purple: { primary: '#667eea', secondary: '#764ba2', text: '#FFFFFF' },
+            blue: { primary: '#2196F3', secondary: '#1976D2', text: '#FFFFFF' },
+            green: { primary: '#4CAF50', secondary: '#388E3C', text: '#FFFFFF' },
+            orange: { primary: '#FF9800', secondary: '#F57C00', text: '#FFFFFF' },
+            red: { primary: '#f44336', secondary: '#d32f2f', text: '#FFFFFF' }
+        };
+
+        function drawIcon(theme = currentTheme) {
+            const colors = themes[theme];
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, 512, 512);
+            
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, 512, 512);
+            gradient.addColorStop(0, colors.primary);
+            gradient.addColorStop(1, colors.secondary);
+            
+            // Rounded rectangle background
+            ctx.fillStyle = gradient;
+            roundRect(ctx, 0, 0, 512, 512, 80);
+            ctx.fill();
+            
+            // Add subtle shadow effect
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+            ctx.shadowBlur = 20;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 10;
+            
+            // Main circle for logo
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = 15;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 5;
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.beginPath();
+            ctx.arc(256, 220, 90, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            
+            // Draw "O" letter (for Onykroua)
+            ctx.fillStyle = colors.primary;
+            ctx.font = 'bold 120px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('O', 256, 220);
+            
+            // Draw "IT" (for Italian) below
+            ctx.fillStyle = colors.secondary;
+            ctx.font = 'bold 48px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            ctx.fillText('IT', 256, 280);
+            
+            // Add decorative elements
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([5, 5]);
+            
+            // Top decorative arc
+            ctx.beginPath();
+            ctx.arc(256, 220, 110, -Math.PI * 0.7, -Math.PI * 0.3);
+            ctx.stroke();
+            
+            // Bottom text "Onykroua"
+            ctx.setLineDash([]);
+            ctx.fillStyle = colors.text;
+            ctx.font = 'bold 36px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            ctx.fillText('Onykroua', 256, 380);
+            
+            // Subtitle
+            ctx.font = '24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.fillText('Italian Tutor', 256, 420);
+            
+            // Small decorative dots
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            for (let i = 0; i < 5; i++) {
+                ctx.beginPath();
+                ctx.arc(180 + i * 38, 460, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+
+        function generateIcon() {
+            drawIcon(currentTheme);
+        }
+
+        function downloadIcon() {
+            const link = document.createElement('a');
+            link.download = 'onykroua-app-icon-512x512.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function copyToClipboard() {
+            canvas.toBlob(function(blob) {
+                const item = new ClipboardItem({ 'image/png': blob });
+                navigator.clipboard.write([item]).then(function() {
+                    alert('✅ Icône copiée dans le presse-papiers !');
+                }).catch(function(error) {
+                    alert('❌ Erreur: ' + error);
+                });
+            });
+        }
+
+        // Theme selector
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                currentTheme = this.dataset.theme;
+                drawIcon(currentTheme);
+            });
+        });
+
+        // Generate initial icon
+        drawIcon(currentTheme);
+
+        // Canvas click to regenerate
+        canvas.addEventListener('click', generateIcon);
+    </script>
+</body>
+</html>

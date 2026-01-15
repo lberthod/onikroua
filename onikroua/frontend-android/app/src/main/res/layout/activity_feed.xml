@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FAFAFA">
+
+    <!-- Language Toggle (top right corner) -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal"
+        android:background="@android:color/white"
+        android:padding="4dp"
+        android:elevation="8dp">
+
+        <Button
+            android:id="@+id/languageButtonIt"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:text="🇮🇹"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/languageButtonEs"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:text="🇪🇸"
+            android:textSize="20sp"
+            android:layout_marginStart="4dp" />
+    </LinearLayout>
+
+    <!-- ViewPager2 for vertical swiping -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/feedViewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" />
+
+    <!-- Loading Indicator -->
+    <ProgressBar
+        android:id="@+id/loadingIndicator"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+</FrameLayout>

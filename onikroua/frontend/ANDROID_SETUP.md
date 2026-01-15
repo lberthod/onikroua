@@ -23,7 +23,7 @@ npx cap init
 
 Utiliser les valeurs suivantes quand demandé:
 - **App name**: `Onikroua`
-- **App ID**: `com.onikroua.app`
+- **App ID**: `com.loicberthod.onykroua`
 - **Web dir**: `dist`
 
 ### Étape 3: Ajouter la plateforme Android

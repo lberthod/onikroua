@@ -77,13 +77,21 @@ public class VocabularyDataManager: ObservableObject {
         var categories: [VocabCategory]
         do {
             categories = try decoder.decode([VocabCategory].self, from: data)
+            
+            // AUTOMATION: Trier les catégories par nom
+            categories.sort { $0.name.lowercased() < $1.name.lowercased() }
+            
+            // Les mots seront triés ci-dessous lors de la reconstruction des catégories
         } catch {
             throw AppError.decodingError(error.localizedDescription)
         }
         
-        // Update each word with its category info
+        // Update each word with its category info AND sort words
         categories = categories.map { category in
-            let updatedWords = category.words.map { word in
+            // Trier les mots de la catégorie avant de créer les nouveaux VocabWord
+            let sortedRawWords = category.words.sorted { $0.word.lowercased() < $1.word.lowercased() }
+            
+            let updatedWords = sortedRawWords.map { word in
                 VocabWord(
                     word: word.word,
                     translation: word.translation,

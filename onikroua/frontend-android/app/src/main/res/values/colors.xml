@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#7C3AED</color>
+    
+    <!-- Friendly & Accessible Light Theme (Variante 2) -->
+    <!-- Background gradient -->
+    <color name="bg_top">#F5F3FF</color>
+    <color name="bg_mid">#EDE9FE</color>
+    <color name="bg_bottom">#DDD6FE</color>
+    
+    <!-- Surfaces -->
+    <color name="surface_card">#F6F7FB</color>
+    <color name="surface_card_strong">#FFFFFF</color>
+    <color name="surface_card_soft">#F9FAFB</color>
+    
+    <!-- Text colors -->
+    <color name="text_primary">#1F2937</color>
+    <color name="text_secondary">#6B7280</color>
+    <color name="text_on_gradient">#FFFFFF</color>
+    <color name="text_on_gradient_dim">#D8D3FF</color>
+    
+    <!-- Accent colors -->
+    <color name="primary">#7C3AED</color>
+    <color name="primary_soft">#C4B5FD</color>
+    <color name="primary_dark">#6D28D9</color>
+    <color name="outline">#A78BFA</color>
+    <color name="outline_emoji">#B9A7FF</color>
+    
+    <!-- Borders & strokes -->
+    <color name="stroke_light">#14000000</color>
+</resources>

@@ -69,7 +69,7 @@ Pour que le bouton "Se connecter avec Google" fonctionne dans l'APK :
    - Ouvrir [Firebase Console](https://console.firebase.google.com/)
    - Projet → Paramètres → Général
    - Ajouter app Android ou ajouter empreinte SHA-1
-   - Package : `com.onikroua.app`
+   - Package : `com.loicberthod.onykroua`
 
 3. **Télécharger google-services.json** :
    - Dans Firebase Console

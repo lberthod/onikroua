@@ -1,0 +1,93 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    increment_build_number(xcodeproj: "onykroua/onykroua.xcodeproj")
+    
+    build_app(
+      scheme: "onykroua",
+      workspace: "onykroua/onykroua.xcodeproj",
+      export_method: "app-store",
+      clean: true
+    )
+    
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true
+    )
+    
+    slack(
+      message: "✅ Nouvelle version iOS déployée sur TestFlight!",
+      success: true
+    )
+  end
+
+  desc "Deploy to App Store"
+  lane :release do
+    increment_build_number(xcodeproj: "onykroua/onykroua.xcodeproj")
+    
+    build_app(
+      scheme: "onykroua",
+      workspace: "onykroua/onykroua.xcodeproj",
+      export_method: "app-store",
+      clean: true
+    )
+    
+    upload_to_app_store(
+      force: true,
+      skip_metadata: false,
+      skip_screenshots: false,
+      submit_for_review: true,
+      automatic_release: true
+    )
+    
+    slack(
+      message: "🚀 Nouvelle version iOS soumise à l'App Store!",
+      success: true
+    )
+  end
+
+  desc "Build for development"
+  lane :dev do
+    build_app(
+      scheme: "onykroua",
+      workspace: "onykroua/onykroua.xcodeproj",
+      export_method: "development",
+      clean: true
+    )
+  end
+
+  desc "Run tests"
+  lane :test do
+    run_tests(
+      scheme: "onykroua",
+      workspace: "onykroua/onykroua.xcodeproj"
+    )
+  end
+
+  desc "Take screenshots for App Store"
+  lane :screenshots do
+    capture_screenshots
+    frame_screenshots(white: true)
+  end
+
+  desc "Sync certificates and profiles"
+  lane :sync_certificates do
+    match(
+      type: "appstore",
+      readonly: true
+    )
+  end
+
+  desc "Setup new device for development"
+  lane :setup_device do
+    register_devices(
+      devices_file: "./fastlane/devices.txt"
+    )
+    
+    match(
+      type: "development",
+      force_for_new_devices: true
+    )
+  end
+end

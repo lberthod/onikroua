@@ -1,0 +1,587 @@
+package com.loicberthod.onykroua.grammar
+
+object GrammarData {
+    
+    fun getCategories(): List<GrammarCategory> {
+        return listOf(
+            GrammarCategory("all", "Toutes", "📚", "#3498DB"),
+            GrammarCategory("articles", "Articles", "📰", "#9B59B6"),
+            GrammarCategory("pronouns", "Pronoms", "👤", "#E74C3C"),
+            GrammarCategory("verbs", "Verbes", "⚡", "#27AE60"),
+            GrammarCategory("adjectives", "Adjectifs", "✨", "#F39C12"),
+            GrammarCategory("adverbs", "Adverbes", "🎯", "#E67E22"),
+            GrammarCategory("prepositions", "Prépositions", "🔗", "#1ABC9C"),
+            GrammarCategory("conjunctions", "Conjonctions", "🔀", "#16A085"),
+            GrammarCategory("nouns", "Noms", "📝", "#8E44AD"),
+            GrammarCategory("syntax", "Syntaxe", "🔧", "#34495E")
+        )
+    }
+    
+    fun getGrammarRules(language: String): List<GrammarRule> {
+        return if (language == "it") getItalianGrammar() else getSpanishGrammar()
+    }
+    
+    fun getSubCategoryLabel(subCategory: String): String {
+        return when (subCategory) {
+            // Articles
+            "definite" -> "Articles définis"
+            "indefinite" -> "Articles indéfinis"
+            "partitive" -> "Articles partitifs"
+            "contractions" -> "Contractions"
+            // Pronoms
+            "subject" -> "Pronoms sujets"
+            "object" -> "Pronoms compléments d'objet"
+            "indirect" -> "Pronoms compléments indirects"
+            "reflexive" -> "Pronoms réfléchis"
+            "possessive" -> "Pronoms/Adjectifs possessifs"
+            "demonstrative" -> "Pronoms/Adjectifs démonstratifs"
+            "relative" -> "Pronoms relatifs"
+            "interrogative" -> "Pronoms interrogatifs"
+            "indefinite_pronouns" -> "Pronoms indéfinis"
+            // Verbes
+            "present" -> "Présent de l'indicatif"
+            "past" -> "Temps du passé"
+            "imperfect" -> "Imparfait"
+            "preterite" -> "Passé simple"
+            "perfect" -> "Passé composé"
+            "pluperfect" -> "Plus-que-parfait"
+            "future" -> "Futur"
+            "conditional" -> "Conditionnel"
+            "subjunctive" -> "Subjonctif"
+            "imperative" -> "Impératif"
+            "gerund" -> "Gérondif"
+            "participle" -> "Participes"
+            "infinitive" -> "Infinitif"
+            "modal" -> "Verbes modaux"
+            "auxiliary" -> "Auxiliaires"
+            "irregular" -> "Verbes irréguliers"
+            // Adjectifs
+            "agreement" -> "Accord des adjectifs"
+            "position" -> "Position des adjectifs"
+            "comparison" -> "Comparatif et superlatif"
+            "demonstrative_adj" -> "Adjectifs démonstratifs"
+            "possessive_adj" -> "Adjectifs possessifs"
+            "numeral" -> "Adjectifs numéraux"
+            // Adverbes
+            "manner" -> "Adverbes de manière"
+            "time" -> "Adverbes de temps"
+            "place" -> "Adverbes de lieu"
+            "quantity" -> "Adverbes de quantité"
+            "affirmation" -> "Adverbes d'affirmation/négation"
+            "formation" -> "Formation des adverbes"
+            // Prépositions
+            "simple" -> "Prépositions simples"
+            "common" -> "Prépositions courantes"
+            "combined" -> "Prépositions articulées"
+            "location" -> "Prépositions de lieu"
+            "time_prep" -> "Prépositions de temps"
+            "usage" -> "Usages particuliers"
+            // Conjonctions
+            "coordination" -> "Conjonctions de coordination"
+            "subordination" -> "Conjonctions de subordination"
+            // Noms
+            "gender" -> "Genre des noms"
+            "plural" -> "Formation du pluriel"
+            "diminutive" -> "Diminutifs et augmentatifs"
+            // Syntaxe
+            "word_order" -> "Ordre des mots"
+            "negation" -> "La négation"
+            "questions" -> "Formation des questions"
+            "reported_speech" -> "Discours indirect"
+            "passive" -> "Voix passive"
+            else -> subCategory
+        }
+    }
+    
+    private fun getItalianGrammar(): List<GrammarRule> {
+        return listOf(
+            // ARTICLES
+            GrammarRule(
+                "it_art_1",
+                "articles",
+                "definite",
+                "Articles définis masculin",
+                "IL (singulier) : devant consonne\nLO (singulier) : devant s+consonne, z, gn, ps, x, y\nL' (singulier) : devant voyelle\nI (pluriel) : devant consonne\nGLI (pluriel) : devant s+consonne, z, gn, voyelle",
+                "il libro (le livre), lo studente (l'étudiant), l'amico (l'ami), i libri (les livres), gli studenti (les étudiants)",
+                null,
+                "débutant"
+            ),
+            GrammarRule(
+                "it_art_2",
+                "articles",
+                "definite",
+                "Articles définis féminin",
+                "LA (singulier) : devant consonne\nL' (singulier) : devant voyelle\nLE (pluriel) : toujours",
+                "la casa (la maison), l'amica (l'amie), le case (les maisons), le amiche (les amies)",
+                null,
+                "débutant"
+            ),
+            GrammarRule(
+                "it_art_3",
+                "articles",
+                "indefinite",
+                "Articles indéfinis",
+                "UN (masculin) : devant consonne ou voyelle\nUNO (masculin) : devant s+consonne, z, gn, ps\nUNA (féminin) : devant consonne\nUN' (féminin) : devant voyelle",
+                "un libro (un livre), uno studente (un étudiant), una casa (une maison), un'amica (une amie)",
+                null,
+                "débutant"
+            ),
+            GrammarRule(
+                "it_art_4",
+                "articles",
+                "partitive",
+                "Articles partitifs",
+                "Formés par : di + article défini\nMasculin : del, dello, dell', dei, degli\nFéminin : della, dell', delle",
+                "del pane (du pain), della carne (de la viande), degli amici (des amis)",
+                "Utilisés pour exprimer une quantité indéterminée",
+                "intermédiaire"
+            ),
+            
+            // PRONOMS
+            GrammarRule(
+                "it_pro_1",
+                "pronouns",
+                "subject",
+                "Pronoms sujets",
+                "io (je), tu (tu), lui/lei (il/elle), noi (nous), voi (vous), loro (ils/elles)",
+                "Io parlo italiano. (Je parle italien.)\nLui studia medicina. (Il étudie la médecine.)",
+                "Souvent omis car la conjugaison indique la personne",
+                "débutant"
+            ),
+            GrammarRule(
+                "it_pro_2",
+                "pronouns",
+                "object",
+                "Pronoms compléments directs",
+                "mi (me), ti (te), lo/la (le/la), ci (nous), vi (vous), li/le (les)\nPlacés AVANT le verbe conjugué",
+                "Lo vedo. (Je le vois.)\nMi chiama. (Il m'appelle.)\nTi amo. (Je t'aime.)",
+                null,
+                "intermédiaire"
+            ),
+            GrammarRule(
+                "it_pro_3",
+                "pronouns",
+                "reflexive",
+                "Pronoms réfléchis",
+                "mi, ti, si, ci, vi, si\nUtilisés avec les verbes pronominaux",
+                "Mi alzo alle 7. (Je me lève à 7h.)\nSi chiama Marco. (Il s'appelle Marco.)",
+                "Indispensables avec les verbes pronominaux",
+                "débutant"
+            ),
+            GrammarRule(
+                "it_pro_4",
+                "pronouns",
+                "possessive",
+                "Adjectifs possessifs",
+                "Précédés de l'article sauf pour la famille au singulier\nmio/mia (mon/ma), tuo/tua (ton/ta), suo/sua (son/sa), nostro/nostra (notre), vostro/vostra (votre), loro (leur)",
+                "il mio libro (mon livre), mia madre (ma mère), la tua casa (ta maison)",
+                null,
+                "débutant"
+            ),
+            
+            // VERBES
+            GrammarRule(
+                "it_verb_1",
+                "verbs",
+                "present",
+                "Présent - Verbes en -ARE",
+                "Terminaisons : -o, -i, -a, -iamo, -ate, -ano\nPARLARE : parlo, parli, parla, parliamo, parlate, parlano",
+                "Io parlo italiano. (Je parle italien.)\nLei mangia la pizza. (Elle mange la pizza.)",
+                "Groupe le plus régulier",
+                "débutant"
+            ),
+            GrammarRule(
+                "it_verb_2",
+                "verbs",
+                "present",
+                "Présent - Verbes en -ERE",
+                "Terminaisons : -o, -i, -e, -iamo, -ete, -ono\nCREDERE : credo, credi, crede, crediamo, credete, credono",
+                "Io prendo il treno. (Je prends le train.)\nLoro leggono il libro. (Ils lisent le livre.)",
+                null,
+                "débutant"
+            ),
+            GrammarRule(
+                "it_verb_3",
+                "verbs",
+                "present",
+                "Présent - Verbes en -IRE",
+                "Terminaisons : -o, -i, -e, -iamo, -ite, -ono\nDORMIRE : dormo, dormi, dorme, dormiamo, dormite, dormono\nCAPIRE (avec -isc-) : capisco, capisci, capisce, capiamo, capite, capiscono",
+                "Io dormo bene. (Je dors bien.)\nLei capisce tutto. (Elle comprend tout.)",
+                "Attention aux verbes en -isc-",
+                "débutant"
+            ),
+            GrammarRule(
+                "it_verb_4",
+                "verbs",
+                "past",
+                "Passé composé (Passato Prossimo)",
+                "Formé avec : AVERE ou ESSERE + participe passé\n-ARE → -ato, -ERE → -uto, -IRE → -ito",
+                "Ho mangiato (j'ai mangé), Sono andato (je suis allé), Abbiamo visto (nous avons vu)",
+                "ESSERE avec verbes de mouvement et réfléchis",
+                "intermédiaire"
+            ),
+            GrammarRule(
+                "it_verb_5",
+                "verbs",
+                "future",
+                "Futur simple",
+                "Terminaisons : -ò, -ai, -à, -emo, -ete, -anno\nPARLARE : parlerò, parlerai, parlerà, parleremo, parlerete, parleranno",
+                "Domani parlerò con lui. (Demain je parlerai avec lui.)\nAndranno in Italia. (Ils iront en Italie.)",
+                null,
+                "intermédiaire"
+            ),
+            GrammarRule(
+                "it_verb_6",
+                "verbs",
+                "conditional",
+                "Conditionnel présent",
+                "Terminaisons : -ei, -esti, -ebbe, -emmo, -este, -ebbero\nUtilisé pour exprimer un souhait, une demande polie",
+                "Vorrei un caffè. (Je voudrais un café.)\nSarebbe bello. (Ce serait bien.)",
+                null,
+                "avancé"
+            ),
+            GrammarRule(
+                "it_verb_7",
+                "verbs",
+                "imperative",
+                "Impératif",
+                "Pour TU : -a/-i/-i (ARE/ERE/IRE)\nPour NOI : -iamo\nPour VOI : -ate/-ete/-ite\nPour LEI (forme polie) : 3ᵉ pers. subjonctif",
+                "Parla! (Parle!), Mangia! (Mange!), Scusi! (Excusez-moi!), Andiamo! (Allons-y!)",
+                "Forme négative TU : non + infinitif",
+                "intermédiaire"
+            ),
+            
+            // ADJECTIFS
+            GrammarRule(
+                "it_adj_1",
+                "adjectives",
+                "agreement",
+                "Accord des adjectifs",
+                "L'adjectif s'accorde en genre et en nombre avec le nom\n-o/-a/-i/-e (m.sing/f.sing/m.plur/f.plur)",
+                "ragazzo alto (garçon grand), ragazza alta (fille grande), ragazzi alti (garçons grands), ragazze alte (filles grandes)",
+                null,
+                "débutant"
+            ),
+            GrammarRule(
+                "it_adj_2",
+                "adjectives",
+                "position",
+                "Position des adjectifs",
+                "Généralement APRÈS le nom\nQuelques adjectifs courants AVANT : bello, buono, grande, piccolo, giovane, vecchio",
+                "una casa bella (une belle maison), un bel libro (un beau livre), una buona idea (une bonne idée)",
+                "BELLO change comme l'article défini",
+                "intermédiaire"
+            ),
+            GrammarRule(
+                "it_adj_3",
+                "adjectives",
+                "comparison",
+                "Comparatif et superlatif",
+                "Comparatif : più... di (plus... que), meno... di (moins... que), così... come (aussi... que)\nSuperlatif relatif : il più (le plus)\nSuperlatif absolu : -issimo",
+                "Marco è più alto di Luca. (Marco est plus grand que Luca.)\nQuesto è bellissimo! (C'est très beau!)",
+                null,
+                "intermédiaire"
+            ),
+            
+            // PRÉPOSITIONS
+            GrammarRule(
+                "it_prep_1",
+                "prepositions",
+                "common",
+                "Prépositions simples",
+                "di (de), a (à), da (de/depuis/chez), in (dans/en), con (avec), su (sur), per (pour), tra/fra (entre)",
+                "Vado a Roma. (Je vais à Rome.)\nVengo da Milano. (Je viens de Milan.)\nAbito in Italia. (J'habite en Italie.)",
+                null,
+                "débutant"
+            ),
+            GrammarRule(
+                "it_prep_2",
+                "prepositions",
+                "combined",
+                "Prépositions articulées",
+                "Préposition + article défini fusionnent\ndi + il = del, a + il = al, da + il = dal, in + il = nel, su + il = sul",
+                "del libro (du livre), al cinema (au cinéma), dal medico (chez le médecin), nel parco (dans le parc)",
+                "Se contractent avec tous les articles définis",
+                "intermédiaire"
+            ),
+            
+            // SYNTAXE
+            GrammarRule(
+                "it_syn_1",
+                "syntax",
+                "word_order",
+                "Ordre des mots",
+                "Ordre de base : Sujet + Verbe + Complément\nMais très flexible en italien, l'accent peut changer l'ordre",
+                "Io mangio la pizza. / La pizza la mangio io. / Mangio la pizza.",
+                "L'intonation indique l'élément mis en valeur",
+                "avancé"
+            ),
+            GrammarRule(
+                "it_syn_2",
+                "syntax",
+                "negation",
+                "La négation",
+                "NON placé AVANT le verbe\nDouble négation possible : non... mai, non... niente, non... nessuno",
+                "Non parlo inglese. (Je ne parle pas anglais.)\nNon ho mai visto questo film. (Je n'ai jamais vu ce film.)",
+                null,
+                "débutant"
+            ),
+            GrammarRule(
+                "it_syn_3",
+                "syntax",
+                "questions",
+                "Formation des questions",
+                "Même structure qu'une phrase affirmative + intonation montante\nMots interrogatifs : chi? (qui), che cosa? (quoi), dove? (où), quando? (quand), perché? (pourquoi), come? (comment)",
+                "Parli italiano? (Tu parles italien?)\nDove vai? (Où vas-tu?)\nChe cosa fai? (Que fais-tu?)",
+                null,
+                "débutant"
+            )
+        )
+    }
+    
+    private fun getSpanishGrammar(): List<GrammarRule> {
+        return listOf(
+            // ARTICLES
+            GrammarRule(
+                "es_art_1",
+                "articles",
+                "definite",
+                "Articles définis",
+                "EL (masculin singulier), LA (féminin singulier)\nLOS (masculin pluriel), LAS (féminin pluriel)",
+                "el libro (le livre), la casa (la maison), los libros (les livres), las casas (les maisons)",
+                null,
+                "débutant"
+            ),
+            GrammarRule(
+                "es_art_2",
+                "articles",
+                "indefinite",
+                "Articles indéfinis",
+                "UN (masculin singulier), UNA (féminin singulier)\nUNOS (masculin pluriel), UNAS (féminin pluriel)",
+                "un libro (un livre), una casa (une maison), unos libros (des livres), unas casas (des maisons)",
+                null,
+                "débutant"
+            ),
+            GrammarRule(
+                "es_art_3",
+                "articles",
+                "definite",
+                "Contractions des articles",
+                "a + el = al (à le/au)\nde + el = del (de le/du)",
+                "Voy al cine. (Je vais au cinéma.)\nVengo del trabajo. (Je viens du travail.)",
+                "Pas de contraction avec la, los, las",
+                "débutant"
+            ),
+            
+            // PRONOMS
+            GrammarRule(
+                "es_pro_1",
+                "pronouns",
+                "subject",
+                "Pronoms sujets",
+                "yo (je), tú (tu), él/ella/usted (il/elle/vous formel), nosotros/nosotras (nous), vosotros/vosotras (vous), ellos/ellas/ustedes (ils/elles/vous formel pluriel)",
+                "Yo hablo español. (Je parle espagnol.)\nÉl estudia medicina. (Il étudie la médecine.)",
+                "Souvent omis car la conjugaison indique la personne",
+                "débutant"
+            ),
+            GrammarRule(
+                "es_pro_2",
+                "pronouns",
+                "object",
+                "Pronoms compléments directs",
+                "me (me), te (te), lo/la (le/la), nos (nous), os (vous), los/las (les)\nPlacés AVANT le verbe conjugué ou APRÈS l'infinitif",
+                "Lo veo. (Je le vois.)\nMe llama. (Il m'appelle.)\nVoy a verlo. / Lo voy a ver. (Je vais le voir.)",
+                null,
+                "intermédiaire"
+            ),
+            GrammarRule(
+                "es_pro_3",
+                "pronouns",
+                "reflexive",
+                "Pronoms réfléchis",
+                "me, te, se, nos, os, se\nUtilisés avec les verbes pronominaux",
+                "Me levanto a las 7. (Je me lève à 7h.)\nSe llama Carlos. (Il s'appelle Carlos.)",
+                "Indispensables avec les verbes pronominaux",
+                "débutant"
+            ),
+            GrammarRule(
+                "es_pro_4",
+                "pronouns",
+                "possessive",
+                "Adjectifs possessifs",
+                "mi/mis (mon/ma/mes), tu/tus (ton/ta/tes), su/sus (son/sa/ses), nuestro/nuestra/nuestros/nuestras (notre/nos), vuestro/vuestra/vuestros/vuestras (votre/vos), su/sus (leur/leurs)",
+                "mi libro (mon livre), tus libros (tes livres), nuestra casa (notre maison)",
+                "Pas d'article devant le possessif",
+                "débutant"
+            ),
+            
+            // VERBES
+            GrammarRule(
+                "es_verb_1",
+                "verbs",
+                "present",
+                "Présent - Verbes en -AR",
+                "Terminaisons : -o, -as, -a, -amos, -áis, -an\nHABLAR : hablo, hablas, habla, hablamos, habláis, hablan",
+                "Yo hablo español. (Je parle espagnol.)\nElla canta bien. (Elle chante bien.)",
+                "Groupe le plus régulier",
+                "débutant"
+            ),
+            GrammarRule(
+                "es_verb_2",
+                "verbs",
+                "present",
+                "Présent - Verbes en -ER",
+                "Terminaisons : -o, -es, -e, -emos, -éis, -en\nCOMER : como, comes, come, comemos, coméis, comen",
+                "Yo como paella. (Je mange de la paella.)\nEllos beben agua. (Ils boivent de l'eau.)",
+                null,
+                "débutant"
+            ),
+            GrammarRule(
+                "es_verb_3",
+                "verbs",
+                "present",
+                "Présent - Verbes en -IR",
+                "Terminaisons : -o, -es, -e, -imos, -ís, -en\nVIVIR : vivo, vives, vive, vivimos, vivís, viven",
+                "Yo vivo en Madrid. (J'habite à Madrid.)\nEllos escriben cartas. (Ils écrivent des lettres.)",
+                null,
+                "débutant"
+            ),
+            GrammarRule(
+                "es_verb_4",
+                "verbs",
+                "past",
+                "Passé composé (Pretérito Perfecto)",
+                "Formé avec : HABER + participe passé\n-AR → -ado, -ER/-IR → -ido",
+                "He comido (j'ai mangé), Has hablado (tu as parlé), Hemos vivido (nous avons vécu)",
+                "Utilisé pour des actions récentes ou liées au présent",
+                "intermédiaire"
+            ),
+            GrammarRule(
+                "es_verb_5",
+                "verbs",
+                "past",
+                "Passé simple (Pretérito Indefinido)",
+                "-AR : -é, -aste, -ó, -amos, -asteis, -aron\n-ER/-IR : -í, -iste, -ió, -imos, -isteis, -ieron",
+                "Hablé con él. (J'ai parlé avec lui.)\nComieron paella. (Ils ont mangé de la paella.)",
+                "Pour des actions terminées dans le passé",
+                "intermédiaire"
+            ),
+            GrammarRule(
+                "es_verb_6",
+                "verbs",
+                "future",
+                "Futur simple",
+                "Infinitif + terminaisons : -é, -ás, -á, -emos, -éis, -án",
+                "Hablaré español. (Je parlerai espagnol.)\nIrán a España. (Ils iront en Espagne.)",
+                "Même terminaison pour les 3 groupes",
+                "intermédiaire"
+            ),
+            GrammarRule(
+                "es_verb_7",
+                "verbs",
+                "conditional",
+                "Conditionnel présent",
+                "Infinitif + terminaisons : -ía, -ías, -ía, -íamos, -íais, -ían",
+                "Me gustaría un café. (J'aimerais un café.)\nSería genial. (Ce serait génial.)",
+                null,
+                "avancé"
+            ),
+            GrammarRule(
+                "es_verb_8",
+                "verbs",
+                "imperative",
+                "Impératif",
+                "Pour TÚ : 3ᵉ pers. présent sans -s (affirmatif)\nPour USTED : 3ᵉ pers. subjonctif\nPour NOSOTROS : 1ʳᵉ pers. pluriel subjonctif\nPour VOSOTROS : infinitif - r + d",
+                "¡Habla! (Parle!), ¡Come! (Mange!), ¡Perdone! (Excusez-moi!), ¡Vamos! (Allons-y!)",
+                "Forme négative : subjonctif",
+                "intermédiaire"
+            ),
+            
+            // ADJECTIFS
+            GrammarRule(
+                "es_adj_1",
+                "adjectives",
+                "agreement",
+                "Accord des adjectifs",
+                "L'adjectif s'accorde en genre et en nombre\n-o/-a/-os/-as OU invariable en -e",
+                "chico alto (garçon grand), chica alta (fille grande), chicos altos (garçons grands), chicas altas (filles grandes)",
+                null,
+                "débutant"
+            ),
+            GrammarRule(
+                "es_adj_2",
+                "adjectives",
+                "position",
+                "Position des adjectifs",
+                "Généralement APRÈS le nom\nQuelques adjectifs courants AVANT : bueno, malo, grande, pequeño, joven, viejo",
+                "una casa bonita (une belle maison), un buen libro (un bon livre), una gran idea (une grande idée)",
+                "GRANDE → GRAN devant nom singulier",
+                "intermédiaire"
+            ),
+            GrammarRule(
+                "es_adj_3",
+                "adjectives",
+                "comparison",
+                "Comparatif et superlatif",
+                "Comparatif : más... que (plus... que), menos... que (moins... que), tan... como (aussi... que)\nSuperlatif relatif : el/la más (le/la plus)\nSuperlatif absolu : -ísimo",
+                "Carlos es más alto que Luis. (Carlos est plus grand que Luis.)\n¡Esto es buenísimo! (C'est très bon!)",
+                null,
+                "intermédiaire"
+            ),
+            
+            // PRÉPOSITIONS
+            GrammarRule(
+                "es_prep_1",
+                "prepositions",
+                "common",
+                "Prépositions courantes",
+                "a (à), de (de), en (dans/en), con (avec), sin (sans), para (pour), por (par/pour), desde (depuis), hasta (jusqu'à)",
+                "Voy a Madrid. (Je vais à Madrid.)\nVivo en España. (J'habite en Espagne.)\nEs para ti. (C'est pour toi.)",
+                null,
+                "débutant"
+            ),
+            GrammarRule(
+                "es_prep_2",
+                "prepositions",
+                "common",
+                "POR vs PARA",
+                "POR : cause, moyen, durée approximative, lieu traversé\nPARA : but, destination, destinataire, date limite",
+                "Trabajo por dinero. (Je travaille pour l'argent = à cause)\nEsto es para ti. (C'est pour toi = destinataire)\nPaso por el parque. (Je passe par le parc)",
+                "Distinction importante en espagnol",
+                "avancé"
+            ),
+            
+            // SYNTAXE
+            GrammarRule(
+                "es_syn_1",
+                "syntax",
+                "word_order",
+                "Ordre des mots",
+                "Ordre de base : Sujet + Verbe + Complément\nFlexible mais moins qu'en italien",
+                "Yo como paella. / Como paella.",
+                null,
+                "avancé"
+            ),
+            GrammarRule(
+                "es_syn_2",
+                "syntax",
+                "negation",
+                "La négation",
+                "NO placé AVANT le verbe\nDouble négation possible : no... nunca, no... nada, no... nadie",
+                "No hablo inglés. (Je ne parle pas anglais.)\nNo he visto nunca esta película. (Je n'ai jamais vu ce film.)",
+                null,
+                "débutant"
+            ),
+            GrammarRule(
+                "es_syn_3",
+                "syntax",
+                "questions",
+                "Formation des questions",
+                "Même structure + intonation + ¿...?\nMots interrogatifs : ¿quién? (qui), ¿qué? (quoi), ¿dónde? (où), ¿cuándo? (quand), ¿por qué? (pourquoi), ¿cómo? (comment)",
+                "¿Hablas español? (Tu parles espagnol?)\n¿Dónde vas? (Où vas-tu?)\n¿Qué haces? (Que fais-tu?)",
+                "Points d'interrogation inversés au début",
+                "débutant"
+            )
+        )
+    }
+}

@@ -1,0 +1,10 @@
+git_url("https://github.com/YOUR_USERNAME/certificates")
+
+storage_mode("git")
+
+type("development")
+type("appstore")
+
+app_identifier(["com.onykroua.app"])
+username("loic.berthod@onykroua.com")
+team_id("N668CK695Q")

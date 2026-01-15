@@ -20,32 +20,6 @@ struct ProfileView: View {
                     } else {
                         signInPromptSection
                     }
-                    VStack(spacing: 16) {
-                        ZStack {
-                            Circle()
-                                .fill(LinearGradient(colors: [.blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
-                                .frame(width: 100, height: 100)
-                            
-                            Text("🎓")
-                                .font(.system(size: 50))
-                        }
-                        
-                        Text("utilisateur@onykroua.com")
-                            .font(.headline)
-                        
-                        HStack(spacing: 8) {
-                            Image(systemName: "star.fill")
-                                .foregroundColor(.yellow)
-                            Text("Niveau \(progressTracker.getUserLevel())")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 6)
-                        .background(Color.yellow.opacity(0.2))
-                        .cornerRadius(20)
-                    }
-                    .padding(.top, 20)
                     
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Progression")
@@ -119,21 +93,6 @@ struct ProfileView: View {
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
-                    
-                    Button(action: {}) {
-                        HStack {
-                            Image(systemName: "rectangle.portrait.and.arrow.right")
-                            Text("Déconnexion")
-                                .fontWeight(.semibold)
-                        }
-                        .foregroundColor(.red)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color(.systemBackground))
-                        .cornerRadius(16)
-                        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
-                    }
-                    .padding(.horizontal)
                 }
                 .padding(.vertical)
             }

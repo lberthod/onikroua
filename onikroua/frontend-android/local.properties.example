@@ -1,0 +1,4 @@
+# Configuration locale - NE PAS COMMITER CE FICHIER
+# Renommez en "local.properties" et remplissez votre API key
+
+GEMINI_API_KEY=VOTRE_API_KEY_ICI

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ic_launcher_background">#A78BFA</color>
+    
+    <!-- Premium Dark Violet Theme (Variante 1 - Night Mode) -->
+    <!-- Background gradient -->
+    <color name="bg_top">#1B0B4D</color>
+    <color name="bg_mid">#2E138A</color>
+    <color name="bg_bottom">#4C1ED6</color>
+    
+    <!-- Surfaces -->
+    <color name="surface_card">#1F2937</color>
+    <color name="surface_card_strong">#111827</color>
+    <color name="surface_card_soft">#2A2540</color>
+    
+    <!-- Text colors -->
+    <color name="text_primary">#F9FAFB</color>
+    <color name="text_secondary">#9CA3AF</color>
+    <color name="text_on_gradient">#FFFFFF</color>
+    <color name="text_on_gradient_dim">#C7C9FF</color>
+    
+    <!-- Accent colors -->
+    <color name="primary">#6366F1</color>
+    <color name="primary_soft">#A5B4FC</color>
+    <color name="primary_dark">#4338CA</color>
+    <color name="outline">#A5B4FC</color>
+    <color name="outline_emoji">#C4B5FD</color>
+    
+    <!-- Borders & strokes -->
+    <color name="stroke_light">#28FFFFFF</color>
+</resources>
