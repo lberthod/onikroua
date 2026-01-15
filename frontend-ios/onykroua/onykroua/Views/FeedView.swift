@@ -71,10 +71,10 @@ struct FeedView: View {
                 loadInitialFeed()
             }
         }
-        .onChange(of: selectedLanguage) { newLanguage in
+        .onChange(of: selectedLanguage) { _, newLanguage in
             env.vocabularyManager.ensureLoaded(language: newLanguage)
         }
-        .onChange(of: env.vocabularyManager.loadingError != nil) { hasError in
+        .onChange(of: env.vocabularyManager.loadingError != nil) { _, hasError in
             if hasError, let error = env.vocabularyManager.loadingError {
                 env.errorManager.handle(error) {
                     env.vocabularyManager.loadVocabularyAsync(language: selectedLanguage)

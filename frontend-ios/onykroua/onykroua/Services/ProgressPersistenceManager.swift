@@ -362,7 +362,7 @@ class ProgressPersistenceManager: ObservableObject {
             return [:]
         }
         
-        let learnedWords = getLearnedWords(userId: userId)
+        let _ = getLearnedWords(userId: userId)
         let sessions = getStudySessions(userId: userId)
         
         return [

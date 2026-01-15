@@ -5,6 +5,7 @@ import SwiftUI
 
 /// Centralise tous les services et managers de l'application
 /// Utilise le pattern Dependency Injection pour faciliter les tests
+@MainActor
 class AppEnvironment: ObservableObject {
     
     // MARK: - Shared Instance

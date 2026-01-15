@@ -19,14 +19,14 @@ public struct Verb: Identifiable, Codable {
 }
 
 public struct TenseInfo: Identifiable, Codable {
-    public let id: String = UUID().uuidString
+    public var id: String = UUID().uuidString
     public let name: String
     public let description: String
     public let example: String
 }
 
 public struct ConjugationGrammarRule: Identifiable, Codable {
-    public let id: String = UUID().uuidString
+    public var id: String = UUID().uuidString
     public let title: String
     public let description: String
     public let examples: [String]
@@ -34,7 +34,7 @@ public struct ConjugationGrammarRule: Identifiable, Codable {
 }
 
 public struct Pronoun: Identifiable, Codable {
-    public let id: String = UUID().uuidString
+    public var id: String = UUID().uuidString
     public let pronoun: String
     public let translation: String
     public let type: String // "subject", "direct", "indirect"

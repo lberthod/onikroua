@@ -1,6 +1,7 @@
 import Foundation
 import AVFoundation
 
+@MainActor
 public class SpeechService: NSObject, ObservableObject {
     private let synthesizer = AVSpeechSynthesizer()
     @Published public var isSpeaking = false
@@ -50,11 +51,15 @@ public class SpeechService: NSObject, ObservableObject {
 }
 
 extension SpeechService: AVSpeechSynthesizerDelegate {
-    public func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        isSpeaking = false
+    nonisolated public func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        Task { @MainActor in
+            isSpeaking = false
+        }
     }
     
-    public func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
-        isSpeaking = false
+    nonisolated public func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+        Task { @MainActor in
+            isSpeaking = false
+        }
     }
 }

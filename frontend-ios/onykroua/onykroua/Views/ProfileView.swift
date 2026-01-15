@@ -3,6 +3,8 @@ import SwiftUI
 struct ProfileView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var env: AppEnvironment
+    @EnvironmentObject var firebaseManager: FirebaseManager
+    @State private var showEmailSignIn = false
     
     private var progressTracker: ProgressTracker {
         env.progressTracker
@@ -12,6 +14,12 @@ struct ProfileView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 24) {
+                    // User account section
+                    if firebaseManager.isSignedIn {
+                        userAccountSection
+                    } else {
+                        signInPromptSection
+                    }
                     VStack(spacing: 16) {
                         ZStack {
                             Circle()
@@ -131,7 +139,7 @@ struct ProfileView: View {
             }
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .navigationTitle("Profil")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Fermer") {
@@ -140,12 +148,132 @@ struct ProfileView: View {
                 }
             }
         }
+        .sheet(isPresented: $showEmailSignIn) {
+            EmailSignInView()
+                .environmentObject(firebaseManager)
+        }
+    }
+    
+    // MARK: - User Account Section (Connected)
+    
+    private var userAccountSection: some View {
+        VStack(spacing: 16) {
+            // User info
+            VStack(spacing: 8) {
+                Image(systemName: "person.circle.fill")
+                    .font(.system(size: 80))
+                    .foregroundColor(.blue)
+                
+                if let displayName = firebaseManager.userDisplayName {
+                    Text(displayName)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                }
+                
+                if let email = firebaseManager.userEmail {
+                    Text(email)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                
+                Text("ID: \(firebaseManager.userId?.prefix(8) ?? "N/A")...")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.vertical)
+            
+            // Sign out button
+            Button(action: {
+                try? firebaseManager.signOut()
+            }) {
+                HStack {
+                    Image(systemName: "arrow.right.square")
+                    Text("Se déconnecter")
+                }
+                .font(.headline)
+                .foregroundColor(.red)
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+            }
+            .padding(.horizontal)
+        }
+    }
+    
+    // MARK: - Sign In Prompt (Not Connected)
+    
+    private var signInPromptSection: some View {
+        VStack(spacing: 24) {
+            VStack(spacing: 12) {
+                Image(systemName: "person.crop.circle.badge.questionmark")
+                    .font(.system(size: 80))
+                    .foregroundColor(.gray)
+                
+                Text("Non connecté")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                
+                Text("Connectez-vous pour synchroniser vos progrès sur tous vos appareils")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+            }
+            .padding(.vertical)
+            
+            VStack(spacing: 12) {
+                // Sign In with Apple button
+                SignInWithAppleButton {
+                    print("User signed in with Apple!")
+                }
+                
+                // Email Sign In button
+                Button(action: { showEmailSignIn = true }) {
+                    HStack {
+                        Image(systemName: "envelope.fill")
+                        Text("Connexion avec Email")
+                    }
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+                    .background(Color.blue)
+                    .cornerRadius(16)
+                }
+                
+                // Anonymous Sign In button
+                Button(action: signInAnonymously) {
+                    HStack {
+                        Image(systemName: "person.fill.questionmark")
+                        Text("Mode invité")
+                    }
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+                    .background(Color.gray)
+                    .cornerRadius(16)
+                }
+            }
+            .padding(.horizontal, 32)
+        }
     }
     
     private func formattedDate(_ date: Date) -> String {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .full
         return formatter.localizedString(for: date, relativeTo: Date())
+    }
+    
+    private func signInAnonymously() {
+        Task {
+            do {
+                try await firebaseManager.signInAnonymously()
+            } catch {
+                print("❌ Error signing in anonymously: \(error)")
+            }
+        }
     }
 }
 

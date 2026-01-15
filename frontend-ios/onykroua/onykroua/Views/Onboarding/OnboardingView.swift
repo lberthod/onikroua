@@ -14,8 +14,10 @@ struct OnboardingPage: Identifiable {
 
 struct OnboardingView: View {
     @EnvironmentObject var env: AppEnvironment
+    @EnvironmentObject var firebaseManager: FirebaseManager
     @State private var currentPage = 0
     @State private var selectedLanguage: String = "it"
+    @State private var showEmailSignIn = false
     @Binding var isPresented: Bool
     
     private let pages: [OnboardingPage] = [
@@ -88,16 +90,48 @@ struct OnboardingView: View {
                 // Navigation buttons
                 VStack(spacing: 16) {
                     if currentPage == pages.count {
-                        // Final page - Get started button
-                        Button(action: completeOnboarding) {
-                            Text("Commencer")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 56)
-                                .background(Color.blue)
-                                .cornerRadius(16)
+                        // Sign In with Apple button
+                        SignInWithAppleButton {
+                            completeOnboarding()
                         }
+                        
+                        // Email Sign In button
+                        Button(action: { showEmailSignIn = true }) {
+                            HStack {
+                                Image(systemName: "envelope.fill")
+                                    .font(.title3)
+                                Text("Continuer avec Email")
+                                    .font(.headline)
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(Color.blue)
+                            .cornerRadius(16)
+                        }
+                        
+                        // Anonymous Sign In button
+                        Button(action: signInAnonymously) {
+                            HStack {
+                                Image(systemName: "person.fill.questionmark")
+                                    .font(.title3)
+                                Text("Continuer en mode invité")
+                                    .font(.headline)
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(Color.gray)
+                            .cornerRadius(16)
+                        }
+                        
+                        // Skip button
+                        Button(action: completeOnboarding) {
+                            Text("Passer")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.top, 8)
                     } else {
                         // Next button
                         Button(action: nextPage) {
@@ -114,6 +148,10 @@ struct OnboardingView: View {
                 .padding(.horizontal, 32)
                 .padding(.bottom, 32)
             }
+        }
+        .sheet(isPresented: $showEmailSignIn) {
+            EmailSignInView()
+                .environmentObject(firebaseManager)
         }
     }
     
@@ -134,6 +172,18 @@ struct OnboardingView: View {
         
         withAnimation {
             isPresented = false
+        }
+    }
+    
+    private func signInAnonymously() {
+        Task {
+            do {
+                try await firebaseManager.signInAnonymously()
+                completeOnboarding()
+            } catch {
+                print("❌ Error signing in anonymously: \(error)")
+                completeOnboarding()
+            }
         }
     }
 }

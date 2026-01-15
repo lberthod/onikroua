@@ -88,7 +88,7 @@ struct AdvancedSearchView: View {
                 .textFieldStyle(.plain)
                 .autocapitalization(.none)
                 .disableAutocorrection(true)
-                .onChange(of: searchQuery) { newValue in
+                .onChange(of: searchQuery) { _, newValue in
                     searchSubject.send(newValue)
                 }
             
