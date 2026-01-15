@@ -252,9 +252,13 @@ class FirebaseSyncService: ObservableObject {
     // MARK: - Sync Vocabulary Progress
     
     func syncVocabularyWord(wordId: String, status: String, reviewCount: Int, lastReviewDate: Date) async throws {
-        guard let userId = Auth.auth().currentUser?.uid else {
+        guard let currentUser = Auth.auth().currentUser else {
+            print("❌ Firebase Sync: Attempted to sync vocabulary without authentication")
             throw FirebaseSyncError.userNotAuthenticated
         }
+        
+        let userId = currentUser.uid
+        print("🔄 Firebase Sync: Syncing word \(wordId) for user \(userId)...")
         
         // Nettoyage manuel du chemin si safeFirebasePath n'est pas encore propagé
         let safePath = wordId
@@ -274,7 +278,13 @@ class FirebaseSyncService: ObservableObject {
             "lastUpdated": ServerValue.timestamp()
         ]
         
-        try await wordRef.setValue(data)
+        do {
+            try await wordRef.setValue(data)
+            print("✅ Firebase Sync: Successfully synced word \(wordId)")
+        } catch {
+            print("❌ Firebase Sync: Permission denied or other error for path \(wordRef.description) - \(error.localizedDescription)")
+            throw error
+        }
     }
     
     func fetchVocabularyStatus() async throws -> [String: [String: Any]] {
