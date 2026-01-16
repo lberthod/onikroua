@@ -29,7 +29,13 @@ struct onykrouaApp: App {
             Achievement.self,
             OnboardingData.self,
             LearningPath.self,
-            DailySession.self
+            DailySession.self,
+            CachedUserProgress.self,
+            CachedVocabWord.self,
+            CachedAchievement.self,
+            CachedSession.self,
+            SyncOutboxItem.self,
+            SyncMetadata.self
         ])
         let modelConfiguration = ModelConfiguration(
             schema: schema,
@@ -39,7 +45,13 @@ struct onykrouaApp: App {
         
         do {
             let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
-            print("✅ ModelContainer created successfully with new schemas")
+            print("✅ ModelContainer created successfully with sync cache schemas")
+            
+            Task { @MainActor in
+                CloudSyncEngine.shared.configure(with: container)
+                print("✅ CloudSyncEngine configured with ModelContainer")
+            }
+            
             return container
         } catch {
             fatalError("Could not create ModelContainer: \(error)")

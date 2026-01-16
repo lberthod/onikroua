@@ -165,7 +165,14 @@ class QuizDataManager: ObservableObject {
     // MARK: - Vocabulary Quizzes
     
     func generateVocabularyQuiz(difficulty: QuizDifficulty, language: String = "it", count: Int = 10) -> [QuizQuestion] {
+        VocabularyDataManager.shared.ensureLoaded(language: language)
         let allWords = VocabularyDataManager.shared.getAllWords(language: language)
+        
+        guard !allWords.isEmpty else {
+            print("⚠️ Aucun mot de vocabulaire disponible pour \(language)")
+            return []
+        }
+        
         let shuffledWords = allWords.shuffled().prefix(count)
         
         return shuffledWords.map { word in
@@ -196,6 +203,12 @@ class QuizDataManager: ObservableObject {
     
     func generateConjugationQuiz(difficulty: QuizDifficulty, language: String = "it", count: Int = 10) -> [QuizQuestion] {
         let verbs = language == "it" ? VerbData.getItalianVerbs() : VerbData.getSpanishVerbs()
+        
+        guard !verbs.isEmpty else {
+            print("⚠️ Aucun verbe disponible pour \(language)")
+            return []
+        }
+        
         let shuffledVerbs = verbs.shuffled().prefix(count)
         
         let tenses = ["Présent", "Passé composé", "Futur"]
@@ -249,6 +262,12 @@ class QuizDataManager: ObservableObject {
     func generateGrammarQuiz(difficulty: QuizDifficulty, language: String = "it", count: Int = 10) -> [QuizQuestion] {
         let grammarData = GrammarData()
         let rules = grammarData.getGrammarRules(language: language)
+        
+        guard !rules.isEmpty else {
+            print("⚠️ Aucune règle de grammaire disponible pour \(language)")
+            return []
+        }
+        
         let shuffledRules = rules.shuffled().prefix(count)
         
         return shuffledRules.compactMap { rule in
@@ -344,6 +363,42 @@ class QuizDataManager: ObservableObject {
         }
         
         return Array(questions).compactMap { $0 }
+    }
+    
+    // MARK: - Listening Quiz (Text-to-Speech based vocabulary)
+    
+    func generateListeningQuiz(difficulty: QuizDifficulty, language: String = "it", count: Int = 10) -> [QuizQuestion] {
+        VocabularyDataManager.shared.ensureLoaded(language: language)
+        let allWords = VocabularyDataManager.shared.getAllWords(language: language)
+        
+        guard !allWords.isEmpty else {
+            print("⚠️ Aucun mot de vocabulaire disponible pour \(language)")
+            return []
+        }
+        
+        let shuffledWords = allWords.shuffled().prefix(count)
+        
+        return shuffledWords.map { word in
+            let incorrectTranslations = allWords
+                .filter { $0.translation != word.translation }
+                .map { $0.translation }
+                .shuffled()
+                .prefix(3)
+            
+            var options = Array(incorrectTranslations) + [word.translation]
+            options.shuffle()
+            
+            let correctIndex = options.firstIndex(of: word.translation) ?? 0
+            
+            return QuizQuestion(
+                type: .listening,
+                difficulty: difficulty,
+                question: "Écoute et trouve la traduction de : \"\(word.word)\"",
+                options: options,
+                correctAnswerIndex: correctIndex,
+                explanation: word.example != nil ? "\(word.example!) - \(word.exampleTranslation ?? "")" : nil
+            )
+        }
     }
     
     // MARK: - Generate Mixed Quiz

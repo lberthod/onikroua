@@ -4,11 +4,15 @@ import SwiftData
 public struct QuizGameView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject var firebaseManager: FirebaseManager
     @State private var session: QuizSession
     @State private var selectedAnswer: Int?
     @State private var showExplanation = false
     @State private var showResults = false
+    @State private var showHint = false
     @State private var gamificationManager: GamificationManager?
+    @State private var showCorrectAnimation = false
+    @State private var showWrongAnimation = false
     
     public let language: String
     
@@ -67,30 +71,34 @@ public struct QuizGameView: View {
     }
     
     private var progressHeader: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 12) {
             HStack {
-                Text("Question \(session.currentQuestionIndex + 1)/\(session.questions.count)")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
+                Button(action: { dismiss() }) {
+                    Image(systemName: "xmark")
+                        .font(.title3)
+                        .foregroundColor(.primary)
+                }
                 
                 Spacer()
                 
-                Text(session.difficulty.icon)
-                    .font(.title3)
+                Text("\(session.currentQuestionIndex + 1) / \(session.questions.count)")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(.secondary)
             }
             
             ProgressView(value: Double(session.currentQuestionIndex), total: Double(session.questions.count))
                 .tint(session.type.color)
         }
         .padding()
-        .background(Color(.systemGray6))
     }
     
     private var questionCard: some View {
         VStack(spacing: 16) {
             HStack {
-                Text(session.type.icon)
+                Image(systemName: session.type.icon)
                     .font(.title)
+                    .foregroundColor(session.type.color)
                 
                 Text(session.type.rawValue)
                     .font(.caption)
@@ -104,18 +112,80 @@ public struct QuizGameView: View {
                     .foregroundColor(session.type.color)
                 
                 Spacer()
+                
+                if selectedAnswer == nil && !showHint {
+                    Button(action: { 
+                        withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                            showHint = true
+                        }
+                    }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "lightbulb.fill")
+                            Text("Indice")
+                        }
+                        .font(.caption)
+                        .foregroundColor(.orange)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(Color.orange.opacity(0.15))
+                        )
+                    }
+                }
             }
             
             Text(currentQuestion?.question ?? "")
                 .font(.title3)
                 .fontWeight(.semibold)
                 .frame(maxWidth: .infinity, alignment: .leading)
+            
+            if showHint && selectedAnswer == nil {
+                HStack(spacing: 8) {
+                    Image(systemName: "info.circle.fill")
+                        .foregroundColor(.orange)
+                    Text("Prends ton temps et réfléchis bien à la bonne réponse")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(Color.orange.opacity(0.1))
+                .cornerRadius(8)
+                .transition(.scale.combined(with: .opacity))
+            }
         }
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color(.systemBackground))
                 .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
+        )
+        .overlay(
+            Group {
+                if showCorrectAnimation {
+                    VStack {
+                        Text("✅")
+                            .font(.system(size: 80))
+                        Text("Bravo !")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.green)
+                    }
+                    .transition(.scale.combined(with: .opacity))
+                } else if showWrongAnimation {
+                    VStack {
+                        Text("❌")
+                            .font(.system(size: 80))
+                        Text("Oups !")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.red)
+                    }
+                    .transition(.scale.combined(with: .opacity))
+                }
+            }
         )
     }
     
@@ -203,18 +273,42 @@ public struct QuizGameView: View {
         selectedAnswer = index
         session.answerQuestion(answerIndex: index)
         
-        withAnimation(.easeInOut(duration: 0.3)) {
-            showExplanation = true
+        let isCorrect = index == currentQuestion?.correctAnswerIndex
+        
+        if isCorrect {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                showCorrectAnimation = true
+            }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                withAnimation {
+                    showCorrectAnimation = false
+                    showExplanation = true
+                }
+            }
+        } else {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                showWrongAnimation = true
+            }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                withAnimation {
+                    showWrongAnimation = false
+                    showExplanation = true
+                }
+            }
         }
     }
     
     private func nextQuestion() {
         if session.isCompleted {
+            saveQuizResults()
             awardXP()
             showResults = true
         } else {
             selectedAnswer = nil
             showExplanation = false
+            showHint = false
         }
     }
     
@@ -223,6 +317,12 @@ public struct QuizGameView: View {
         session.currentQuestionIndex -= 1
         selectedAnswer = session.answers[session.currentQuestionIndex]
         showExplanation = selectedAnswer != nil
+        showHint = false
+    }
+    
+    private func saveQuizResults() {
+        let userId = firebaseManager.userId ?? "guest"
+        QuizStatsManager.saveQuizResult(session: session, userId: userId, modelContext: modelContext)
     }
     
     private func awardXP() {
@@ -426,6 +526,41 @@ struct QuizResultsView: View {
     
     private var actionButtons: some View {
         VStack(spacing: 12) {
+            if session.score < 70 {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "lightbulb.fill")
+                            .foregroundColor(.orange)
+                        Text("Conseils pour progresser")
+                            .font(.headline)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        RecommendationRow(
+                            icon: "book.fill",
+                            text: "Révise le contenu de \(session.type.rawValue) avant de recommencer"
+                        )
+                        
+                        RecommendationRow(
+                            icon: "clock.fill",
+                            text: "Prends plus de temps pour réfléchir à chaque réponse"
+                        )
+                        
+                        if session.difficulty != .beginner {
+                            RecommendationRow(
+                                icon: "chart.bar.fill",
+                                text: "Essaie un niveau plus facile pour consolider tes bases"
+                            )
+                        }
+                    }
+                }
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.orange.opacity(0.1))
+                )
+            }
+            
             Button(action: onDismiss) {
                 Text("Terminer")
                     .font(.headline)
@@ -474,5 +609,24 @@ struct QuestionResultRow: View {
         .padding()
         .background(Color(.systemBackground))
         .cornerRadius(12)
+    }
+}
+
+struct RecommendationRow: View {
+    let icon: String
+    let text: String
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: icon)
+                .font(.caption)
+                .foregroundColor(.orange)
+                .frame(width: 20)
+            
+            Text(text)
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
     }
 }

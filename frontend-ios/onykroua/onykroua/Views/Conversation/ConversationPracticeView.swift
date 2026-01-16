@@ -71,51 +71,51 @@ struct ConversationPracticeView: View {
                 GridItem(.flexible()),
                 GridItem(.flexible())
             ], spacing: 12) {
-                CategoryButton(
+                ConversationCategoryButton(
                     icon: "🏨",
                     title: "Voyage",
                     count: scenariosCount(for: "Voyage"),
-                    color: .blue,
+                    isSelected: selectedCategory == "Voyage",
                     action: { selectedCategory = "Voyage" }
                 )
                 
-                CategoryButton(
+                ConversationCategoryButton(
                     icon: "☕",
                     title: "Quotidien",
                     count: scenariosCount(for: "Quotidien"),
-                    color: .green,
+                    isSelected: selectedCategory == "Quotidien",
                     action: { selectedCategory = "Quotidien" }
                 )
                 
-                CategoryButton(
+                ConversationCategoryButton(
                     icon: "💼",
                     title: "Professionnel",
                     count: scenariosCount(for: "Professionnel"),
-                    color: .purple,
+                    isSelected: selectedCategory == "Professionnel",
                     action: { selectedCategory = "Professionnel" }
                 )
                 
-                CategoryButton(
+                ConversationCategoryButton(
                     icon: "👥",
                     title: "Social",
                     count: scenariosCount(for: "Social"),
-                    color: .orange,
+                    isSelected: selectedCategory == "Social",
                     action: { selectedCategory = "Social" }
                 )
                 
-                CategoryButton(
+                ConversationCategoryButton(
                     icon: "🏥",
                     title: "Urgences",
                     count: scenariosCount(for: "Urgences"),
-                    color: .red,
+                    isSelected: selectedCategory == "Urgences",
                     action: { selectedCategory = "Urgences" }
                 )
                 
-                CategoryButton(
+                ConversationCategoryButton(
                     icon: "🎭",
                     title: "Culture",
                     count: scenariosCount(for: "Culture"),
-                    color: .pink,
+                    isSelected: selectedCategory == "Culture",
                     action: { selectedCategory = "Culture" }
                 )
             }
@@ -158,40 +158,34 @@ struct ConversationPracticeView: View {
     }
 }
 
-struct CategoryButton: View {
+struct ConversationCategoryButton: View {
     let icon: String
     let title: String
     let count: Int
-    let color: Color
+    let isSelected: Bool
     let action: () -> Void
     
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 12) {
+            VStack(spacing: 8) {
                 Text(icon)
-                    .font(.system(size: 40))
+                    .font(.system(size: 30))
                 
-                VStack(spacing: 4) {
-                    Text(title)
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                    
-                    Text("\(count) scénarios")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(isSelected ? .white : .primary)
+                
+                Text("\(count) scénarios")
+                    .font(.caption)
+                    .foregroundColor(isSelected ? .white.opacity(0.8) : .secondary)
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 120)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(color.opacity(0.1))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(color, lineWidth: 2)
-            )
+            .padding()
+            .background(isSelected ? Color.blue : Color(.systemBackground))
+            .cornerRadius(12)
+            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
         }
+        .buttonStyle(.plain)
     }
 }
 

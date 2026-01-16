@@ -239,7 +239,7 @@ struct VocabularyCard: View {
     }
 }
 
-struct CategoryButton: View {
+struct VocabularyCategoryButton: View {
     let name: String
     let icon: String
     let isSelected: Bool

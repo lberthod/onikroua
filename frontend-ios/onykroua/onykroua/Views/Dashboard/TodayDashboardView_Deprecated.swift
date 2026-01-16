@@ -14,6 +14,7 @@ struct TodayDashboardView: View {
     @State private var showReviewSession = false
     @State private var showLearningPath = false
     @State private var showVocabulary = false
+    @State private var showConjugation = false
     @State private var showPracticeHub = false
     @State private var showFeed = false
     @State private var showConversation = false
@@ -37,9 +38,9 @@ struct TodayDashboardView: View {
                     }
                     
                     QuickAccessCarousel(
-                        onFeed: { showFeed = true },
-                        onConversation: { showConversation = true },
-                        onStatistics: { showStatistics = true }
+                        onLearningPath: { showLearningPath = true },
+                        onVocabulary: { showVocabulary = true },
+                        onConjugation: { showConjugation = true }
                     )
                     
                     if let progress = userProgress {
@@ -76,6 +77,9 @@ struct TodayDashboardView: View {
             }
             .navigationDestination(isPresented: $showPracticeHub) {
                 PracticeHubView(language: "it")
+            }
+            .navigationDestination(isPresented: $showConjugation) {
+                ConjugationView()
             }
             .navigationDestination(isPresented: $showFeed) {
                 FeedView()

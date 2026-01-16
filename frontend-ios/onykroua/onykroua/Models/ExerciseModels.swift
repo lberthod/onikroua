@@ -222,7 +222,14 @@ public class ExerciseDataManager: ObservableObject {
     // MARK: - Flashcard Generation
     
     public func generateVocabularyFlashcards(language: String, category: String? = nil, limit: Int = 20) -> FlashcardDeck {
+        VocabularyDataManager.shared.ensureLoaded(language: language)
         let words = VocabularyDataManager.shared.getAllWords(language: language)
+        
+        guard !words.isEmpty else {
+            print("⚠️ Aucun mot disponible pour les flashcards")
+            return FlashcardDeck(title: "Vocabulaire", description: "Aucune carte", cards: [], difficulty: .beginner)
+        }
+        
         let filteredWords = category != nil ? words.filter { $0.category == category } : words
         let selectedWords = Array(filteredWords.shuffled().prefix(limit))
         
@@ -277,6 +284,12 @@ public class ExerciseDataManager: ObservableObject {
     
     public func generateFillInTheBlankExercises(language: String, count: Int = 10) -> [FillInTheBlankExercise] {
         let scenarios = ConversationData.getScenarios(for: language)
+        
+        guard !scenarios.isEmpty else {
+            print("⚠️ Aucun scénario de conversation disponible")
+            return []
+        }
+        
         let messages = scenarios.flatMap { $0.messages }
         let shuffled = messages.shuffled().prefix(count)
         
@@ -311,7 +324,14 @@ public class ExerciseDataManager: ObservableObject {
     // MARK: - Matching Exercise Generation
     
     public func generateMatchingExercise(language: String, count: Int = 8) -> MatchingExercise {
+        VocabularyDataManager.shared.ensureLoaded(language: language)
         let words = VocabularyDataManager.shared.getAllWords(language: language)
+        
+        guard !words.isEmpty else {
+            print("⚠️ Aucun mot disponible pour l'exercice d'association")
+            return MatchingExercise(title: "Association", pairs: [], difficulty: .beginner)
+        }
+        
         let selectedWords = Array(words.shuffled().prefix(count))
         
         let pairs = selectedWords.map { word in

@@ -11,7 +11,22 @@ struct TodayContentView: View {
     @State private var dailySessionService: DailySessionService?
     @State private var learningPathManager: LearningPathManager?
     @State private var recommendationEngine: RecommendationEngine?
+    @State private var mission: Mission?
+    @State private var recommendedAction: RecommendedAction = .explore
     @State private var showReviewSession = false
+    @State private var showLearningPath = false
+    @State private var showVocabulary = false
+    @State private var showConjugation = false
+    @State private var showPracticeHub = false
+    @State private var showFeed = false
+    @State private var showConversation = false
+    @State private var showStatistics = false
+    @State private var showQuiz = false
+    @State private var showEmoji = false
+    @State private var showGrammar = false
+    @State private var showPhonetic = false
+    @State private var showGeminiLive = false
+    @State private var showAchievements = false
     @State private var reviewMode: ReviewSessionView.ReviewMode = .standard
     
     private var userProgress: UserProgress? {
@@ -19,25 +34,15 @@ struct TodayContentView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
                     headerSection
                     
-                    if let sessionService = dailySessionService,
-                       let mission = sessionService.todayMission,
-                       !mission.isCompleted {
+                    if let mission = mission, !mission.isCompleted {
                         HeroMissionCard(mission: mission, onStart: { self.startMission() })
-                    } else if let recEngine = recommendationEngine,
-                              let pathManager = learningPathManager,
-                              let sessionService = dailySessionService {
-                        HeroActionCard(
-                            action: recEngine.getNextBestAction(
-                                dailySessionService: sessionService,
-                                learningPathManager: pathManager
-                            ),
-                            onStart: { self.handleAction() }
-                        )
+                    } else {
+                        HeroActionCard(action: recommendedAction, onStart: { self.handleAction() })
                     }
                     
                     if let progress = userProgress {
@@ -56,23 +61,63 @@ struct TodayContentView: View {
                     
                     quickAccessSection
                     
+                    learningCategoriesSection
+                    
+                    practiceToolsSection
+                    
                     if let progress = userProgress {
                         MotivationSection(progress: progress)
                     }
                 }
-                .padding(.bottom, 20)
+                .padding(.bottom, 40)
             }
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
-            .navigationBarHidden(true)
             .sheet(isPresented: $showProfile) {
                 ProfileView()
             }
             .sheet(isPresented: $showReviewSession) {
-                NavigationView {
-                    ReviewSessionView(
-                        reviewSystem: env.reviewSystem
-                    )
+                NavigationStack {
+                    ReviewSessionView(reviewSystem: env.reviewSystem)
                 }
+            }
+            .navigationDestination(isPresented: $showLearningPath) {
+                LearningPathView()
+            }
+            .navigationDestination(isPresented: $showVocabulary) {
+                VocabularyView_Enhanced()
+            }
+            .navigationDestination(isPresented: $showConjugation) {
+                ConjugationView()
+            }
+            .navigationDestination(isPresented: $showPracticeHub) {
+                PracticeHubView(language: "it")
+            }
+            .navigationDestination(isPresented: $showFeed) {
+                FeedView()
+            }
+            .navigationDestination(isPresented: $showConversation) {
+                ConversationView()
+            }
+            .navigationDestination(isPresented: $showStatistics) {
+                InsightsView()
+            }
+            .navigationDestination(isPresented: $showQuiz) {
+                QuizSelectionView(language: "it")
+            }
+            .navigationDestination(isPresented: $showEmoji) {
+                EmojiView_Enhanced()
+            }
+            .navigationDestination(isPresented: $showGrammar) {
+                GrammarView()
+            }
+            .navigationDestination(isPresented: $showPhonetic) {
+                PhoneticView()
+            }
+            .navigationDestination(isPresented: $showGeminiLive) {
+                GeminiLiveView()
+            }
+            .navigationDestination(isPresented: $showAchievements) {
+                AchievementsView()
             }
             .onAppear {
                 setupServices()
@@ -112,44 +157,6 @@ struct TodayContentView: View {
         .padding(.top)
     }
     
-    private var quickAccessSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Accès rapide")
-                .font(.headline)
-                .padding(.horizontal)
-            
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
-                    if let pathManager = learningPathManager {
-                        NavigationLink(destination: LearningPathView()) {
-                            QuickAccessCard(icon: "🎯", title: "Mon Parcours")
-                        }
-                    }
-                    
-                    NavigationLink(destination: VocabularyView_Enhanced()) {
-                        QuickAccessCard(icon: "📚", title: "Vocabulaire")
-                    }
-                    
-                    NavigationLink(destination: ConjugationView()) {
-                        QuickAccessCard(icon: "📖", title: "Conjugaison")
-                    }
-                    
-                    NavigationLink(destination: FeedView()) {
-                        QuickAccessCard(icon: "📱", title: "Feed")
-                    }
-                    
-                    NavigationLink(destination: ConversationView()) {
-                        QuickAccessCard(icon: "💬", title: "Conversation")
-                    }
-                    
-                    NavigationLink(destination: AnalyticsView()) {
-                        QuickAccessCard(icon: "📊", title: "Statistiques")
-                    }
-                }
-                .padding(.horizontal)
-            }
-        }
-    }
     
     private var greetingMessage: String {
         let hour = Calendar.current.component(.hour, from: Date())
@@ -157,6 +164,112 @@ struct TodayContentView: View {
         case 0..<12: return "Buongiorno!"
         case 12..<18: return "Buon pomeriggio!"
         default: return "Buonasera!"
+        }
+    }
+    
+    private var quickAccessSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Accès rapide")
+                .font(.headline)
+                .padding(.horizontal)
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    QuickAccessButton(icon: "target", title: "Mon Parcours", color: .red) {
+                        showLearningPath = true
+                    }
+                    QuickAccessButton(icon: "book.fill", title: "Vocabulaire", color: .green) {
+                        showVocabulary = true
+                    }
+                    QuickAccessButton(icon: "book.closed.fill", title: "Conjugaison", color: .blue) {
+                        showConjugation = true
+                    }
+                    QuickAccessButton(icon: "flame.fill", title: "Feed", color: .orange) {
+                        showFeed = true
+                    }
+                    QuickAccessButton(icon: "trophy.fill", title: "Succès", color: .yellow) {
+                        showAchievements = true
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
+    }
+    
+    private var learningCategoriesSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Catégories d'apprentissage")
+                .font(.headline)
+                .padding(.horizontal)
+            
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                DashboardCategoryButton(icon: "face.smiling.fill", title: "Emoji", color: Color.orange) {
+                    showEmoji = true
+                }
+                DashboardCategoryButton(icon: "message.fill", title: "Conversation", color: Color.purple) {
+                    showConversation = true
+                }
+                DashboardCategoryButton(icon: "text.alignleft", title: "Grammaire", color: Color.red) {
+                    showGrammar = true
+                }
+                DashboardCategoryButton(icon: "speaker.wave.3.fill", title: "Phonétique", color: Color.pink) {
+                    showPhonetic = true
+                }
+                                DashboardCategoryButton(icon: "flame.fill", title: "Feed", color: Color.yellow) {
+                    showFeed = true
+                }
+                                DashboardCategoryButton(icon: "book.closed.fill", title: "Conjugaison", color: Color.green) {
+                    showConjugation = true
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+    
+    private var practiceToolsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Outils de pratique")
+                .font(.headline)
+                .padding(.horizontal)
+            
+            VStack(spacing: 12) {
+                PracticeToolCard(
+                    icon: "gamecontroller.fill",
+                    title: "Quiz Interactif",
+                    subtitle: "Teste tes connaissances",
+                    color: .blue
+                ) {
+                    showQuiz = true
+                }
+                
+                PracticeToolCard(
+                    icon: "brain.head.profile",
+                    title: "Hub de Pratique",
+                    subtitle: "Flashcards, exercices et plus",
+                    color: .green
+                ) {
+                    showPracticeHub = true
+                }
+                
+                PracticeToolCard(
+                    icon: "mic.fill",
+                    title: "Gemini Live",
+                    subtitle: "Conversation avec l'IA",
+                    color: .indigo
+                ) {
+                    showGeminiLive = true
+                }
+                
+                PracticeToolCard(
+                    icon: "chart.bar.fill",
+                    title: "Statistiques",
+                    subtitle: "Analyse tes progrès",
+                    color: .cyan
+                ) {
+                    showStatistics = true
+                }
+            }
+            .padding(.horizontal)
         }
     }
     
@@ -174,7 +287,8 @@ struct TodayContentView: View {
     private func loadDailyContent() {
         guard let progress = userProgress,
               let sessionService = dailySessionService,
-              let pathManager = learningPathManager else {
+              let pathManager = learningPathManager,
+              let recEngine = recommendationEngine else {
             return
         }
         
@@ -188,55 +302,44 @@ struct TodayContentView: View {
             reviewSystem: env.reviewSystem,
             learningPathManager: pathManager
         )
+        
+        mission = sessionService.todayMission
+        
+        recommendedAction = recEngine.getNextBestAction(
+            dailySessionService: sessionService,
+            learningPathManager: pathManager
+        )
     }
     
     private func startMission() {
-        guard let mission = dailySessionService?.todayMission else { return }
+        guard let mission = mission else { return }
         
         switch mission.type {
         case .review:
             reviewMode = .standard
             showReviewSession = true
         case .newLesson:
-            break
+            showLearningPath = true
         default:
-            break
+            showPracticeHub = true
         }
     }
     
     private func handleAction() {
-        guard let recEngine = recommendationEngine,
-              let pathManager = learningPathManager,
-              let sessionService = dailySessionService else {
-            return
-        }
-        
-        let action = recEngine.getNextBestAction(
-            dailySessionService: sessionService,
-            learningPathManager: pathManager
-        )
-        
-        switch action {
+        switch recommendedAction {
         case .urgentReview, .dailyMission:
             reviewMode = .intensive
             showReviewSession = true
         case .continueLesson:
-            break
+            showLearningPath = true
         case .reinforceArea:
-            break
+            showPracticeHub = true
         case .explore:
-            break
+            showVocabulary = true
         }
     }
 }
 
-struct AnalyticsView: View {
-    var body: some View {
-        Text("Statistiques (À venir)")
-            .font(.title)
-            .navigationTitle("Statistiques")
-    }
-}
 
 struct QuickAccessCard: View {
     let icon: String
@@ -255,5 +358,108 @@ struct QuickAccessCard: View {
         .background(Color(.systemBackground))
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+    }
+}
+
+struct QuickAccessButton: View {
+    let icon: String
+    let title: String
+    let color: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.title2)
+                    .foregroundColor(.white)
+                    .frame(width: 60, height: 60)
+                    .background(color)
+                    .cornerRadius(12)
+                
+                Text(title)
+                    .font(.caption)
+                    .foregroundColor(.primary)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(width: 90)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct DashboardCategoryButton: View {
+    let icon: String
+    let title: String
+    let color: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 36))
+                    .foregroundColor(.white)
+                
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 100)
+            .background(
+                LinearGradient(
+                    gradient: Gradient(colors: [color, color.opacity(0.7)]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .cornerRadius(16)
+            .shadow(color: color.opacity(0.3), radius: 8, x: 0, y: 4)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct PracticeToolCard: View {
+    let icon: String
+    let title: String
+    let subtitle: String
+    let color: Color
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 16) {
+                Image(systemName: icon)
+                    .font(.system(size: 28))
+                    .foregroundColor(.white)
+                    .frame(width: 56, height: 56)
+                    .background(color)
+                    .cornerRadius(12)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    
+                    Text(subtitle)
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.secondary)
+            }
+            .padding()
+            .background(Color(.systemBackground))
+            .cornerRadius(16)
+            .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 2)
+        }
+        .buttonStyle(.plain)
     }
 }

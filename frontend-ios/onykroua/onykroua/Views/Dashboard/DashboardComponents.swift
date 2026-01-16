@@ -239,14 +239,14 @@ public struct ReviewReminderCard: View {
 }
 
 public struct QuickAccessCarousel: View {
-    public var onFeed: () -> Void = {}
-    public var onConversation: () -> Void = {}
-    public var onStatistics: () -> Void = {}
+    public var onLearningPath: () -> Void = {}
+    public var onVocabulary: () -> Void = {}
+    public var onConjugation: () -> Void = {}
     
-    public init(onFeed: @escaping () -> Void = {}, onConversation: @escaping () -> Void = {}, onStatistics: @escaping () -> Void = {}) {
-        self.onFeed = onFeed
-        self.onConversation = onConversation
-        self.onStatistics = onStatistics
+    public init(onLearningPath: @escaping () -> Void = {}, onVocabulary: @escaping () -> Void = {}, onConjugation: @escaping () -> Void = {}) {
+        self.onLearningPath = onLearningPath
+        self.onVocabulary = onVocabulary
+        self.onConjugation = onConjugation
     }
     
     public var body: some View {
@@ -257,16 +257,15 @@ public struct QuickAccessCarousel: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
-                    Button(action: onFeed) {
-                        QuickAccessItem(icon: "iphone", title: "Feed", color: .blue)
+                    Button(action: onLearningPath) {
+                        QuickAccessItem(icon: "target", title: "Mon Parcours", color: .red)
                     }
-                    Button(action: onConversation) {
-                        QuickAccessItem(icon: "bubble.left.and.bubble.right.fill", title: "Conversation", color: .green)
+                    Button(action: onVocabulary) {
+                        QuickAccessItem(icon: "book.fill", title: "Vocabulaire", color: .green)
                     }
-                    Button(action: onStatistics) {
-                        QuickAccessItem(icon: "chart.bar.fill", title: "Statistiques", color: .purple)
+                    Button(action: onConjugation) {
+                        QuickAccessItem(icon: "book.closed.fill", title: "Conjugaison", color: .blue)
                     }
-                    QuickAccessItem(icon: "mic.fill", title: "Pratique", color: .orange)
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 8)

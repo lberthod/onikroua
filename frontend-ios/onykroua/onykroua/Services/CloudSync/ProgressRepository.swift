@@ -1,0 +1,181 @@
+import Foundation
+import SwiftData
+import FirebaseAuth
+import FirebaseDatabase
+
+@MainActor
+class ProgressRepository: ObservableObject {
+    private let modelContainer: ModelContainer
+    private let database = Database.database().reference()
+    
+    init(container: ModelContainer) {
+        self.modelContainer = container
+    }
+    
+    func getProgress() -> CachedUserProgress? {
+        guard let userId = Auth.auth().currentUser?.uid else { return nil }
+        
+        let context = ModelContext(modelContainer)
+        let descriptor = FetchDescriptor<CachedUserProgress>(
+            predicate: #Predicate { $0.userId == userId }
+        )
+        
+        return try? context.fetch(descriptor).first
+    }
+    
+    func addXP(_ amount: Int) async throws {
+        guard let userId = Auth.auth().currentUser?.uid else {
+            throw RepositoryError.userNotAuthenticated
+        }
+        
+        let context = ModelContext(modelContainer)
+        let descriptor = FetchDescriptor<CachedUserProgress>(
+            predicate: #Predicate { $0.userId == userId }
+        )
+        
+        guard let cached = try context.fetch(descriptor).first else {
+            throw RepositoryError.dataNotFound
+        }
+        
+        cached.xp += amount
+        cached.updatedAt = Date().toMilliseconds()
+        
+        try context.save()
+        
+        try await pushProgressToCloud(userId: userId, cached: cached)
+    }
+    
+    func incrementStreak() async throws {
+        guard let userId = Auth.auth().currentUser?.uid else {
+            throw RepositoryError.userNotAuthenticated
+        }
+        
+        let context = ModelContext(modelContainer)
+        let descriptor = FetchDescriptor<CachedUserProgress>(
+            predicate: #Predicate { $0.userId == userId }
+        )
+        
+        guard let cached = try context.fetch(descriptor).first else {
+            throw RepositoryError.dataNotFound
+        }
+        
+        cached.streakDays += 1
+        if cached.streakDays > cached.longestStreak {
+            cached.longestStreak = cached.streakDays
+        }
+        cached.lastStudyAt = Date().toMilliseconds()
+        cached.updatedAt = Date().toMilliseconds()
+        
+        try context.save()
+        
+        try await pushProgressToCloud(userId: userId, cached: cached)
+    }
+    
+    func recordWordLearned() async throws {
+        guard let userId = Auth.auth().currentUser?.uid else {
+            throw RepositoryError.userNotAuthenticated
+        }
+        
+        let context = ModelContext(modelContainer)
+        let descriptor = FetchDescriptor<CachedUserProgress>(
+            predicate: #Predicate { $0.userId == userId }
+        )
+        
+        guard let cached = try context.fetch(descriptor).first else {
+            throw RepositoryError.dataNotFound
+        }
+        
+        cached.wordsLearned += 1
+        cached.updatedAt = Date().toMilliseconds()
+        
+        try context.save()
+        
+        try await pushProgressToCloud(userId: userId, cached: cached)
+    }
+    
+    func recordWordReviewed() async throws {
+        guard let userId = Auth.auth().currentUser?.uid else {
+            throw RepositoryError.userNotAuthenticated
+        }
+        
+        let context = ModelContext(modelContainer)
+        let descriptor = FetchDescriptor<CachedUserProgress>(
+            predicate: #Predicate { $0.userId == userId }
+        )
+        
+        guard let cached = try context.fetch(descriptor).first else {
+            throw RepositoryError.dataNotFound
+        }
+        
+        cached.wordsReviewed += 1
+        cached.updatedAt = Date().toMilliseconds()
+        
+        try context.save()
+        
+        try await pushProgressToCloud(userId: userId, cached: cached)
+    }
+    
+    func recordSessionCompleted(xpGained: Int, activityType: String, itemsCount: Int, correctCount: Int, durationSeconds: Int) async throws {
+        guard let userId = Auth.auth().currentUser?.uid else {
+            throw RepositoryError.userNotAuthenticated
+        }
+        
+        let context = ModelContext(modelContainer)
+        let descriptor = FetchDescriptor<CachedUserProgress>(
+            predicate: #Predicate { $0.userId == userId }
+        )
+        
+        guard let cached = try context.fetch(descriptor).first else {
+            throw RepositoryError.dataNotFound
+        }
+        
+        cached.xp += xpGained
+        cached.sessionsCompleted += 1
+        cached.studyTimeMinutes += durationSeconds / 60
+        cached.lastStudyAt = Date().toMilliseconds()
+        cached.updatedAt = Date().toMilliseconds()
+        
+        try context.save()
+        
+        try await pushProgressToCloud(userId: userId, cached: cached)
+        
+        let nowMs = Date().toMilliseconds()
+        let sessionDTO = SessionDTO(
+            sessionId: database.child("users").child(userId).child("sessions").childByAutoId().key ?? UUID().uuidString,
+            startedAt: nowMs - Int64(durationSeconds * 1000),
+            endedAt: nowMs,
+            itemsCount: itemsCount,
+            correctCount: correctCount,
+            xpGained: xpGained,
+            activityType: activityType,
+            updatedAt: nowMs
+        )
+        
+        let sessionCache = CachedSession(userId: userId, dto: sessionDTO)
+        context.insert(sessionCache)
+        try context.save()
+        
+        let path = "users/\(userId)/sessions/\(sessionDTO.sessionId)"
+        try await enqueueWrite(userId: userId, path: path, payload: sessionDTO.toDictionary(), context: context)
+    }
+    
+    private func pushProgressToCloud(userId: String, cached: CachedUserProgress) async throws {
+        let dto = cached.toDTO()
+        let path = "users/\(userId)/progress"
+        
+        let context = ModelContext(modelContainer)
+        try await enqueueWrite(userId: userId, path: path, payload: dto.toDictionary(), context: context)
+    }
+    
+    private func enqueueWrite(userId: String, path: String, payload: [String: Any], context: ModelContext) async throws {
+        do {
+            try await database.child(path).setValue(payload)
+            print("✅ ProgressRepository: Direct write succeeded - \(path)")
+        } catch {
+            print("⚠️ ProgressRepository: Direct write failed, enqueueing - \(error)")
+            let outboxItem = SyncOutboxItem(userId: userId, path: path, payload: payload)
+            context.insert(outboxItem)
+            try context.save()
+        }
+    }
+}

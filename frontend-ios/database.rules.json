@@ -1,0 +1,198 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid",
+        
+        "meta": {
+          ".validate": "newData.hasChildren(['schemaVersion', 'createdAt', 'lastLoginAt', 'updatedAt'])",
+          "schemaVersion": {
+            ".validate": "newData.isNumber() && newData.val() >= 1"
+          },
+          "createdAt": {
+            ".validate": "newData.isNumber() && newData.val() > 0"
+          },
+          "lastLoginAt": {
+            ".validate": "newData.isNumber() && newData.val() > 0"
+          },
+          "activeDeviceId": {
+            ".validate": "newData.isString() && newData.val().length <= 100"
+          },
+          "updatedAt": {
+            ".validate": "newData.isNumber() && newData.val() > 0"
+          },
+          "$other": {
+            ".validate": false
+          }
+        },
+        
+        "progress": {
+          ".validate": "newData.hasChildren(['level', 'xp', 'streakDays', 'longestStreak', 'lastStudyAt', 'wordsLearned', 'wordsReviewed', 'lessonsCompleted', 'quizzesCompleted', 'quizzesCorrect', 'conversationsCompleted', 'grammarRulesLearned', 'verbsLearned', 'studyTimeMinutes', 'sessionsCompleted', 'updatedAt'])",
+          "level": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100"
+          },
+          "xp": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "streakDays": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "longestStreak": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "lastStudyAt": {
+            ".validate": "newData.isNumber() && newData.val() > 0"
+          },
+          "wordsLearned": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "wordsReviewed": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "lessonsCompleted": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "quizzesCompleted": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "quizzesCorrect": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "conversationsCompleted": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "grammarRulesLearned": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "verbsLearned": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "studyTimeMinutes": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "sessionsCompleted": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "updatedAt": {
+            ".validate": "newData.isNumber() && newData.val() > 0"
+          },
+          "$other": {
+            ".validate": false
+          }
+        },
+        
+        "vocab": {
+          "$wordId": {
+            ".validate": "newData.hasChildren(['status', 'strength', 'lastSeenAt', 'reviewCount', 'correctCount', 'updatedAt'])",
+            "status": {
+              ".validate": "newData.isString() && (newData.val() === 'new' || newData.val() === 'learning' || newData.val() === 'known')"
+            },
+            "strength": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "lastSeenAt": {
+              ".validate": "newData.isNumber() && newData.val() > 0"
+            },
+            "reviewCount": {
+              ".validate": "newData.isNumber() && newData.val() >= 0"
+            },
+            "correctCount": {
+              ".validate": "newData.isNumber() && newData.val() >= 0"
+            },
+            "updatedAt": {
+              ".validate": "newData.isNumber() && newData.val() > 0"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        
+        "achievements": {
+          "$achievementId": {
+            ".validate": "newData.hasChildren(['unlocked', 'progress', 'updatedAt'])",
+            "unlocked": {
+              ".validate": "newData.isBoolean()"
+            },
+            "unlockedAt": {
+              ".validate": "newData.isNumber() && newData.val() > 0"
+            },
+            "progress": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+            },
+            "updatedAt": {
+              ".validate": "newData.isNumber() && newData.val() > 0"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        
+        "sessions": {
+          "$sessionId": {
+            ".validate": "newData.hasChildren(['startedAt', 'endedAt', 'itemsCount', 'correctCount', 'xpGained', 'activityType', 'updatedAt'])",
+            "startedAt": {
+              ".validate": "newData.isNumber() && newData.val() > 0"
+            },
+            "endedAt": {
+              ".validate": "newData.isNumber() && newData.val() > 0"
+            },
+            "itemsCount": {
+              ".validate": "newData.isNumber() && newData.val() >= 0"
+            },
+            "correctCount": {
+              ".validate": "newData.isNumber() && newData.val() >= 0"
+            },
+            "xpGained": {
+              ".validate": "newData.isNumber() && newData.val() >= 0"
+            },
+            "activityType": {
+              ".validate": "newData.isString() && newData.val().length <= 50"
+            },
+            "updatedAt": {
+              ".validate": "newData.isNumber() && newData.val() > 0"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    
+    "leaderboards": {
+      "global": {
+        "$uid": {
+          ".read": true,
+          ".write": "$uid === auth.uid",
+          ".validate": "newData.hasChildren(['xp', 'level', 'username', 'updatedAt'])",
+          "xp": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "level": {
+            ".validate": "newData.isNumber() && newData.val() >= 1"
+          },
+          "username": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 50"
+          },
+          "updatedAt": {
+            ".validate": "newData.isNumber() && newData.val() > 0"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      }
+    },
+    
+    "$other": {
+      ".validate": false
+    }
+  }
+}

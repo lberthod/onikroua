@@ -46,6 +46,9 @@ struct PracticeHubView: View {
                     MatchingExerciseView(exercise: exercise)
                 }
             }
+            .onAppear {
+                VocabularyDataManager.shared.ensureLoaded(language: language)
+            }
         }
     }
     
@@ -220,17 +223,29 @@ struct PracticeHubView: View {
     
     private func startFlashcards() {
         selectedFlashcardDeck = ExerciseDataManager.shared.generateVocabularyFlashcards(language: language, limit: 20)
-        showFlashcards = true
+        if !selectedFlashcardDeck!.cards.isEmpty {
+            showFlashcards = true
+        } else {
+            print("❌ Aucune flashcard générée")
+        }
     }
     
     private func startFillInBlank() {
         fillInBlankExercises = ExerciseDataManager.shared.generateFillInTheBlankExercises(language: language, count: 10)
-        showFillInBlank = true
+        if !fillInBlankExercises.isEmpty {
+            showFillInBlank = true
+        } else {
+            print("❌ Aucun exercice texte à trous généré")
+        }
     }
     
     private func startMatching() {
         matchingExercise = ExerciseDataManager.shared.generateMatchingExercise(language: language, count: 8)
-        showMatching = true
+        if let exercise = matchingExercise, !exercise.pairs.isEmpty {
+            showMatching = true
+        } else {
+            print("❌ Aucun exercice d'association généré")
+        }
     }
 }
 
