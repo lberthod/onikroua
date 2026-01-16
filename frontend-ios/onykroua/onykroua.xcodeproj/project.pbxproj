@@ -28,11 +28,6 @@
 		E02D54F32F16C9EF00F31467 /* FeedModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54F12F16C9EF00F31467 /* FeedModels.swift */; };
 		E02D54F42F16C9EF00F31467 /* EmojiModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54F02F16C9EF00F31467 /* EmojiModels.swift */; };
 		E02D54F62F16CBAF00F31467 /* GrammarData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54F52F16CBAF00F31467 /* GrammarData.swift */; };
-		E02D54FD2F16CBC300F31467 /* MoreTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54F72F16CBC300F31467 /* MoreTab.swift */; };
-		E02D54FE2F16CBC300F31467 /* TensesTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54FA2F16CBC300F31467 /* TensesTab.swift */; };
-		E02D54FF2F16CBC300F31467 /* RulesTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54F92F16CBC300F31467 /* RulesTab.swift */; };
-		E02D55002F16CBC300F31467 /* PracticeTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54F82F16CBC300F31467 /* PracticeTab.swift */; };
-		E02D55012F16CBC300F31467 /* VerbsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54FB2F16CBC300F31467 /* VerbsTab.swift */; };
 		E02D55032F16D00400F31467 /* VerbData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55022F16D00400F31467 /* VerbData.swift */; };
 		E02D55092F16D2C800F31467 /* DictionaryTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55052F16D2C800F31467 /* DictionaryTab.swift */; };
 		E02D550A2F16D2C800F31467 /* CategoriesTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55042F16D2C800F31467 /* CategoriesTab.swift */; };
@@ -41,9 +36,6 @@
 		E02D55102F16D88600F31467 /* vocabulary_es.json in Resources */ = {isa = PBXBuildFile; fileRef = E02D550F2F16D88600F31467 /* vocabulary_es.json */; };
 		E02D55192F16DB7D00F31467 /* GrammarDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55182F16DB7D00F31467 /* GrammarDataManager.swift */; };
 		E02D551B2F16DB9B00F31467 /* GrammarModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D551A2F16DB9B00F31467 /* GrammarModels.swift */; };
-		E02D551F2F16DCB600F31467 /* QuickReferenceGrammarTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D551D2F16DCB600F31467 /* QuickReferenceGrammarTab.swift */; };
-		E02D55202F16DCB600F31467 /* RulesGrammarTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D551E2F16DCB600F31467 /* RulesGrammarTab.swift */; };
-		E02D55212F16DCB600F31467 /* CategoriesGrammarTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D551C2F16DCB600F31467 /* CategoriesGrammarTab.swift */; };
 		E02D55262F16E25500F31467 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55222F16E25500F31467 /* Constants.swift */; };
 		E02D55292F16E4ED00F31467 /* SharedComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55272F16E4ED00F31467 /* SharedComponents.swift */; };
 		E02D552B2F18520700F31467 /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D552A2F18520700F31467 /* AppEnvironment.swift */; };
@@ -134,6 +126,7 @@
 		E02D56102F1AB33900F31467 /* CacheModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D560D2F1AB33900F31467 /* CacheModels.swift */; };
 		E02D56112F1AB33900F31467 /* FirebaseDTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D560E2F1AB33900F31467 /* FirebaseDTOs.swift */; };
 		E02D56132F1AD51500F31467 /* GamificationSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D56122F1AD51500F31467 /* GamificationSyncManager.swift */; };
+		E02D56162F1ADD5600F31467 /* OnykrouaUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D56142F1ADD5600F31467 /* OnykrouaUI.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -159,11 +152,6 @@
 		E02D54F02F16C9EF00F31467 /* EmojiModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiModels.swift; sourceTree = "<group>"; };
 		E02D54F12F16C9EF00F31467 /* FeedModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedModels.swift; sourceTree = "<group>"; };
 		E02D54F52F16CBAF00F31467 /* GrammarData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarData.swift; sourceTree = "<group>"; };
-		E02D54F72F16CBC300F31467 /* MoreTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreTab.swift; sourceTree = "<group>"; };
-		E02D54F82F16CBC300F31467 /* PracticeTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeTab.swift; sourceTree = "<group>"; };
-		E02D54F92F16CBC300F31467 /* RulesTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesTab.swift; sourceTree = "<group>"; };
-		E02D54FA2F16CBC300F31467 /* TensesTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TensesTab.swift; sourceTree = "<group>"; };
-		E02D54FB2F16CBC300F31467 /* VerbsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerbsTab.swift; sourceTree = "<group>"; };
 		E02D55022F16D00400F31467 /* VerbData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerbData.swift; sourceTree = "<group>"; };
 		E02D55042F16D2C800F31467 /* CategoriesTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesTab.swift; sourceTree = "<group>"; };
 		E02D55052F16D2C800F31467 /* DictionaryTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryTab.swift; sourceTree = "<group>"; };
@@ -172,9 +160,6 @@
 		E02D550F2F16D88600F31467 /* vocabulary_es.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = vocabulary_es.json; sourceTree = "<group>"; };
 		E02D55182F16DB7D00F31467 /* GrammarDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarDataManager.swift; sourceTree = "<group>"; };
 		E02D551A2F16DB9B00F31467 /* GrammarModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarModels.swift; sourceTree = "<group>"; };
-		E02D551C2F16DCB600F31467 /* CategoriesGrammarTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesGrammarTab.swift; sourceTree = "<group>"; };
-		E02D551D2F16DCB600F31467 /* QuickReferenceGrammarTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickReferenceGrammarTab.swift; sourceTree = "<group>"; };
-		E02D551E2F16DCB600F31467 /* RulesGrammarTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesGrammarTab.swift; sourceTree = "<group>"; };
 		E02D55222F16E25500F31467 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		E02D55272F16E4ED00F31467 /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
 		E02D552A2F18520700F31467 /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppEnvironment.swift; sourceTree = "<group>"; };
@@ -259,6 +244,7 @@
 		E02D560D2F1AB33900F31467 /* CacheModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheModels.swift; sourceTree = "<group>"; };
 		E02D560E2F1AB33900F31467 /* FirebaseDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseDTOs.swift; sourceTree = "<group>"; };
 		E02D56122F1AD51500F31467 /* GamificationSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamificationSyncManager.swift; sourceTree = "<group>"; };
+		E02D56142F1ADD5600F31467 /* OnykrouaUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnykrouaUI.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -377,11 +363,10 @@
 			children = (
 				E02D555B2F185E3800F31467 /* Auth */,
 				E02D55282F16E4ED00F31467 /* Components */,
-				E02D54FC2F16CBC300F31467 /* ConjugationTabs */,
 				E02D55B92F1A593100F31467 /* Dashboard */,
+				E02D56152F1ADD5600F31467 /* DesignSystem */,
 				E02D56002F1AB31D00F31467 /* Debug */,
 				E02D55892F1869EE00F31467 /* Gamification */,
-				E02D55142F16DB7200F31467 /* GrammarTabs */,
 				E02D55BC2F1A5F8400F31467 /* LearningPath */,
 				E02D55502F185C6100F31467 /* Onboarding */,
 				E02D55072F16D2C800F31467 /* VocabularyTabs */,
@@ -410,18 +395,6 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
-		E02D54FC2F16CBC300F31467 /* ConjugationTabs */ = {
-			isa = PBXGroup;
-			children = (
-				E02D54F72F16CBC300F31467 /* MoreTab.swift */,
-				E02D54F82F16CBC300F31467 /* PracticeTab.swift */,
-				E02D54F92F16CBC300F31467 /* RulesTab.swift */,
-				E02D54FA2F16CBC300F31467 /* TensesTab.swift */,
-				E02D54FB2F16CBC300F31467 /* VerbsTab.swift */,
-			);
-			path = ConjugationTabs;
-			sourceTree = "<group>";
-		};
 		E02D55072F16D2C800F31467 /* VocabularyTabs */ = {
 			isa = PBXGroup;
 			children = (
@@ -431,16 +404,6 @@
 				E02D550D2F16D43600F31467 /* VocabularyPracticeTab.swift */,
 			);
 			path = VocabularyTabs;
-			sourceTree = "<group>";
-		};
-		E02D55142F16DB7200F31467 /* GrammarTabs */ = {
-			isa = PBXGroup;
-			children = (
-				E02D551C2F16DCB600F31467 /* CategoriesGrammarTab.swift */,
-				E02D551D2F16DCB600F31467 /* QuickReferenceGrammarTab.swift */,
-				E02D551E2F16DCB600F31467 /* RulesGrammarTab.swift */,
-			);
-			path = GrammarTabs;
 			sourceTree = "<group>";
 		};
 		E02D55242F16E25500F31467 /* Utils */ = {
@@ -615,6 +578,14 @@
 			path = CloudSync;
 			sourceTree = "<group>";
 		};
+		E02D56152F1ADD5600F31467 /* DesignSystem */ = {
+			isa = PBXGroup;
+			children = (
+				E02D56142F1ADD5600F31467 /* OnykrouaUI.swift */,
+			);
+			path = DesignSystem;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -734,18 +705,15 @@
 				E02D557B2F18698E00F31467 /* RhythmSelectionScreen.swift in Sources */,
 				E02D54F32F16C9EF00F31467 /* FeedModels.swift in Sources */,
 				E02D55192F16DB7D00F31467 /* GrammarDataManager.swift in Sources */,
-				E02D54FD2F16CBC300F31467 /* MoreTab.swift in Sources */,
 				E02D553A2F18566C00F31467 /* VocabularyPersistenceManager.swift in Sources */,
 				E02D55F62F1A740800F31467 /* QuizModels.swift in Sources */,
 				E02D558E2F186A0D00F31467 /* ProgressDashboardView.swift in Sources */,
 				E02D55BD2F1A5F8400F31467 /* LearningPathView.swift in Sources */,
-				E02D54FE2F16CBC300F31467 /* TensesTab.swift in Sources */,
 				E02D556A2F1868DB00F31467 /* CEFRLevel.swift in Sources */,
 				E02D556B2F1868DB00F31467 /* Achievement.swift in Sources */,
 				E02D55292F16E4ED00F31467 /* SharedComponents.swift in Sources */,
 				E02D55752F18694B00F31467 /* NotificationManager.swift in Sources */,
 				E02D55CB2F1A636800F31467 /* AppRootView.swift in Sources */,
-				E02D54FF2F16CBC300F31467 /* RulesTab.swift in Sources */,
 				E02D55362F18565200F31467 /* VocabularyWord+Model.swift in Sources */,
 				E02D55442F1857F700F31467 /* SyncStatusView.swift in Sources */,
 				E02D55AE2F1A58DD00F31467 /* TodayContentView.swift in Sources */,
@@ -755,18 +723,15 @@
 				E02D550C2F16D2D400F31467 /* VocabularyDataManager.swift in Sources */,
 				E02D550E2F16D43600F31467 /* VocabularyPracticeTab.swift in Sources */,
 				E02D554E2F1859AC00F31467 /* AdvancedSearchView.swift in Sources */,
-				E02D551F2F16DCB600F31467 /* QuickReferenceGrammarTab.swift in Sources */,
 				E02D55B72F1A592100F31467 /* RecommendationEngine.swift in Sources */,
 				E02D56132F1AD51500F31467 /* GamificationSyncManager.swift in Sources */,
 				E02D55572F185E0600F31467 /* AppleSignInManager.swift in Sources */,
 				E02D559E2F199CA900F31467 /* VocabularyLearnedTab.swift in Sources */,
 				E02D556F2F1868ED00F31467 /* OnboardingData.swift in Sources */,
 				E02D55532F185CDF00F31467 /* OnboardingView.swift in Sources */,
-				E02D55202F16DCB600F31467 /* RulesGrammarTab.swift in Sources */,
 				E02D55872F1869DC00F31467 /* StreakWidget.swift in Sources */,
 				E02D55852F1869AE00F31467 /* XPGainAnimationView.swift in Sources */,
 				E02D55712F18693900F31467 /* AnalyticsService.swift in Sources */,
-				E02D55212F16DCB600F31467 /* CategoriesGrammarTab.swift in Sources */,
 				E02D55EA2F1A63F400F31467 /* QuizSelectionView.swift in Sources */,
 				E02D55EB2F1A63F400F31467 /* QuizGameView.swift in Sources */,
 				E02D55462F18597200F31467 /* EmptyStateView.swift in Sources */,
@@ -776,8 +741,6 @@
 				E02D55E12F1A63CE00F31467 /* MatchingExerciseView.swift in Sources */,
 				E02D55E22F1A63CE00F31467 /* PracticeHubView.swift in Sources */,
 				E02D55E32F1A63CE00F31467 /* ReviewSessionView.swift in Sources */,
-				E02D55002F16CBC300F31467 /* PracticeTab.swift in Sources */,
-				E02D55012F16CBC300F31467 /* VerbsTab.swift in Sources */,
 				E02D54F42F16C9EF00F31467 /* EmojiModels.swift in Sources */,
 				E02D55F82F1A7B2700F31467 /* LearningPathComponents.swift in Sources */,
 				E02D55C12F1A612900F31467 /* Recommendation.swift in Sources */,
@@ -790,6 +753,7 @@
 				E02D54EC2F16C41A00F31467 /* VocabularyView.swift in Sources */,
 				A1000001000000000000001 /* onykrouaApp.swift in Sources */,
 				E02D55C72F1A62DE00F31467 /* DashboardComponents.swift in Sources */,
+				E02D56162F1ADD5600F31467 /* OnykrouaUI.swift in Sources */,
 				E02D56102F1AB33900F31467 /* CacheModels.swift in Sources */,
 				E02D56112F1AB33900F31467 /* FirebaseDTOs.swift in Sources */,
 				E02D558A2F1869EE00F31467 /* AchievementsView.swift in Sources */,

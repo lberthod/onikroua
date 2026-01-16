@@ -3,14 +3,18 @@ import Foundation
 public struct ConversationScenario: Identifiable {
     public let id = UUID()
     public let name: String
+    public let description: String
     public let icon: String
     public let color: String
+    public let category: String
     public let messages: [ConversationMessage]
     
-    public init(name: String, icon: String, color: String, messages: [ConversationMessage]) {
+    public init(name: String, description: String = "", icon: String, color: String, category: String = "daily", messages: [ConversationMessage]) {
         self.name = name
+        self.description = description
         self.icon = icon
         self.color = color
+        self.category = category
         self.messages = messages
     }
 }
@@ -42,8 +46,10 @@ struct ConversationDataSource {
         return [
             ConversationScenario(
                 name: "Restaurant",
+                description: "Commander un repas",
                 icon: "🍽️",
                 color: "orange",
+                category: "social",
                 messages: [
                     ConversationMessage(text: "Buongiorno! Avete un tavolo per due?", translation: "Bonjour! Avez-vous une table pour deux?", isUser: false),
                     ConversationMessage(text: "Sì, certo! Seguitemi.", translation: "Oui, bien sûr! Suivez-moi.", isUser: false),
@@ -59,8 +65,10 @@ struct ConversationDataSource {
             ),
             ConversationScenario(
                 name: "Hôtel",
+                description: "Gérer sa réservation",
                 icon: "🏨",
                 color: "blue",
+                category: "travel",
                 messages: [
                     ConversationMessage(text: "Buonasera! Ho una prenotazione.", translation: "Bonsoir! J'ai une réservation.", isUser: true),
                     ConversationMessage(text: "Benvenuto! A che nome?", translation: "Bienvenue! À quel nom?", isUser: false),
@@ -76,8 +84,10 @@ struct ConversationDataSource {
             ),
             ConversationScenario(
                 name: "Gare",
+                description: "Acheter un billet",
                 icon: "🚂",
                 color: "green",
+                category: "travel",
                 messages: [
                     ConversationMessage(text: "Buongiorno! Un biglietto per Roma, per favore.", translation: "Bonjour! Un billet pour Rome, s'il vous plaît.", isUser: true),
                     ConversationMessage(text: "Andata o andata e ritorno?", translation: "Aller simple ou aller-retour?", isUser: false),
@@ -93,8 +103,10 @@ struct ConversationDataSource {
             ),
             ConversationScenario(
                 name: "Shopping",
+                description: "Acheter des vêtements",
                 icon: "🛍️",
                 color: "purple",
+                category: "social",
                 messages: [
                     ConversationMessage(text: "Buongiorno! Posso aiutarla?", translation: "Bonjour! Puis-je vous aider?", isUser: false),
                     ConversationMessage(text: "Sì, cerco una camicia.", translation: "Oui, je cherche une chemise.", isUser: true),
@@ -114,8 +126,10 @@ struct ConversationDataSource {
             // NOUVEAUX SCÉNARIOS - VOYAGE
             ConversationScenario(
                 name: "Aéroport - Check-in",
+                description: "S'enregistrer pour un vol",
                 icon: "✈️",
                 color: "cyan",
+                category: "travel",
                 messages: [
                     ConversationMessage(text: "Buongiorno! Il suo passaporto e biglietto, per favore.", translation: "Bonjour! Votre passeport et billet, s'il vous plaît.", isUser: false),
                     ConversationMessage(text: "Ecco. Vado a Parigi.", translation: "Voici. Je vais à Paris.", isUser: true),
@@ -131,8 +145,10 @@ struct ConversationDataSource {
             ),
             ConversationScenario(
                 name: "Douane",
+                description: "Passer le contrôle",
                 icon: "🛃",
                 color: "red",
+                category: "travel",
                 messages: [
                     ConversationMessage(text: "Benvenuto in Italia! Passaporto, per favore.", translation: "Bienvenue en Italie! Passeport, s'il vous plaît.", isUser: false),
                     ConversationMessage(text: "Ecco il mio passaporto.", translation: "Voici mon passeport.", isUser: true),
@@ -147,8 +163,10 @@ struct ConversationDataSource {
             ),
             ConversationScenario(
                 name: "Taxi",
+                description: "Prendre une course",
                 icon: "🚕",
                 color: "yellow",
+                category: "travel",
                 messages: [
                     ConversationMessage(text: "Buongiorno! Dove andiamo?", translation: "Bonjour! Où allons-nous?", isUser: false),
                     ConversationMessage(text: "All'Hotel Venezia, per favore.", translation: "À l'Hôtel Venezia, s'il vous plaît.", isUser: true),
@@ -165,8 +183,10 @@ struct ConversationDataSource {
             ),
             ConversationScenario(
                 name: "Informations Touristiques",
+                description: "Demander des conseils",
                 icon: "🗺️",
                 color: "teal",
+                category: "travel",
                 messages: [
                     ConversationMessage(text: "Buongiorno! Come posso aiutarla?", translation: "Bonjour! Comment puis-je vous aider?", isUser: false),
                     ConversationMessage(text: "Vorrei visitare i principali monumenti. Cosa mi consiglia?", translation: "Je voudrais visiter les principaux monuments. Que me conseillez-vous?", isUser: true),
@@ -182,8 +202,10 @@ struct ConversationDataSource {
             ),
             ConversationScenario(
                 name: "Musée - Billets",
+                description: "Visiter une exposition",
                 icon: "🎫",
                 color: "brown",
+                category: "travel",
                 messages: [
                     ConversationMessage(text: "Buongiorno! Quanti biglietti?", translation: "Bonjour! Combien de billets?", isUser: false),
                     ConversationMessage(text: "Due adulti, per favore.", translation: "Deux adultes, s'il vous plaît.", isUser: true),
@@ -198,8 +220,10 @@ struct ConversationDataSource {
             ),
             ConversationScenario(
                 name: "Plage - Location",
+                description: "Louer du matériel",
                 icon: "🏖️",
                 color: "orange",
+                category: "travel",
                 messages: [
                     ConversationMessage(text: "Buongiorno! Volete un ombrellone?", translation: "Bonjour! Voulez-vous un parasol?", isUser: false),
                     ConversationMessage(text: "Sì, un ombrellone e due lettini.", translation: "Oui, un parasol et deux transats.", isUser: true),
@@ -216,8 +240,10 @@ struct ConversationDataSource {
             // VIE QUOTIDIENNE
             ConversationScenario(
                 name: "Supermarché",
+                description: "Faire ses courses",
                 icon: "🏪",
                 color: "green",
+                category: "daily",
                 messages: [
                     ConversationMessage(text: "Buongiorno! Ha bisogno di aiuto?", translation: "Bonjour! Avez-vous besoin d'aide?", isUser: false),
                     ConversationMessage(text: "Sì, dove trovo il pane?", translation: "Oui, où puis-je trouver le pain?", isUser: true),
@@ -234,8 +260,10 @@ struct ConversationDataSource {
             ),
             ConversationScenario(
                 name: "Pharmacie",
+                description: "Acheter des médicaments",
                 icon: "💊",
                 color: "red",
+                category: "daily",
                 messages: [
                     ConversationMessage(text: "Buongiorno! Come posso aiutarla?", translation: "Bonjour! Comment puis-je vous aider?", isUser: false),
                     ConversationMessage(text: "Ho mal di testa. Ha qualcosa?", translation: "J'ai mal à la tête. Avez-vous quelque chose?", isUser: true),
@@ -250,8 +278,10 @@ struct ConversationDataSource {
             ),
             ConversationScenario(
                 name: "Coiffeur",
+                description: "Demander une coupe",
                 icon: "✂️",
                 color: "pink",
+                category: "daily",
                 messages: [
                     ConversationMessage(text: "Buongiorno! Ha un appuntamento?", translation: "Bonjour! Avez-vous un rendez-vous?", isUser: false),
                     ConversationMessage(text: "No, è possibile senza appuntamento?", translation: "Non, est-ce possible sans rendez-vous?", isUser: true),
@@ -266,8 +296,10 @@ struct ConversationDataSource {
             ),
             ConversationScenario(
                 name: "Poste",
+                description: "Envoyer un colis",
                 icon: "📦",
                 color: "blue",
+                category: "daily",
                 messages: [
                     ConversationMessage(text: "Buongiorno! Cosa desidera?", translation: "Bonjour! Que désirez-vous?", isUser: false),
                     ConversationMessage(text: "Vorrei spedire questo pacco in Francia.", translation: "Je voudrais envoyer ce colis en France.", isUser: true),
@@ -283,8 +315,10 @@ struct ConversationDataSource {
             ),
             ConversationScenario(
                 name: "Banque",
+                description: "Ouvrir un compte",
                 icon: "🏦",
                 color: "indigo",
+                category: "daily",
                 messages: [
                     ConversationMessage(text: "Buongiorno! Come posso aiutarla?", translation: "Bonjour! Comment puis-je vous aider?", isUser: false),
                     ConversationMessage(text: "Vorrei aprire un conto corrente.", translation: "Je voudrais ouvrir un compte courant.", isUser: true),
@@ -300,8 +334,10 @@ struct ConversationDataSource {
             ),
             ConversationScenario(
                 name: "Service Client Téléphone",
+                description: "Signaler un problème",
                 icon: "📞",
                 color: "purple",
+                category: "daily",
                 messages: [
                     ConversationMessage(text: "Servizio clienti, buongiorno! Come posso aiutarla?", translation: "Service client, bonjour! Comment puis-je vous aider?", isUser: false),
                     ConversationMessage(text: "Ho un problema con la mia connessione internet.", translation: "J'ai un problème avec ma connexion internet.", isUser: true),
@@ -319,8 +355,10 @@ struct ConversationDataSource {
             // PROFESSIONNEL
             ConversationScenario(
                 name: "Entretien d'embauche",
+                description: "Passer un entretien",
                 icon: "💼",
                 color: "gray",
+                category: "work",
                 messages: [
                     ConversationMessage(text: "Buongiorno! Si accomodi pure.", translation: "Bonjour! Installez-vous.", isUser: false),
                     ConversationMessage(text: "Grazie mille per questa opportunità.", translation: "Merci beaucoup pour cette opportunité.", isUser: true),
@@ -337,8 +375,10 @@ struct ConversationDataSource {
             ),
             ConversationScenario(
                 name: "Réunion de travail",
+                description: "Participer au bureau",
                 icon: "🤝",
                 color: "teal",
+                category: "work",
                 messages: [
                     ConversationMessage(text: "Buongiorno a tutti! Iniziamo la riunione.", translation: "Bonjour à tous! Commençons la réunion.", isUser: false),
                     ConversationMessage(text: "Buongiorno! Ho preparato i dati di vendita.", translation: "Bonjour! J'ai préparé les données de vente.", isUser: true),
@@ -356,8 +396,10 @@ struct ConversationDataSource {
             // SOCIAL
             ConversationScenario(
                 name: "Invitation à une fête",
+                description: "Rejoindre des amis",
                 icon: "🎉",
                 color: "pink",
+                category: "social",
                 messages: [
                     ConversationMessage(text: "Ciao! Sabato organizzo una festa a casa mia.", translation: "Salut! Samedi j'organise une fête chez moi.", isUser: false),
                     ConversationMessage(text: "Che bello! A che ora?", translation: "Génial! À quelle heure?", isUser: true),
@@ -373,8 +415,10 @@ struct ConversationDataSource {
             ),
             ConversationScenario(
                 name: "Au Café",
+                description: "Boire un café",
                 icon: "☕",
                 color: "brown",
+                category: "social",
                 messages: [
                     ConversationMessage(text: "Ciao! Come va?", translation: "Salut! Comment ça va?", isUser: false),
                     ConversationMessage(text: "Tutto bene, grazie! E tu?", translation: "Tout va bien, merci! Et toi?", isUser: true),
@@ -390,8 +434,10 @@ struct ConversationDataSource {
             ),
             ConversationScenario(
                 name: "Rendez-vous",
+                description: "Une soirée spéciale",
                 icon: "❤️",
                 color: "red",
+                category: "social",
                 messages: [
                     ConversationMessage(text: "Ciao! Che piacere vederti!", translation: "Salut! Quel plaisir de te voir!", isUser: false),
                     ConversationMessage(text: "Anche per me! Sei bellissima stasera.", translation: "Moi aussi! Tu es magnifique ce soir.", isUser: true),
@@ -409,8 +455,10 @@ struct ConversationDataSource {
             // URGENCES
             ConversationScenario(
                 name: "Médecin - Urgence",
+                description: "Demander de l'aide",
                 icon: "🏥",
                 color: "red",
+                category: "daily",
                 messages: [
                     ConversationMessage(text: "Buongiorno, cosa non va?", translation: "Bonjour, qu'est-ce qui ne va pas?", isUser: false),
                     ConversationMessage(text: "Mi fa molto male lo stomaco da ieri.", translation: "J'ai très mal au ventre depuis hier.", isUser: true),
@@ -427,8 +475,10 @@ struct ConversationDataSource {
             ),
             ConversationScenario(
                 name: "Commissariat",
+                description: "Déposer une plainte",
                 icon: "🚔",
                 color: "blue",
+                category: "daily",
                 messages: [
                     ConversationMessage(text: "Buongiorno, come posso aiutarla?", translation: "Bonjour, comment puis-je vous aider?", isUser: false),
                     ConversationMessage(text: "Vorrei denunciare un furto.", translation: "Je voudrais déclarer un vol.", isUser: true),

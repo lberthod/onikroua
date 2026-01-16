@@ -126,38 +126,6 @@ struct TodayContentView: View {
         }
     }
     
-    private var headerSection: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(greetingMessage)
-                    .font(.title)
-                    .fontWeight(.bold)
-                Text(firebaseManager.userEmail ?? "Prêt à apprendre?")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-            
-            Spacer()
-            
-            Button(action: { showProfile = true }) {
-                ZStack(alignment: .topTrailing) {
-                    Image(systemName: "person.circle.fill")
-                        .font(.system(size: 40))
-                        .foregroundColor(.blue)
-                    
-                    if let progress = userProgress {
-                        Text(progress.level.icon)
-                            .font(.caption)
-                            .offset(x: 5, y: -5)
-                    }
-                }
-            }
-        }
-        .padding(.horizontal)
-        .padding(.top)
-    }
-    
-    
     private var greetingMessage: String {
         let hour = Calendar.current.component(.hour, from: Date())
         switch hour {
@@ -167,15 +135,50 @@ struct TodayContentView: View {
         }
     }
     
+    private var headerSection: some View {
+        VStack(alignment: .leading, spacing: UI.Spacing.md) {
+            HStack {
+                VStack(alignment: .leading, spacing: UI.Spacing.xs) {
+                    Text(greetingMessage)
+                        .font(.title2.weight(.bold))
+                    Text(firebaseManager.userEmail ?? "Prêt à apprendre?")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                
+                Spacer()
+                
+                Button(action: { showProfile = true }) {
+                    ZStack(alignment: .topTrailing) {
+                        Image(systemName: "person.circle.fill")
+                            .font(.system(size: 40))
+                            .foregroundColor(.accentColor)
+                        
+                        if let progress = userProgress {
+                            Text(progress.level.icon)
+                                .font(.caption)
+                                .offset(x: 5, y: -5)
+                        }
+                    }
+                }
+            }
+            
+            // Unified Sync Status integration
+            SyncStatusView(networkMonitor: env.networkMonitor)
+        }
+        .padding(.horizontal, UI.Spacing.lg)
+        .padding(.top, UI.Spacing.md)
+    }
+    
     private var quickAccessSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: UI.Spacing.md) {
             Text("Accès rapide")
                 .font(.headline)
-                .padding(.horizontal)
+                .padding(.horizontal, UI.Spacing.lg)
             
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
-                    QuickAccessButton(icon: "target", title: "Mon Parcours", color: .red) {
+                HStack(spacing: UI.Spacing.md) {
+                    QuickAccessButton(icon: "target", title: "Parcours", color: .red) {
                         showLearningPath = true
                     }
                     QuickAccessButton(icon: "book.fill", title: "Vocabulaire", color: .green) {
@@ -191,18 +194,18 @@ struct TodayContentView: View {
                         showAchievements = true
                     }
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, UI.Spacing.lg)
             }
         }
     }
     
     private var learningCategoriesSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: UI.Spacing.lg) {
             Text("Catégories d'apprentissage")
                 .font(.headline)
-                .padding(.horizontal)
+                .padding(.horizontal, UI.Spacing.lg)
             
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: UI.Spacing.md) {
                 DashboardCategoryButton(icon: "face.smiling.fill", title: "Emoji", color: Color.orange) {
                     showEmoji = true
                 }
@@ -215,24 +218,24 @@ struct TodayContentView: View {
                 DashboardCategoryButton(icon: "speaker.wave.3.fill", title: "Phonétique", color: Color.pink) {
                     showPhonetic = true
                 }
-                                DashboardCategoryButton(icon: "flame.fill", title: "Feed", color: Color.yellow) {
+                DashboardCategoryButton(icon: "flame.fill", title: "Feed", color: Color.yellow) {
                     showFeed = true
                 }
-                                DashboardCategoryButton(icon: "book.closed.fill", title: "Conjugaison", color: Color.green) {
+                DashboardCategoryButton(icon: "book.closed.fill", title: "Conjugaison", color: Color.green) {
                     showConjugation = true
                 }
             }
-            .padding(.horizontal)
+            .padding(.horizontal, UI.Spacing.lg)
         }
     }
     
     private var practiceToolsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: UI.Spacing.md) {
             Text("Outils de pratique")
                 .font(.headline)
-                .padding(.horizontal)
+                .padding(.horizontal, UI.Spacing.lg)
             
-            VStack(spacing: 12) {
+            VStack(spacing: UI.Spacing.md) {
                 PracticeToolCard(
                     icon: "gamecontroller.fill",
                     title: "Quiz Interactif",
@@ -269,7 +272,7 @@ struct TodayContentView: View {
                     showStatistics = true
                 }
             }
-            .padding(.horizontal)
+            .padding(.horizontal, UI.Spacing.lg)
         }
     }
     
@@ -360,7 +363,6 @@ struct QuickAccessCard: View {
         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
     }
 }
-
 struct QuickAccessButton: View {
     let icon: String
     let title: String
@@ -369,21 +371,21 @@ struct QuickAccessButton: View {
     
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 8) {
+            VStack(spacing: UI.Spacing.sm) {
                 Image(systemName: icon)
-                    .font(.title2)
+                    .font(.title3.weight(.semibold))
                     .foregroundColor(.white)
-                    .frame(width: 60, height: 60)
+                    .frame(width: 56, height: 56)
                     .background(color)
-                    .cornerRadius(12)
+                    .cornerRadius(UI.Radius.r12)
                 
                 Text(title)
                     .font(.caption)
                     .foregroundColor(.primary)
-                    .lineLimit(2)
+                    .lineLimit(1)
                     .multilineTextAlignment(.center)
             }
-            .frame(width: 90)
+            .frame(width: 80)
         }
         .buttonStyle(.plain)
     }
@@ -397,27 +399,19 @@ struct DashboardCategoryButton: View {
     
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 12) {
-                Image(systemName: icon)
-                    .font(.system(size: 36))
-                    .foregroundColor(.white)
-                
-                Text(title)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.white)
+            OnykrouaCard(isInteractive: true) {
+                VStack(spacing: UI.Spacing.md) {
+                    Image(systemName: icon)
+                        .font(.system(size: 32))
+                        .foregroundColor(color)
+                    
+                    Text(title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundColor(.primary)
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 100)
             }
-            .frame(maxWidth: .infinity)
-            .frame(height: 100)
-            .background(
-                LinearGradient(
-                    gradient: Gradient(colors: [color, color.opacity(0.7)]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .cornerRadius(16)
-            .shadow(color: color.opacity(0.3), radius: 8, x: 0, y: 4)
         }
         .buttonStyle(.plain)
     }
@@ -432,34 +426,35 @@ struct PracticeToolCard: View {
     
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 16) {
-                Image(systemName: icon)
-                    .font(.system(size: 28))
-                    .foregroundColor(.white)
-                    .frame(width: 56, height: 56)
-                    .background(color)
-                    .cornerRadius(12)
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(title)
-                        .font(.headline)
-                        .foregroundColor(.primary)
+            OnykrouaCard(isInteractive: true) {
+                HStack(spacing: UI.Spacing.lg) {
+                    Image(systemName: icon)
+                        .font(.system(size: 28))
+                        .foregroundColor(.white)
+                        .frame(width: 56, height: 56)
+                        .background(color)
+                        .cornerRadius(UI.Radius.r12)
                     
-                    Text(subtitle)
-                        .font(.subheadline)
+                    VStack(alignment: .leading, spacing: UI.Spacing.xs) {
+                        Text(title)
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        
+                        Text(subtitle)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.bold))
                         .foregroundColor(.secondary)
                 }
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .foregroundColor(.secondary)
+                .padding(UI.Spacing.md)
             }
-            .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(16)
-            .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 2)
         }
         .buttonStyle(.plain)
     }
 }
+

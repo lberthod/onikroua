@@ -2,151 +2,157 @@ import SwiftUI
 
 struct ConversationView: View {
     @EnvironmentObject var env: AppEnvironment
-    @State private var selectedScenario: ConversationScenario?
-    @State private var showScenarioPicker = true
-    @State private var currentMessageIndex = 0
-    
-    let scenarios = ConversationDataSource.getAllScenarios()
+    @State private var selectedTab = 0
     
     var body: some View {
         VStack(spacing: 0) {
-            if showScenarioPicker {
-                scenarioPicker
-            } else if let scenario = selectedScenario {
-                conversationView(scenario: scenario)
+            Picker("", selection: $selectedTab) {
+                Text("📖 Explorer").tag(0)
+                Text("🎯 Pratique").tag(1)
+                Text("🕒 Historique").tag(2)
             }
+            .pickerStyle(.segmented)
+            .padding()
+            .background(Color(.systemGroupedBackground))
+            
+            TabView(selection: $selectedTab) {
+                ConversationExplorerTab()
+                    .tag(0)
+                
+                ConversationPracticeTab()
+                    .tag(1)
+                
+                Text("Historique (Bientôt disponible)")
+                    .tag(2)
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never))
         }
-        .navigationTitle("💬 Conversation")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            if !showScenarioPicker {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Changer") {
-                        withAnimation {
-                            showScenarioPicker = true
-                            currentMessageIndex = 0
+        .navigationTitle("Conversation")
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+    }
+}
+
+struct ConversationExplorerTab: View {
+    @EnvironmentObject var env: AppEnvironment
+    @State private var searchText = ""
+    @State private var selectedFilter: String? = nil
+    @State private var activeScenario: ConversationScenario? = nil
+    
+    let scenarios = ConversationDataSource.getAllScenarios()
+    
+    private var filteredScenarios: [ConversationScenario] {
+        scenarios.filter { scenario in
+            let matchesSearch = searchText.isEmpty || 
+                scenario.name.localizedCaseInsensitiveContains(searchText) || 
+                scenario.description.localizedCaseInsensitiveContains(searchText)
+            
+            let matchesFilter = selectedFilter == nil || scenario.category == selectedFilter
+            
+            return matchesSearch && matchesFilter
+        }
+    }
+    
+    private let chips: [ChipItem] = [
+        .init(id: "travel", label: "Voyage", icon: "airplane"),
+        .init(id: "daily", label: "Quotidien", icon: "sun.max"),
+        .init(id: "work", label: "Travail", icon: "briefcase"),
+        .init(id: "social", label: "Social", icon: "person.2")
+    ]
+    
+    var body: some View {
+        ScrollView {
+            LazyVStack(spacing: UI.Spacing.md, pinnedViews: [.sectionHeaders]) {
+                Section {
+                    if filteredScenarios.isEmpty {
+                        EmptyState(
+                            title: "Aucun scénario trouvé",
+                            message: "Essaie un autre filtre ou une autre recherche",
+                            icon: "message.and.waveform"
+                        )
+                        .padding(.top, 40)
+                    } else {
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: UI.Spacing.md) {
+                            ForEach(filteredScenarios) { scenario in
+                                ScenarioCard(scenario: scenario) {
+                                    activeScenario = scenario
+                                }
+                            }
                         }
+                        .padding(.horizontal, UI.Spacing.lg)
                     }
+                } header: {
+                    StickyHeader(
+                        title: "Explorer les scénarios",
+                        subtitle: "Pratique l'italien en situation réelle",
+                        searchText: $searchText,
+                        chips: chips,
+                        selectedChipId: selectedFilter,
+                        onSelectChip: { selectedFilter = $0 },
+                        countText: "\(filteredScenarios.count) scénarios disponibles"
+                    )
                 }
             }
         }
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        .background(Color(.systemGroupedBackground))
+        .fullScreenCover(item: $activeScenario) { scenario in
+            ActiveConversationView(scenario: scenario)
+        }
     }
+}
+
+struct ActiveConversationView: View {
+    let scenario: ConversationScenario
+    @EnvironmentObject var env: AppEnvironment
+    @Environment(\.dismiss) private var dismiss
+    @State private var currentMessageIndex = 0
     
-    var scenarioPicker: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                Text("Choisissez un scénario")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .padding(.top, 20)
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                ScrollView {
+                    VStack(spacing: 12) {
+                        ForEach(Array(scenario.messages.prefix(currentMessageIndex + 1).enumerated()), id: \.element.id) { index, message in
+                            ConversationMessageBubble(message: message, speechService: env.speechService)
+                        }
+                    }
+                    .padding()
+                }
                 
-                Text("Pratiquez l'italien dans différentes situations")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-                
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                    ForEach(scenarios) { scenario in
-                        ScenarioCard(scenario: scenario) {
+                VStack(spacing: UI.Spacing.md) {
+                    if currentMessageIndex < scenario.messages.count - 1 {
+                        PrimaryCTAButton(title: "Message suivant", icon: "arrow.down.circle.fill") {
                             withAnimation {
-                                selectedScenario = scenario
-                                showScenarioPicker = false
-                                currentMessageIndex = 0
+                                currentMessageIndex += 1
+                            }
+                        }
+                    } else {
+                        HStack(spacing: UI.Spacing.md) {
+                            Button(action: { currentMessageIndex = 0 }) {
+                                Label("Recommencer", systemImage: "arrow.counterclockwise")
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color(.systemGray5))
+                                    .cornerRadius(UI.Radius.r16)
+                            }
+                            .buttonStyle(.plain)
+                            
+                            PrimaryCTAButton(title: "Terminer", icon: "checkmark.circle.fill") {
+                                dismiss()
                             }
                         }
                     }
                 }
                 .padding()
-            }
-        }
-    }
-    
-    func conversationView(scenario: ConversationScenario) -> some View {
-        VStack(spacing: 0) {
-            HStack {
-                Text(scenario.icon)
-                    .font(.title)
-                Text(scenario.name)
-                    .font(.headline)
-                Spacer()
-            }
-            .padding()
-            .background(Color(.systemBackground))
-            
-            ScrollView {
-                VStack(spacing: 12) {
-                    ForEach(Array(scenario.messages.prefix(currentMessageIndex + 1).enumerated()), id: \.element.id) { index, message in
-                        ConversationMessageBubble(message: message, speechService: env.speechService)
-                    }
-                }
-                .padding()
-            }
-            
-            if currentMessageIndex < scenario.messages.count - 1 {
-                Button(action: { 
-                    withAnimation {
-                        currentMessageIndex += 1
-                    }
-                }) {
-                    HStack {
-                        Image(systemName: "arrow.down.circle.fill")
-                        Text("Message suivant")
-                            .fontWeight(.semibold)
-                    }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(getScenarioColor(scenario.color))
-                    .cornerRadius(16)
-                }
-                .padding()
                 .background(Color(.systemBackground))
-            } else {
-                HStack(spacing: 12) {
-                    Button(action: { currentMessageIndex = 0 }) {
-                        HStack {
-                            Image(systemName: "arrow.counterclockwise")
-                            Text("Recommencer")
-                        }
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.gray)
-                        .cornerRadius(16)
-                    }
-                    
-                    Button(action: { 
-                        withAnimation {
-                            showScenarioPicker = true
-                            currentMessageIndex = 0
-                        }
-                    }) {
-                        HStack {
-                            Image(systemName: "checkmark.circle.fill")
-                            Text("Terminé")
-                        }
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.green)
-                        .cornerRadius(16)
-                    }
-                }
-                .padding()
-                .background(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: -4)
             }
-        }
-    }
-    
-    func getScenarioColor(_ colorName: String) -> Color {
-        switch colorName {
-        case "orange": return .orange
-        case "blue": return .blue
-        case "green": return .green
-        case "purple": return .purple
-        default: return .blue
+            .navigationTitle(scenario.name)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Quitter") { dismiss() }
+                }
+            }
         }
     }
 }
@@ -157,24 +163,57 @@ struct ScenarioCard: View {
     
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 12) {
-                Text(scenario.icon)
-                    .font(.system(size: 50))
-                
-                Text(scenario.name)
-                    .font(.headline)
-                    .foregroundColor(.primary)
-                
-                Text("\(scenario.messages.count) messages")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+            OnykrouaCard(isInteractive: true) {
+                VStack(spacing: UI.Spacing.md) {
+                    Text(scenario.icon)
+                        .font(.system(size: 40))
+                    
+                    VStack(spacing: UI.Spacing.xs) {
+                        Text(scenario.name)
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                            .multilineTextAlignment(.center)
+                        
+                        Text("\(scenario.messages.count) messages")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 140)
+                .padding(UI.Spacing.sm)
             }
-            .frame(maxWidth: .infinity)
-            .frame(height: 150)
-            .background(Color(.systemBackground))
-            .cornerRadius(16)
-            .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
         }
+        .buttonStyle(.plain)
+    }
+}
+
+struct ConversationPracticeTab: View {
+    var body: some View {
+        ScrollView {
+            VStack(spacing: UI.Spacing.lg) {
+                PracticeModeCard(
+                    title: "Rôle Libre",
+                    subtitle: "Discute librement avec l'IA",
+                    icon: "sparkles.rectangle.stack",
+                    color: .purple,
+                    badge: "Nouveau"
+                ) {
+                    // Start roleplay
+                }
+                
+                PracticeModeCard(
+                    title: "Défis de Grammaire",
+                    subtitle: "Applique les règles en parlant",
+                    icon: "checkmark.bubble.fill",
+                    color: .green
+                ) {
+                    // Start grammar challenge
+                }
+            }
+            .padding(UI.Spacing.lg)
+        }
+        .background(Color(.systemGroupedBackground))
     }
 }
 

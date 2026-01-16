@@ -7,81 +7,39 @@ struct VocabularyView_Enhanced: View {
     
     @State private var selectedTab = 0
     @State private var currentLanguage = "it"
-    @State private var showAdvancedSearch = false
-    @State private var selectedLevelFilter: CEFRLevel? = nil
-    @State private var showOnlyMastered = false
-    @State private var showOnlyToReview = false
     @State private var gamificationManager: GamificationManager?
     
-    private var totalWords: Int {
-        env.vocabularyManager.getAllWords(language: currentLanguage).count
-    }
-    
-    private var filteredWords: [VocabularyWord] {
-        var words = env.vocabularyManager.getAllWords(language: currentLanguage)
-        
-        if let levelFilter = selectedLevelFilter {
-            words = words.filter { getCEFRLevel(for: $0) == levelFilter }
-        }
-        
-        return words
-    }
-    
     var body: some View {
-        ZStack {
-            VStack(spacing: 0) {
-                levelFilterBar
-                
-                Picker("", selection: $selectedTab) {
-                    Text("📖 Dictionnaire").tag(0)
-                    Text("🎓 Apprentissage").tag(1)
-                    Text("🗂️ Catégories").tag(2)
-                    Text("🎯 Pratique").tag(3)
-                }
-                .pickerStyle(.segmented)
-                .padding()
-                
-                TabView(selection: $selectedTab) {
-                    EnhancedDictionaryTab(
-                        language: currentLanguage,
-                        words: filteredWords,
-                        gamificationManager: gamificationManager
-                    )
+        VStack(spacing: 0) {
+            // Main Tabs
+            Picker("", selection: $selectedTab) {
+                Text("📖 Explorer").tag(0)
+                Text("🗂️ Catégories").tag(1)
+                Text("🎯 Pratique").tag(2)
+            }
+            .pickerStyle(.segmented)
+            .padding()
+            .background(Color(.systemGroupedBackground))
+            
+            TabView(selection: $selectedTab) {
+                VocabularyExplorerTab(language: currentLanguage, gamificationManager: gamificationManager)
                     .tag(0)
-                    
-                    VocabularyLearnedTab(language: currentLanguage)
-                        .tag(1)
-                    
-                    CategoriesTab(language: currentLanguage)
-                        .tag(2)
-                    
-                    VocabularyPracticeTab(language: currentLanguage)
-                        .tag(3)
-                }
-                .tabViewStyle(.page(indexDisplayMode: .never))
+                
+                CategoriesTab(language: currentLanguage)
+                    .tag(1)
+                
+                VocabularyPracticeTab(language: currentLanguage)
+                    .tag(2)
             }
-            .navigationTitle("📚 Vocabulaire (\(filteredWords.count))")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        Button(action: { currentLanguage = "it" }) {
-                            Label("Italien", systemImage: currentLanguage == "it" ? "checkmark" : "")
-                        }
-                        Button(action: { currentLanguage = "es" }) {
-                            Label("Espagnol", systemImage: currentLanguage == "es" ? "checkmark" : "")
-                        }
-                    } label: {
-                        Text(currentLanguage == "it" ? "🇮🇹" : "🇪🇸")
-                            .font(.title2)
-                    }
-                }
-            }
-            .background(Color(.systemGroupedBackground).ignoresSafeArea())
-            
-            LoadingOverlay(isLoading: env.vocabularyManager.isLoading, message: "Chargement du vocabulaire...")
-            
-            ErrorOverlay(errorManager: env.errorManager)
+            .tabViewStyle(.page(indexDisplayMode: .never))
         }
+        .navigationTitle("Vocabulaire")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                LanguagePicker(currentLanguage: $currentLanguage)
+            }
+        }
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .onAppear {
             env.vocabularyManager.loadVocabularyAsync(language: currentLanguage)
             if gamificationManager == nil {
@@ -92,45 +50,92 @@ struct VocabularyView_Enhanced: View {
             env.vocabularyManager.loadVocabularyAsync(language: newLanguage)
         }
     }
+}
+
+struct VocabularyExplorerTab: View {
+    let language: String
+    let gamificationManager: GamificationManager?
     
-    private var levelFilterBar: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-                LevelFilterButton(
-                    level: nil,
-                    isSelected: selectedLevelFilter == nil,
-                    action: { selectedLevelFilter = nil }
-                )
-                
-                ForEach(CEFRLevel.allCases) { level in
-                    LevelFilterButton(
-                        level: level,
-                        isSelected: selectedLevelFilter == level,
-                        action: { selectedLevelFilter = level }
+    @EnvironmentObject var env: AppEnvironment
+    @State private var searchText = ""
+    @State private var selectedLevel: String? = nil
+    
+    private var filteredWords: [VocabularyWord] {
+        var words = env.vocabularyManager.getAllWords(language: language)
+        
+        if let level = selectedLevel {
+            words = words.filter { getCEFRLevel(for: $0).rawValue == level }
+        }
+        
+        if !searchText.isEmpty {
+            words = words.filter { 
+                $0.word.localizedCaseInsensitiveContains(searchText) || 
+                $0.translation.localizedCaseInsensitiveContains(searchText)
+            }
+        }
+        
+        return words.sorted { $0.word.localizedCaseInsensitiveCompare($1.word) == .orderedAscending }
+    }
+    
+    private let levelChips: [ChipItem] = [
+        .init(id: "A1", label: "A1", icon: "gauge.low"),
+        .init(id: "A2", label: "A2", icon: "gauge.medium"),
+        .init(id: "B1", label: "B1", icon: "gauge.high"),
+        .init(id: "B2", label: "B2", icon: "speedometer"),
+        .init(id: "C1", label: "C1", icon: "chart.bar.fill"),
+        .init(id: "C2", label: "C2", icon: "star.fill")
+    ]
+    
+    var body: some View {
+        ScrollView {
+            LazyVStack(spacing: UI.Spacing.md, pinnedViews: [.sectionHeaders]) {
+                Section {
+                    if filteredWords.isEmpty {
+                        EmptyState(
+                            title: "Aucun mot trouvé",
+                            message: "Essaie un autre filtre ou une autre recherche",
+                            icon: "book.closed"
+                        )
+                        .padding(.top, 40)
+                    } else {
+                        ForEach(filteredWords, id: \.word) { word in
+                            EnhancedDictionaryRow(
+                                word: word,
+                                gamificationManager: gamificationManager
+                            )
+                            .padding(.horizontal, UI.Spacing.lg)
+                        }
+                    }
+                } header: {
+                    StickyHeader(
+                        title: "Explorer",
+                        subtitle: "\(language == "it" ? "Italien" : "Espagnol")",
+                        searchText: $searchText,
+                        chips: levelChips,
+                        selectedChipId: selectedLevel,
+                        onSelectChip: { selectedLevel = $0 },
+                        countText: "\(filteredWords.count) mots trouvés",
+                        trailingAction: HeaderAction(icon: "shuffle") {
+                            // Action shuffle déjà gérée dans l'ancien code ou à simplifier
+                        }
                     )
                 }
             }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
         }
-        .background(Color(.systemGray6))
+        .background(Color(.systemGroupedBackground))
     }
     
     private func getCEFRLevel(for word: VocabularyWord) -> CEFRLevel {
-        let wordIndex = env.vocabularyManager.getAllWords(language: currentLanguage)
-            .firstIndex(where: { $0.word == word.word }) ?? 0
+        let words = env.vocabularyManager.getAllWords(language: language)
+        let wordIndex = words.firstIndex(where: { $0.word == word.word }) ?? 0
+        let percentage = Double(wordIndex) / Double(max(1, words.count))
         
-        let totalWords = env.vocabularyManager.getAllWords(language: currentLanguage).count
-        let percentage = Double(wordIndex) / Double(totalWords)
-        
-        switch percentage {
-        case 0..<0.15: return .a1
-        case 0.15..<0.35: return .a2
-        case 0.35..<0.55: return .b1
-        case 0.55..<0.75: return .b2
-        case 0.75..<0.90: return .c1
-        default: return .c2
-        }
+        if percentage < 0.15 { return .a1 }
+        if percentage < 0.35 { return .a2 }
+        if percentage < 0.55 { return .b1 }
+        if percentage < 0.75 { return .b2 }
+        if percentage < 0.90 { return .c1 }
+        return .c2
     }
 }
 
