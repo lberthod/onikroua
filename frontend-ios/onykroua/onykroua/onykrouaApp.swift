@@ -27,7 +27,9 @@ struct onykrouaApp: App {
         let schema = Schema([
             UserProgress.self,
             Achievement.self,
-            OnboardingData.self
+            OnboardingData.self,
+            LearningPath.self,
+            DailySession.self
         ])
         let modelConfiguration = ModelConfiguration(
             schema: schema,
@@ -37,7 +39,7 @@ struct onykrouaApp: App {
         
         do {
             let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
-            print("✅ ModelContainer created successfully")
+            print("✅ ModelContainer created successfully with new schemas")
             return container
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
@@ -67,7 +69,7 @@ struct MainAppView: View {
             } else if !firebaseManager.isSignedIn {
                 AuthSelectionView()
             } else {
-                EnhancedContentView()
+                TodayContentView()
             }
         }
         .id(forceRefresh)
@@ -115,6 +117,10 @@ struct AuthSelectionView: View {
                 
                 VStack(spacing: 16) {
                     SignInWithAppleButton {
+                        // Action déjà gérée dans le bouton
+                    }
+                    
+                    SignInWithGoogleButton {
                         // Action déjà gérée dans le bouton
                     }
                     

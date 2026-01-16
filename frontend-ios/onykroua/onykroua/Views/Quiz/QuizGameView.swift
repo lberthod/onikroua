@@ -1,7 +1,7 @@
 import SwiftUI
 import SwiftData
 
-struct QuizGameView: View {
+public struct QuizGameView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @State private var session: QuizSession
@@ -10,14 +10,14 @@ struct QuizGameView: View {
     @State private var showResults = false
     @State private var gamificationManager: GamificationManager?
     
-    let language: String
+    public let language: String
     
-    init(session: QuizSession, language: String) {
+    public init(session: QuizSession, language: String) {
         _session = State(initialValue: session)
         self.language = language
     }
     
-    var body: some View {
+    public var body: some View {
         NavigationStack {
             ZStack {
                 if showResults {
@@ -226,7 +226,7 @@ struct QuizGameView: View {
     }
     
     private func awardXP() {
-        gamificationManager?.addXP(session.xpEarned, source: "Quiz \(session.type.rawValue)")
+        gamificationManager?.awardXP(session.xpEarned, for: "Quiz \(session.type.rawValue)")
     }
 }
 
@@ -377,21 +377,21 @@ struct QuizResultsView: View {
     
     private var statsCards: some View {
         HStack(spacing: 12) {
-            StatCard(
+            StatBox(
                 icon: "star.fill",
                 value: "+\(session.xpEarned)",
                 label: "XP gagnés",
                 color: .yellow
             )
             
-            StatCard(
+            StatBox(
                 icon: "clock.fill",
                 value: timeSpent,
                 label: "Temps",
                 color: .blue
             )
             
-            StatCard(
+            StatBox(
                 icon: "chart.bar.fill",
                 value: "\(session.difficulty.rawValue)",
                 label: "Niveau",

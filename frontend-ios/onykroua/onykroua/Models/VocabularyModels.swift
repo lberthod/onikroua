@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Vocabulary Models (matching Android VocabularyModels.kt)
 
-public struct VocabWord: Codable, Identifiable {
+public struct VocabWord: Codable, Identifiable, Hashable {
     public let id = UUID()
     public let word: String
     public let translation: String
@@ -17,6 +17,15 @@ public struct VocabWord: Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case word, translation, gender, example, exampleTranslation
         case category, categoryIcon, mainCategory = "main_category", subCategory = "sub_category"
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(word)
+        hasher.combine(translation)
+    }
+    
+    public static func == (lhs: VocabWord, rhs: VocabWord) -> Bool {
+        lhs.word == rhs.word && lhs.translation == rhs.translation
     }
     
     public init(word: String, translation: String, gender: String? = nil, example: String? = nil, 

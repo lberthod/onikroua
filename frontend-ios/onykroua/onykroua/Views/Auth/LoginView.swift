@@ -5,6 +5,7 @@ import SwiftUI
 struct LoginView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var firebaseManager: FirebaseManager
+    @State private var showEmailSignIn = false
     var onSuccess: (() -> Void)? = nil
     
     var body: some View {
@@ -46,16 +47,40 @@ struct LoginView: View {
                         dismiss()
                     }
                     
-                    Button(action: {
-                        print("👆 Continuer sans compte clicked")
+                    SignInWithGoogleButton {
                         onSuccess?()
                         dismiss()
-                    }) {
-                        Text("Continuer sans compte")
-                            .font(.subheadline)
-                            .foregroundColor(.white)
                     }
-                    .padding(.top, 8)
+                    
+                    Button(action: { showEmailSignIn = true }) {
+                        Label("Continuer avec Email", systemImage: "envelope.fill")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(Color.blue)
+                            .cornerRadius(16)
+                    }
+                    
+                    Button(action: {
+                        Task {
+                            do {
+                                try await firebaseManager.signInAnonymously()
+                                onSuccess?()
+                                dismiss()
+                            } catch {
+                                print("❌ Error signing in anonymously: \(error)")
+                            }
+                        }
+                    }) {
+                        Label("Continuer en invité", systemImage: "person.fill.questionmark")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(Color(.systemGray6))
+                            .cornerRadius(16)
+                    }
                 }
                 .padding(.horizontal, 32)
                 .padding(.bottom, 40)
@@ -68,6 +93,10 @@ struct LoginView: View {
                     .padding(.horizontal, 32)
                     .padding(.bottom, 20)
             }
+        }
+        .sheet(isPresented: $showEmailSignIn) {
+            EmailSignInView()
+                .environmentObject(firebaseManager)
         }
     }
 }

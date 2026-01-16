@@ -3,56 +3,56 @@ import SwiftData
 
 // MARK: - Adaptive Review System
 
-class AdaptiveReviewSystem: ObservableObject {
-    static let shared = AdaptiveReviewSystem()
+public class AdaptiveReviewSystem: ObservableObject {
+    public static let shared = AdaptiveReviewSystem()
     
-    @Published var reviewQueue: [ReviewItem] = []
-    @Published var dailyReviewCount: Int = 0
-    @Published var reviewStreak: Int = 0
+    @Published public var reviewQueue: [ReviewItem] = []
+    @Published public var dailyReviewCount: Int = 0
+    @Published public var reviewStreak: Int = 0
     
     private let modelContext: ModelContext?
     
-    init(modelContext: ModelContext? = nil) {
+    public init(modelContext: ModelContext? = nil) {
         self.modelContext = modelContext
     }
     
     // MARK: - Review Item
     
-    struct ReviewItem: Identifiable, Codable {
-        let id: UUID
-        let type: ReviewType
-        let content: ReviewContent
-        var difficulty: DifficultyLevel
-        var lastReviewed: Date
-        var nextReview: Date
-        var reviewCount: Int
-        var correctCount: Int
-        var incorrectCount: Int
-        var easeFactor: Double
-        var interval: Int
+    public struct ReviewItem: Identifiable, Codable {
+        public let id: UUID
+        public let type: ReviewType
+        public let content: ReviewContent
+        public var difficulty: DifficultyLevel
+        public var lastReviewed: Date
+        public var nextReview: Date
+        public var reviewCount: Int
+        public var correctCount: Int
+        public var incorrectCount: Int
+        public var easeFactor: Double
+        public var interval: Int
         
-        enum ReviewType: String, Codable {
+        public enum ReviewType: String, Codable {
             case vocabulary
             case conjugation
             case grammar
             case conversation
         }
         
-        struct ReviewContent: Codable {
-            let question: String
-            let answer: String
-            let hint: String?
-            let example: String?
+        public struct ReviewContent: Codable {
+            public let question: String
+            public let answer: String
+            public let hint: String?
+            public let example: String?
         }
         
-        enum DifficultyLevel: Int, Codable {
+        public enum DifficultyLevel: Int, Codable {
             case veryEasy = 1
             case easy = 2
             case medium = 3
             case hard = 4
             case veryHard = 5
             
-            var color: String {
+            public var color: String {
                 switch self {
                 case .veryEasy: return "green"
                 case .easy: return "blue"
@@ -62,7 +62,7 @@ class AdaptiveReviewSystem: ObservableObject {
                 }
             }
             
-            var multiplier: Double {
+            public var multiplier: Double {
                 switch self {
                 case .veryEasy: return 2.5
                 case .easy: return 2.0
@@ -73,7 +73,7 @@ class AdaptiveReviewSystem: ObservableObject {
             }
         }
         
-        init(type: ReviewType, content: ReviewContent, difficulty: DifficultyLevel = .medium) {
+        public init(type: ReviewType, content: ReviewContent, difficulty: DifficultyLevel = .medium) {
             self.id = UUID()
             self.type = type
             self.content = content
@@ -87,16 +87,16 @@ class AdaptiveReviewSystem: ObservableObject {
             self.interval = 0
         }
         
-        var successRate: Double {
+        public var successRate: Double {
             guard reviewCount > 0 else { return 0 }
             return Double(correctCount) / Double(reviewCount)
         }
         
-        var isDueForReview: Bool {
+        public var isDueForReview: Bool {
             return nextReview <= Date()
         }
         
-        var mastery: MasteryLevel {
+        public var mastery: MasteryLevel {
             if successRate >= 0.9 && reviewCount >= 10 {
                 return .mastered
             } else if successRate >= 0.75 && reviewCount >= 5 {
@@ -108,13 +108,13 @@ class AdaptiveReviewSystem: ObservableObject {
             }
         }
         
-        enum MasteryLevel: String {
+        public enum MasteryLevel: String {
             case new = "Nouveau"
             case learning = "En apprentissage"
             case proficient = "Compétent"
             case mastered = "Maîtrisé"
             
-            var icon: String {
+            public var icon: String {
                 switch self {
                 case .new: return "🌱"
                 case .learning: return "📚"
@@ -127,7 +127,7 @@ class AdaptiveReviewSystem: ObservableObject {
     
     // MARK: - Adaptive Algorithm (SuperMemo SM-2 Modified)
     
-    func calculateNextReview(item: ReviewItem, quality: Int) -> (interval: Int, easeFactor: Double, nextReview: Date) {
+    public func calculateNextReview(item: ReviewItem, quality: Int) -> (interval: Int, easeFactor: Double, nextReview: Date) {
         var newEaseFactor = item.easeFactor
         var newInterval = item.interval
         
@@ -167,7 +167,7 @@ class AdaptiveReviewSystem: ObservableObject {
     
     // MARK: - Review Item Management
     
-    func recordReview(item: inout ReviewItem, wasCorrect: Bool, difficulty: ReviewItem.DifficultyLevel? = nil) {
+    public func recordReview(item: inout ReviewItem, wasCorrect: Bool, difficulty: ReviewItem.DifficultyLevel? = nil) {
         item.reviewCount += 1
         item.lastReviewed = Date()
         
@@ -203,7 +203,16 @@ class AdaptiveReviewSystem: ObservableObject {
     
     // MARK: - Queue Management
     
-    func getDueItems(limit: Int = 20) -> [ReviewItem] {
+    public func getDueItemsCount() -> Int {
+        return reviewQueue.filter { $0.isDueForReview }.count
+    }
+    
+    public func getUrgentItemsCount() -> Int {
+        let twoDaysAgo = Calendar.current.date(byAdding: .day, value: -2, to: Date()) ?? Date()
+        return reviewQueue.filter { $0.nextReview < twoDaysAgo }.count
+    }
+    
+    public func getDueItems(limit: Int = 20) -> [ReviewItem] {
         return reviewQueue
             .filter { $0.isDueForReview }
             .sorted { item1, item2 in
@@ -220,7 +229,7 @@ class AdaptiveReviewSystem: ObservableObject {
             .map { $0 }
     }
     
-    func getNewItems(limit: Int = 10) -> [ReviewItem] {
+    public func getNewItems(limit: Int = 10) -> [ReviewItem] {
         return reviewQueue
             .filter { $0.reviewCount == 0 }
             .shuffled()
@@ -228,7 +237,7 @@ class AdaptiveReviewSystem: ObservableObject {
             .map { $0 }
     }
     
-    func getLearningItems(limit: Int = 15) -> [ReviewItem] {
+    public func getLearningItems(limit: Int = 15) -> [ReviewItem] {
         return reviewQueue
             .filter { $0.mastery == .learning || $0.mastery == .new }
             .sorted { $0.successRate < $1.successRate }
@@ -236,7 +245,7 @@ class AdaptiveReviewSystem: ObservableObject {
             .map { $0 }
     }
     
-    func getWeakItems(limit: Int = 10) -> [ReviewItem] {
+    public func getWeakItems(limit: Int = 10) -> [ReviewItem] {
         return reviewQueue
             .filter { $0.reviewCount >= 3 && $0.successRate < 0.6 }
             .sorted { $0.successRate < $1.successRate }
@@ -246,7 +255,7 @@ class AdaptiveReviewSystem: ObservableObject {
     
     // MARK: - Statistics
     
-    func getStatistics() -> ReviewStatistics {
+    public func getStatistics() -> ReviewStatistics {
         let totalItems = reviewQueue.count
         let dueItems = reviewQueue.filter { $0.isDueForReview }.count
         let masteredItems = reviewQueue.filter { $0.mastery == .mastered }.count
@@ -271,18 +280,18 @@ class AdaptiveReviewSystem: ObservableObject {
         )
     }
     
-    struct ReviewStatistics {
-        let totalItems: Int
-        let dueItems: Int
-        let masteredItems: Int
-        let learningItems: Int
-        let newItems: Int
-        let totalReviews: Int
-        let averageSuccessRate: Double
-        let dailyReviewCount: Int
-        let reviewStreak: Int
+    public struct ReviewStatistics {
+        public let totalItems: Int
+        public let dueItems: Int
+        public let masteredItems: Int
+        public let learningItems: Int
+        public let newItems: Int
+        public let totalReviews: Int
+        public let averageSuccessRate: Double
+        public let dailyReviewCount: Int
+        public let reviewStreak: Int
         
-        var progressPercentage: Double {
+        public var progressPercentage: Double {
             guard totalItems > 0 else { return 0 }
             return Double(masteredItems) / Double(totalItems) * 100
         }
@@ -290,7 +299,7 @@ class AdaptiveReviewSystem: ObservableObject {
     
     // MARK: - Data Generation
     
-    func generateReviewItemsFromVocabulary(language: String, limit: Int = 100) -> [ReviewItem] {
+    public func generateReviewItemsFromVocabulary(language: String, limit: Int = 100) -> [ReviewItem] {
         let words = VocabularyDataManager.shared.getAllWords(language: language).shuffled().prefix(limit)
         
         return words.map { word in
@@ -306,7 +315,7 @@ class AdaptiveReviewSystem: ObservableObject {
         }
     }
     
-    func generateReviewItemsFromConjugation(language: String, limit: Int = 50) -> [ReviewItem] {
+    public func generateReviewItemsFromConjugation(language: String, limit: Int = 50) -> [ReviewItem] {
         let verbs = language == "it" ? VerbData.getItalianVerbs() : VerbData.getSpanishVerbs()
         let tenses = ["Présent", "Passé composé", "Futur"]
         let pronouns = ["io", "tu", "lui/lei", "noi", "voi", "loro"]
@@ -325,7 +334,7 @@ class AdaptiveReviewSystem: ObservableObject {
                 items.append(ReviewItem(
                     type: .conjugation,
                     content: ReviewItem.ReviewContent(
-                        question: "\(verb.infinitive) - \(tense) - \(pronoun)",
+                        question: "\(verb) - \(tense) - \(pronoun)",
                         answer: form,
                         hint: verb.translation,
                         example: "\(pronoun) \(form)"
@@ -337,8 +346,9 @@ class AdaptiveReviewSystem: ObservableObject {
         return items
     }
     
-    func generateReviewItemsFromGrammar(language: String, limit: Int = 30) -> [ReviewItem] {
-        let rules = GrammarData.getGrammarRules(for: language).shuffled().prefix(limit)
+    public func generateReviewItemsFromGrammar(language: String, limit: Int = 30) -> [ReviewItem] {
+        let grammarData = GrammarData()
+        let rules = grammarData.getGrammarRules(language: language).shuffled().prefix(limit)
         
         return rules.compactMap { rule -> ReviewItem? in
             guard let example = rule.examples.randomElement() else { return nil }
@@ -357,7 +367,7 @@ class AdaptiveReviewSystem: ObservableObject {
     
     // MARK: - Daily Review Session
     
-    func generateDailyReviewSession(targetCount: Int = 30) -> [ReviewItem] {
+    public func generateDailyReviewSession(targetCount: Int = 30) -> [ReviewItem] {
         var session: [ReviewItem] = []
         
         // 50% due items (high priority)

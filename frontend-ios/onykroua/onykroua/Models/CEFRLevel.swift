@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-enum CEFRLevel: String, Codable, CaseIterable, Identifiable {
+public enum CEFRLevel: String, Codable, CaseIterable, Identifiable {
     case a1 = "A1"
     case a2 = "A2"
     case b1 = "B1"
@@ -9,9 +9,9 @@ enum CEFRLevel: String, Codable, CaseIterable, Identifiable {
     case c1 = "C1"
     case c2 = "C2"
     
-    var id: String { rawValue }
+    public var id: String { rawValue }
     
-    var displayName: String {
+    public var displayName: String {
         switch self {
         case .a1: return "A1 - Débutant"
         case .a2: return "A2 - Élémentaire"
@@ -22,7 +22,7 @@ enum CEFRLevel: String, Codable, CaseIterable, Identifiable {
         }
     }
     
-    var shortDescription: String {
+    public var shortDescription: String {
         switch self {
         case .a1: return "Découverte"
         case .a2: return "Survie"
@@ -33,7 +33,7 @@ enum CEFRLevel: String, Codable, CaseIterable, Identifiable {
         }
     }
     
-    var detailedDescription: String {
+    public var description: String {
         switch self {
         case .a1:
             return "Je peux comprendre et utiliser des expressions familières et quotidiennes. Je peux me présenter et poser des questions simples."
@@ -50,7 +50,11 @@ enum CEFRLevel: String, Codable, CaseIterable, Identifiable {
         }
     }
     
-    var xpRequired: Int {
+    public var detailedDescription: String {
+        return description
+    }
+    
+    public var xpRequired: Int {
         switch self {
         case .a1: return 1000
         case .a2: return 2500
@@ -61,7 +65,7 @@ enum CEFRLevel: String, Codable, CaseIterable, Identifiable {
         }
     }
     
-    var color: Color {
+    public var color: Color {
         switch self {
         case .a1: return Color.green
         case .a2: return Color.mint
@@ -72,7 +76,7 @@ enum CEFRLevel: String, Codable, CaseIterable, Identifiable {
         }
     }
     
-    var gradientColors: [Color] {
+    public var gradientColors: [Color] {
         switch self {
         case .a1: return [Color.green, Color.mint]
         case .a2: return [Color.mint, Color.cyan]
@@ -83,7 +87,7 @@ enum CEFRLevel: String, Codable, CaseIterable, Identifiable {
         }
     }
     
-    var icon: String {
+    public var icon: String {
         switch self {
         case .a1: return "🌱"
         case .a2: return "🌿"
@@ -94,7 +98,7 @@ enum CEFRLevel: String, Codable, CaseIterable, Identifiable {
         }
     }
     
-    var estimatedWordsToKnow: Int {
+    public var estimatedWordsToKnow: Int {
         switch self {
         case .a1: return 500
         case .a2: return 1000
@@ -105,7 +109,7 @@ enum CEFRLevel: String, Codable, CaseIterable, Identifiable {
         }
     }
     
-    var nextLevel: CEFRLevel? {
+    public var nextLevel: CEFRLevel? {
         switch self {
         case .a1: return .a2
         case .a2: return .b1
@@ -116,7 +120,7 @@ enum CEFRLevel: String, Codable, CaseIterable, Identifiable {
         }
     }
     
-    var previousLevel: CEFRLevel? {
+    public var previousLevel: CEFRLevel? {
         switch self {
         case .a1: return nil
         case .a2: return .a1
@@ -127,7 +131,7 @@ enum CEFRLevel: String, Codable, CaseIterable, Identifiable {
         }
     }
     
-    static func fromString(_ string: String) -> CEFRLevel {
+    public static func fromString(_ string: String) -> CEFRLevel {
         return CEFRLevel(rawValue: string.uppercased()) ?? .a1
     }
 }

@@ -1,33 +1,46 @@
 import Foundation
 import SwiftUI
-
-struct AssessmentQuestion: Identifiable {
-    let id = UUID()
-    let question: String
-    let options: [String]
-    let correctAnswer: Int
-    let level: CEFRLevel
-    let explanation: String
-}
+import SwiftData
 
 @Observable
-final class LevelAssessmentService {
+public final class LevelAssessmentService {
     
-    var questions: [AssessmentQuestion] = []
-    var currentQuestionIndex: Int = 0
-    var userAnswers: [Int] = []
-    var assessedLevel: CEFRLevel = .a1
+    public struct AssessmentQuestion: Identifiable {
+        public let id = UUID()
+        public let question: String
+        public let options: [String]
+        public let correctAnswer: String
+        public let level: CEFRLevel
+        public let explanation: String
+        public let context: String?
+        
+        public init(question: String, options: [String], correctAnswer: String, level: CEFRLevel, explanation: String, context: String? = nil) {
+            self.question = question
+            self.options = options
+            self.correctAnswer = correctAnswer
+            self.level = level
+            self.explanation = explanation
+            self.context = context
+        }
+    }
     
-    init() {
+    public var questions: [AssessmentQuestion] = []
+    public var currentQuestionIndex: Int = 0
+    public var userAnswers: [String] = []
+    public var assessedLevel: CEFRLevel = .a1
+    private var modelContext: ModelContext
+    
+    public init(modelContext: ModelContext) {
+        self.modelContext = modelContext
         generateQuestions()
     }
     
-    func generateQuestions() {
+    public func generateQuestions() {
         questions = [
             AssessmentQuestion(
                 question: "Comment dit-on 'Bonjour' en italien ?",
                 options: ["Arrivederci", "Buongiorno", "Grazie", "Prego"],
-                correctAnswer: 1,
+                correctAnswer: "Buongiorno",
                 level: .a1,
                 explanation: "'Buongiorno' signifie 'Bonjour' en italien."
             ),
@@ -35,7 +48,7 @@ final class LevelAssessmentService {
             AssessmentQuestion(
                 question: "Complétez : 'Io ____ italiano.'",
                 options: ["parla", "parlo", "parli", "parlano"],
-                correctAnswer: 1,
+                correctAnswer: "parlo",
                 level: .a1,
                 explanation: "La première personne du singulier de 'parlare' est 'parlo'."
             ),
@@ -43,7 +56,7 @@ final class LevelAssessmentService {
             AssessmentQuestion(
                 question: "Que signifie 'Mi piace la pizza' ?",
                 options: ["Je déteste la pizza", "J'aime la pizza", "Je mange la pizza", "Je veux la pizza"],
-                correctAnswer: 1,
+                correctAnswer: "J'aime la pizza",
                 level: .a2,
                 explanation: "'Mi piace' signifie 'j'aime' en italien."
             ),
@@ -51,7 +64,7 @@ final class LevelAssessmentService {
             AssessmentQuestion(
                 question: "Quel est le passé composé de 'andare' (1ère personne) ?",
                 options: ["sono andato", "ho andato", "ero andato", "andrò"],
-                correctAnswer: 0,
+                correctAnswer: "sono andato",
                 level: .a2,
                 explanation: "'Andare' utilise l'auxiliaire 'essere' au passé composé."
             ),
@@ -59,7 +72,7 @@ final class LevelAssessmentService {
             AssessmentQuestion(
                 question: "Choisissez la forme correcte : 'Se ____ tempo, verrei con te.'",
                 options: ["ho", "avrò", "avessi", "avevo"],
-                correctAnswer: 2,
+                correctAnswer: "avessi",
                 level: .b1,
                 explanation: "Le conditionnel avec 'se' nécessite le subjonctif imparfait 'avessi'."
             ),
@@ -67,7 +80,7 @@ final class LevelAssessmentService {
             AssessmentQuestion(
                 question: "Que signifie 'Ne ho abbastanza' ?",
                 options: ["J'en ai assez", "Je n'en ai pas", "J'en veux plus", "Je le comprends"],
-                correctAnswer: 0,
+                correctAnswer: "J'en ai assez",
                 level: .b1,
                 explanation: "'Ne ho abbastanza' est une expression idiomatique signifiant 'j'en ai assez'."
             ),
@@ -75,7 +88,7 @@ final class LevelAssessmentService {
             AssessmentQuestion(
                 question: "Transformez au discours indirect : Marco disse: 'Partirò domani.'",
                 options: ["Marco disse che partirà domani", "Marco disse che sarebbe partito il giorno dopo", "Marco disse che partiva domani", "Marco disse che è partito domani"],
-                correctAnswer: 1,
+                correctAnswer: "Marco disse che sarebbe partito il giorno dopo",
                 level: .b2,
                 explanation: "Le discours indirect nécessite le conditionnel passé et l'ajustement temporel."
             ),
@@ -83,15 +96,15 @@ final class LevelAssessmentService {
             AssessmentQuestion(
                 question: "Quelle phrase utilise correctement le subjonctif ?",
                 options: ["Penso che lui è bravo", "Credo che lui sia bravo", "So che lui sia bravo", "Dico che lui sia bravo"],
-                correctAnswer: 1,
+                correctAnswer: "Credo che lui sia bravo",
                 level: .b2,
-                explanation: "'Credere che' requiert le subjonctif, contrairement à 'sapere che'."
+                explanation: "'Credere che' requiert le subjonctif, contrairement à 'sapere que'."
             ),
             
             AssessmentQuestion(
                 question: "Identifiez l'erreur : 'Benché ha studiato molto, non ha superato l'esame.'",
                 options: ["Benché → Sebbene", "ha studiato → avesse studiato", "non ha → non avrebbe", "l'esame → gli esami"],
-                correctAnswer: 1,
+                correctAnswer: "ha studiato → avesse studiato",
                 level: .c1,
                 explanation: "'Benché' requiert le subjonctif, donc 'avesse studiato' au lieu de 'ha studiato'."
             ),
@@ -99,14 +112,14 @@ final class LevelAssessmentService {
             AssessmentQuestion(
                 question: "Quelle nuance exprime 'Sarà pure bravo, ma non mi convince' ?",
                 options: ["Certitude absolue", "Doute et concession", "Hypothèse future", "Souhait"],
-                correctAnswer: 1,
+                correctAnswer: "Doute et concession",
                 level: .c1,
                 explanation: "'Sarà pure' exprime une concession avec une nuance de doute."
             )
         ]
     }
     
-    func submitAnswer(_ answer: Int) {
+    func submitAnswer(_ answer: String) {
         userAnswers.append(answer)
         if currentQuestionIndex < questions.count - 1 {
             currentQuestionIndex += 1

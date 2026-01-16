@@ -1,7 +1,9 @@
 import SwiftUI
 
-struct MatchingExerciseView: View {
-    let exercise: MatchingExercise
+public struct MatchingExerciseView: View {
+    public let exercise: MatchingExercise
+    public var onComplete: ((ExerciseSession) -> Void)?
+    
     @State private var leftItems: [MatchingPair]
     @State private var rightItems: [String]
     @State private var selectedLeft: MatchingPair?
@@ -18,7 +20,15 @@ struct MatchingExerciseView: View {
         _rightItems = State(initialValue: exercise.pairs.map { $0.right }.shuffled())
     }
     
-    var body: some View {
+    public init(exercise: MatchingExercise, onComplete: ((ExerciseSession) -> Void)? = nil) {
+        self.exercise = exercise
+        self.onComplete = onComplete
+        
+        _leftItems = State(initialValue: exercise.pairs.shuffled())
+        _rightItems = State(initialValue: exercise.pairs.map { $0.right }.shuffled())
+    }
+    
+    public var body: some View {
         NavigationStack {
             ZStack {
                 if showResults {

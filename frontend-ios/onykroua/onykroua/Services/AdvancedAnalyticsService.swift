@@ -492,7 +492,7 @@ class AdvancedAnalyticsService: ObservableObject {
             consistency = 0.3
         }
         
-        let intensity: StudyIntensity
+        let intensity: StudyPattern.StudyIntensity
         if averageSessionTime >= 30 {
             intensity = .high
         } else if averageSessionTime >= 15 {

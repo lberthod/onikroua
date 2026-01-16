@@ -19,11 +19,11 @@ public struct PracticeTab: View {
         self.language = language
     }
     
-    private var questions: [QuizQuestion] {
+    private var questions: [ConjugationQuizQuestion] {
         generateQuestions()
     }
     
-    private var currentQuizQuestion: QuizQuestion? {
+    private var currentQuizQuestion: ConjugationQuizQuestion? {
         guard currentQuestion < questions.count else { return nil }
         return questions[currentQuestion]
     }
@@ -73,16 +73,16 @@ public struct PracticeTab: View {
         }
     }
     
-    private func generateQuestions() -> [QuizQuestion] {
+    private func generateQuestions() -> [ConjugationQuizQuestion] {
         let verbs = grammarData.getVerbs(language: language)
-        var questions: [QuizQuestion] = []
+        var questions: [ConjugationQuizQuestion] = []
         
         switch selectedQuizType {
         case "conjugation":
             for verb in verbs.prefix(5) {
                 if let conjugations = verb.conjugations["Présent"] {
                     for (pronoun, conjugation) in conjugations.prefix(3) {
-                        questions.append(QuizQuestion(
+                        questions.append(ConjugationQuizQuestion(
                             question: "Conjuguez \(verb.verb) avec '\(pronoun)'",
                             correctAnswer: conjugation,
                             type: .conjugation,
@@ -94,7 +94,7 @@ public struct PracticeTab: View {
             }
         case "translation":
             for verb in verbs.prefix(5) {
-                questions.append(QuizQuestion(
+                questions.append(ConjugationQuizQuestion(
                     question: "Traduire: \(verb.verb)",
                     correctAnswer: verb.translation,
                     type: .translation,
@@ -103,10 +103,10 @@ public struct PracticeTab: View {
             }
         case "verb":
             for verb in verbs.prefix(5) {
-                questions.append(QuizQuestion(
+                questions.append(ConjugationQuizQuestion(
                     question: "Quel est le verbe pour: \(verb.translation)?",
                     correctAnswer: verb.verb,
-                    type: .verb,
+                    type: .conjugation,
                     verb: verb.verb
                 ))
             }
@@ -231,7 +231,7 @@ public struct QuizTypeButton: View {
 }
 
 public struct QuizQuestionView: View {
-    let question: QuizQuestion
+    let question: ConjugationQuizQuestion
     @Binding var userAnswer: String
     @Binding var showResult: Bool
     let onNext: () -> Void
@@ -369,7 +369,7 @@ public struct QuizCompletedView: View {
     }
 }
 
-public struct QuizQuestion {
+public struct ConjugationQuizQuestion {
     let id: Int
     let question: String
     let correctAnswer: String
@@ -385,10 +385,4 @@ public struct QuizQuestion {
         self.verb = verb
         self.pronoun = pronoun
     }
-}
-
-public enum QuizType {
-    case conjugation
-    case translation
-    case verb
 }

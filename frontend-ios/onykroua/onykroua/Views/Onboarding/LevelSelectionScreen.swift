@@ -81,7 +81,10 @@ struct LevelSelectionScreen: View {
         }
         .padding()
         .sheet(isPresented: $showAssessment) {
-            LevelAssessmentView(selectedLevel: $selectedLevel)
+            LevelAssessmentView(onComplete: { level in
+                selectedLevel = level.rawValue
+                showAssessment = false
+            })
         }
     }
 }

@@ -88,25 +88,30 @@ struct SplashScreenView: View {
 struct OnboardingFlowView: View {
     let onComplete: () -> Void
     @State private var currentPage = 0
+    @State private var shouldDismiss = false
+    @State private var selectedLanguage = "it"
+    @State private var selectedGoals: [String] = []
+    @State private var selectedLevel = CEFRLevel.a1.rawValue
+    @State private var dailyMinutes = 10
     
     var body: some View {
         TabView(selection: $currentPage) {
-            WelcomeScreen(onNext: { currentPage += 1 })
+            WelcomeScreenWrapper(onNext: { currentPage += 1 })
                 .tag(0)
             
-            LanguageSelectionScreen(onNext: { currentPage += 1 })
+            LanguageSelectionScreenWrapper(selectedLanguage: $selectedLanguage, onNext: { currentPage += 1 })
                 .tag(1)
             
-            GoalsScreen(onNext: { currentPage += 1 })
+            GoalsScreenWrapper(selectedGoals: $selectedGoals, onNext: { currentPage += 1 })
                 .tag(2)
             
-            LevelScreen(onNext: { currentPage += 1 })
+            LevelScreenWrapper(selectedLevel: $selectedLevel, onNext: { currentPage += 1 })
                 .tag(3)
             
-            RhythmScreen(onNext: { currentPage += 1 })
+            RhythmScreenWrapper(dailyMinutes: $dailyMinutes, onNext: { currentPage += 1 })
                 .tag(4)
             
-            PermissionsScreen(onComplete: onComplete)
+            PermissionsScreenWrapper(onComplete: onComplete)
                 .tag(5)
         }
         .tabViewStyle(.page(indexDisplayMode: .always))
@@ -114,10 +119,155 @@ struct OnboardingFlowView: View {
     }
 }
 
+// MARK: - Onboarding Screen Wrappers
+
+struct WelcomeScreenWrapper: View {
+    let onNext: () -> Void
+    @State private var isPresented = false
+    
+    var body: some View {
+        VStack(spacing: 30) {
+            Spacer()
+            
+            Text("🇮🇹")
+                .font(.system(size: 100))
+            
+            VStack(spacing: 12) {
+                Text("Bienvenue sur Onykroua")
+                    .font(.system(size: 32, weight: .bold))
+                    .multilineTextAlignment(.center)
+                
+                Text("Apprendre l'italien avec l'IA")
+                    .font(.title2)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            
+            VStack(spacing: 16) {
+                OnboardingFeatureRow(icon: "book.fill", text: "15,000+ mots", color: .blue)
+                OnboardingFeatureRow(icon: "mic.fill", text: "Tuteur IA vocal", color: .purple)
+                OnboardingFeatureRow(icon: "gamecontroller.fill", text: "Gamification addictive", color: .orange)
+            }
+            .padding(.horizontal, 40)
+            
+            Spacer()
+            
+            Button(action: onNext) {
+                Text("Commencer")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .cornerRadius(12)
+            }
+            .padding(.horizontal, 40)
+        }
+        .padding()
+    }
+}
+
+struct LanguageSelectionScreenWrapper: View {
+    @Binding var selectedLanguage: String
+    let onNext: () -> Void
+    
+    var body: some View {
+        LanguageSelectionScreen(selectedLanguage: $selectedLanguage)
+        Button(action: onNext) {
+            Text("Continuer")
+                .font(.headline)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.blue)
+                .cornerRadius(12)
+        }
+        .padding(.horizontal, 40)
+    }
+}
+
+struct GoalsScreenWrapper: View {
+    @Binding var selectedGoals: [String]
+    let onNext: () -> Void
+    
+    var body: some View {
+        VStack {
+            GoalSelectionScreen(selectedGoals: $selectedGoals)
+            Button(action: onNext) {
+                Text("Continuer")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(selectedGoals.isEmpty ? Color.gray : Color.blue)
+                    .cornerRadius(12)
+            }
+            .disabled(selectedGoals.isEmpty)
+            .padding(.horizontal, 40)
+        }
+    }
+}
+
+struct LevelScreenWrapper: View {
+    @Binding var selectedLevel: String
+    let onNext: () -> Void
+    
+    var body: some View {
+        VStack {
+            LevelSelectionScreen(selectedLevel: $selectedLevel)
+            Button(action: onNext) {
+                Text("Continuer")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .cornerRadius(12)
+            }
+            .padding(.horizontal, 40)
+        }
+    }
+}
+
+struct RhythmScreenWrapper: View {
+    @Binding var dailyMinutes: Int
+    let onNext: () -> Void
+    
+    var body: some View {
+        VStack {
+            RhythmSelectionScreen(dailyMinutes: $dailyMinutes)
+            Button(action: onNext) {
+                Text("Continuer")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .cornerRadius(12)
+            }
+            .padding(.horizontal, 40)
+        }
+    }
+}
+
+struct PermissionsScreenWrapper: View {
+    let onComplete: () -> Void
+    @State private var notificationsEnabled = false
+    @State private var preferredTime: Date?
+    
+    var body: some View {
+        PermissionsScreen(
+            notificationsEnabled: $notificationsEnabled,
+            preferredTime: $preferredTime,
+            onComplete: onComplete
+        )
+    }
+}
+
 // MARK: - Level Assessment View
 
-struct LevelAssessmentView: View {
-    let onComplete: (CEFRLevel) -> Void
+public struct LevelAssessmentView: View {
+    public let onComplete: (CEFRLevel) -> Void
     @Environment(\.modelContext) private var modelContext
     @State private var assessmentService: LevelAssessmentService?
     @State private var currentQuestionIndex = 0
@@ -125,7 +275,11 @@ struct LevelAssessmentView: View {
     @State private var showResults = false
     @State private var assessedLevel: CEFRLevel = .a1
     
-    var body: some View {
+    public init(onComplete: @escaping (CEFRLevel) -> Void) {
+        self.onComplete = onComplete
+    }
+    
+    public var body: some View {
         NavigationStack {
             ZStack {
                 if showResults {

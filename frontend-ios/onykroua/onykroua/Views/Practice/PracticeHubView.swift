@@ -166,23 +166,6 @@ struct PracticeHubView: View {
                     action: startMatching
                 )
                 
-                ExerciseTypeRow(
-                    type: .vocabulary,
-                    count: "Quiz illimités",
-                    action: { showQuizSelection = true }
-                )
-                
-                ExerciseTypeRow(
-                    type: .conjugation,
-                    count: "Quiz illimités",
-                    action: { showQuizSelection = true }
-                )
-                
-                ExerciseTypeRow(
-                    type: .grammar,
-                    count: "Quiz illimités",
-                    action: { showQuizSelection = true }
-                )
             }
         }
     }
@@ -328,10 +311,4 @@ struct ExerciseTypeRow: View {
         }
         .buttonStyle(.plain)
     }
-}
-
-extension ExerciseType {
-    static var vocabulary: ExerciseType { .flashcard }
-    static var conjugation: ExerciseType { .pronunciation }
-    static var grammar: ExerciseType { .dictation }
 }

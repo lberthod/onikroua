@@ -36,6 +36,10 @@ class AppEnvironment: ObservableObject {
     let syncManager: OfflineSyncManager
     let learnedWordsManager: LearnedWordsManager
     
+    // MARK: - Review System
+    
+    let reviewSystem: AdaptiveReviewSystem
+    
     // MARK: - Initialization
     
     private init() {
@@ -58,6 +62,9 @@ class AppEnvironment: ObservableObject {
         self.networkMonitor = NetworkMonitor.shared
         self.syncManager = OfflineSyncManager.shared
         self.learnedWordsManager = LearnedWordsManager.shared
+        
+        // Review System
+        self.reviewSystem = AdaptiveReviewSystem.shared
         
         print("✅ AppEnvironment initialized with persistence & offline support")
     }

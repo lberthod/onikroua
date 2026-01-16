@@ -1,18 +1,40 @@
 import Foundation
 
-struct ConversationScenario: Identifiable {
-    let id = UUID()
-    let name: String
-    let icon: String
-    let color: String
-    let messages: [ConversationMessage]
+public struct ConversationScenario: Identifiable {
+    public let id = UUID()
+    public let name: String
+    public let icon: String
+    public let color: String
+    public let messages: [ConversationMessage]
+    
+    public init(name: String, icon: String, color: String, messages: [ConversationMessage]) {
+        self.name = name
+        self.icon = icon
+        self.color = color
+        self.messages = messages
+    }
 }
 
-struct ConversationMessage: Identifiable {
-    let id = UUID()
-    let text: String
-    let translation: String
-    let isUser: Bool
+public struct ConversationMessage: Identifiable {
+    public let id = UUID()
+    public let text: String
+    public let translation: String
+    public let isUser: Bool
+    
+    public init(text: String, translation: String, isUser: Bool) {
+        self.text = text
+        self.translation = translation
+        self.isUser = isUser
+    }
+}
+
+// Alias pour compatibilité avec le code existant
+public struct ConversationData {
+    public static func getScenarios(for language: String) -> [ConversationScenario] {
+        // Pour l'instant, on retourne toujours les scénarios italiens
+        // Plus tard, on pourra filtrer par langue
+        return ConversationDataSource.getAllScenarios()
+    }
 }
 
 struct ConversationDataSource {

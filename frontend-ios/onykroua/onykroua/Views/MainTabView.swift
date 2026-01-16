@@ -173,21 +173,21 @@ struct HomeView: View {
             }
             
             HStack(spacing: 16) {
-                StatCard(
+                StatItem(
                     icon: "star.fill",
                     value: "\(progress.currentXP)",
                     label: "XP",
                     color: .yellow
                 )
                 
-                StatCard(
+                StatItem(
                     icon: "flame.fill",
                     value: "\(progress.streak)",
                     label: "Série",
                     color: .orange
                 )
                 
-                StatCard(
+                StatItem(
                     icon: "book.fill",
                     value: "\(progress.wordsLearned)",
                     label: "Mots",
@@ -367,34 +367,8 @@ struct HomeView: View {
 
 // MARK: - Supporting Views
 
-struct StatCard: View {
-    let icon: String
-    let value: String
-    let label: String
-    let color: Color
-    
-    var body: some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundColor(color)
-            
-            Text(value)
-                .font(.title3)
-                .fontWeight(.bold)
-            
-            Text(label)
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemBackground))
-        )
-    }
-}
+// StatCard est maintenant défini de manière publique dans DashboardComponents.swift
+// Les définitions locales ont été supprimées pour éviter les conflits de redéclaration.
 
 struct QuickActionCard: View {
     let icon: String

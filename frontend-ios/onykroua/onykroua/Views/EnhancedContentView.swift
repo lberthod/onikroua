@@ -43,9 +43,7 @@ struct EnhancedContentView: View {
             }
         }
         .sheet(isPresented: $showProfile) {
-            if gamificationManager != nil, analyticsService != nil {
-                ProgressDashboardView()
-            }
+            ProfileView()
         }
         .onAppear {
             if gamificationManager == nil {
@@ -204,7 +202,7 @@ struct EnhancedContentView: View {
                     EnhancedCategoryCard(icon: "text.book.closed.fill", title: "Vocabulaire", color: .green)
                 }
                 
-                NavigationLink(destination: EmojiView()) {
+                NavigationLink(destination: EmojiView_Enhanced()) {
                     EnhancedCategoryCard(icon: "face.smiling.fill", title: "Emoji", color: .orange)
                 }
                 

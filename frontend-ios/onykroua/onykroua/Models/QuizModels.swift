@@ -3,47 +3,50 @@ import SwiftUI
 
 // MARK: - Quiz Types
 
-enum QuizType: String, Codable, CaseIterable {
+public enum QuizType: String, Codable, CaseIterable {
     case vocabulary = "Vocabulaire"
     case conjugation = "Conjugaison"
     case grammar = "Grammaire"
-    case listening = "Écoute"
     case translation = "Traduction"
     case conversation = "Conversation"
+    case listening = "Écoute"
+    case mixed = "Mixte"
     
-    var icon: String {
+    public var icon: String {
         switch self {
-        case .vocabulary: return "📚"
-        case .conjugation: return "✏️"
-        case .grammar: return "📖"
-        case .listening: return "🎧"
-        case .translation: return "🔄"
-        case .conversation: return "💬"
+        case .vocabulary: return "book.fill"
+        case .conjugation: return "text.alignleft"
+        case .grammar: return "text.book.closed.fill"
+        case .translation: return "character.bubble.fill"
+        case .conversation: return "bubble.left.and.bubble.right.fill"
+        case .listening: return "ear"
+        case .mixed: return "shuffle"
         }
     }
     
-    var color: Color {
+    public var color: Color {
         switch self {
         case .vocabulary: return .blue
         case .conjugation: return .green
         case .grammar: return .purple
-        case .listening: return .orange
-        case .translation: return .pink
-        case .conversation: return .teal
+        case .translation: return .orange
+        case .conversation: return .pink
+        case .listening: return .cyan
+        case .mixed: return .indigo
         }
     }
 }
 
-enum QuizDifficulty: String, Codable, CaseIterable {
+public enum QuizDifficulty: String, Codable, CaseIterable {
     case beginner = "Débutant"
     case intermediate = "Intermédiaire"
     case advanced = "Avancé"
     
     var cefrLevels: [CEFRLevel] {
         switch self {
-        case .beginner: return [.A1, .A2]
-        case .intermediate: return [.B1, .B2]
-        case .advanced: return [.C1, .C2]
+        case .beginner: return [.a1, .a2]
+        case .intermediate: return [.b1, .b2]
+        case .advanced: return [.c1, .c2]
         }
     }
     
@@ -58,24 +61,22 @@ enum QuizDifficulty: String, Codable, CaseIterable {
 
 // MARK: - Quiz Question Models
 
-struct QuizQuestion: Identifiable, Codable {
-    let id: UUID
-    let type: QuizType
-    let difficulty: QuizDifficulty
-    let question: String
-    let options: [String]
-    let correctAnswerIndex: Int
-    let explanation: String?
-    let imageURL: String?
-    let audioURL: String?
+public struct QuizQuestion: Identifiable, Codable {
+    public let id: UUID
+    public let type: QuizType
+    public let difficulty: QuizDifficulty
+    public let question: String
+    public let options: [String]
+    public let correctAnswerIndex: Int
+    public let explanation: String?
+    public let imageURL: String?
+    public let audioURL: String?
     
-    var correctAnswer: String {
+    public var correctAnswer: String {
         options[correctAnswerIndex]
     }
     
-    init(id: UUID = UUID(), type: QuizType, difficulty: QuizDifficulty, 
-         question: String, options: [String], correctAnswerIndex: Int,
-         explanation: String? = nil, imageURL: String? = nil, audioURL: String? = nil) {
+    public init(id: UUID = UUID(), type: QuizType, difficulty: QuizDifficulty, question: String, options: [String], correctAnswerIndex: Int, explanation: String? = nil, imageURL: String? = nil, audioURL: String? = nil) {
         self.id = id
         self.type = type
         self.difficulty = difficulty
@@ -90,21 +91,31 @@ struct QuizQuestion: Identifiable, Codable {
 
 // MARK: - Quiz Session
 
-struct QuizSession: Identifiable, Codable {
-    let id: UUID
-    let type: QuizType
-    let difficulty: QuizDifficulty
-    let questions: [QuizQuestion]
-    var currentQuestionIndex: Int
-    var answers: [Int?]
-    var startDate: Date
-    var endDate: Date?
+public struct QuizSession: Identifiable, Codable {
+    public let id: UUID
+    public let type: QuizType
+    public let difficulty: QuizDifficulty
+    public let questions: [QuizQuestion]
+    public var currentQuestionIndex: Int
+    public var answers: [Int?]
+    public var startDate: Date
+    public var endDate: Date?
     
-    var isCompleted: Bool {
+    public init(id: UUID = UUID(), type: QuizType, difficulty: QuizDifficulty, questions: [QuizQuestion], currentQuestionIndex: Int = 0, answers: [Int?] = [], startDate: Date = Date()) {
+        self.id = id
+        self.type = type
+        self.difficulty = difficulty
+        self.questions = questions
+        self.currentQuestionIndex = currentQuestionIndex
+        self.answers = answers
+        self.startDate = startDate
+    }
+    
+    public var isCompleted: Bool {
         return currentQuestionIndex >= questions.count
     }
     
-    var correctAnswersCount: Int {
+    public var correctAnswersCount: Int {
         return answers.enumerated().filter { index, answer in
             guard let answer = answer else { return false }
             return answer == questions[index].correctAnswerIndex
@@ -190,19 +201,13 @@ class QuizDataManager: ObservableObject {
         let tenses = ["Présent", "Passé composé", "Futur"]
         let pronouns = ["io", "tu", "lui/lei", "noi", "voi", "loro"]
         
-        return shuffledVerbs.map { verb in
+        return shuffledVerbs.compactMap { verb -> QuizQuestion? in
             let tense = tenses.randomElement() ?? "Présent"
             let pronoun = pronouns.randomElement() ?? "io"
             
             guard let conjugation = verb.conjugations[tense],
                   let correctForm = conjugation[pronoun] else {
-                return QuizQuestion(
-                    type: .conjugation,
-                    difficulty: difficulty,
-                    question: "Erreur de génération",
-                    options: ["N/A"],
-                    correctAnswerIndex: 0
-                )
+                return nil
             }
             
             // Générer des options incorrectes
@@ -231,10 +236,10 @@ class QuizDataManager: ObservableObject {
             return QuizQuestion(
                 type: .conjugation,
                 difficulty: difficulty,
-                question: "Conjugue \"\(verb.infinitive)\" au \(tense) avec \"\(pronoun)\"",
+                question: "Conjugue \"\(verb.verb)\" au \(tense) avec \"\(pronoun)\"",
                 options: options,
                 correctAnswerIndex: correctIndex,
-                explanation: "\(verb.infinitive) (\(verb.translation))"
+                explanation: "\(verb.verb) (\(verb.translation))"
             )
         }
     }
@@ -242,7 +247,8 @@ class QuizDataManager: ObservableObject {
     // MARK: - Grammar Quizzes
     
     func generateGrammarQuiz(difficulty: QuizDifficulty, language: String = "it", count: Int = 10) -> [QuizQuestion] {
-        let rules = GrammarData.getGrammarRules(for: language)
+        let grammarData = GrammarData()
+        let rules = grammarData.getGrammarRules(language: language)
         let shuffledRules = rules.shuffled().prefix(count)
         
         return shuffledRules.compactMap { rule in
@@ -280,7 +286,7 @@ class QuizDataManager: ObservableObject {
         let allMessages = scenarios.flatMap { $0.messages }
         let shuffledMessages = allMessages.shuffled().prefix(count)
         
-        return shuffledMessages.map { message in
+        return shuffledMessages.compactMap { message -> QuizQuestion? in
             // Générer des traductions incorrectes
             let incorrectTranslations = allMessages
                 .filter { $0.translation != message.translation }
@@ -291,7 +297,7 @@ class QuizDataManager: ObservableObject {
             var options = Array(incorrectTranslations) + [message.translation]
             options.shuffle()
             
-            let correctIndex = options.firstIndex(of: message.translation) ?? 0
+            guard let correctIndex = options.firstIndex(of: message.translation) else { return nil }
             
             return QuizQuestion(
                 type: .translation,
@@ -318,7 +324,6 @@ class QuizDataManager: ObservableObject {
             let incorrectResponses = scenarios
                 .filter { $0.id != scenario.id }
                 .flatMap { $0.messages }
-                .filter { $0.speaker != questionMessage.speaker }
                 .map { $0.text }
                 .shuffled()
                 .prefix(3)
@@ -331,14 +336,14 @@ class QuizDataManager: ObservableObject {
             return QuizQuestion(
                 type: .conversation,
                 difficulty: difficulty,
-                question: "Dans le contexte \"\(scenario.title)\", que répondre à :\n\"\(questionMessage.text)\" ?",
+                question: "Dans le contexte \"\(scenario.name)\", que répondre à :\n\"\(questionMessage.text)\" ?",
                 options: options,
                 correctAnswerIndex: correctIndex,
                 explanation: "Traduction : \(messages[1].translation)"
             )
         }
         
-        return Array(questions)
+        return Array(questions).compactMap { $0 }
     }
     
     // MARK: - Generate Mixed Quiz

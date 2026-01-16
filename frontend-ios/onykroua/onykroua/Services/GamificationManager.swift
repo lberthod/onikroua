@@ -51,6 +51,10 @@ final class GamificationManager {
     }
     
     func awardXP(_ amount: Int, for activity: String) {
+        addXP(amount)
+    }
+    
+    func addXP(_ amount: Int) {
         guard let progress = currentProgress else { return }
         
         lastXPGained = amount
@@ -245,6 +249,11 @@ final class GamificationManager {
     func updateStreak() {
         currentProgress?.checkAndUpdateStreak()
         checkAchievements()
+        try? modelContext.save()
+    }
+    
+    func setInitialLevel(_ level: CEFRLevel) {
+        currentProgress?.level = level
         try? modelContext.save()
     }
     

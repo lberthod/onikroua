@@ -1,7 +1,14 @@
 import SwiftUI
 
-struct FillInTheBlankView: View {
-    let exercises: [FillInTheBlankExercise]
+public struct FillInTheBlankView: View {
+    public let exercises: [FillInTheBlankExercise]
+    public var onComplete: ((ExerciseSession) -> Void)?
+    
+    public init(exercises: [FillInTheBlankExercise], onComplete: ((ExerciseSession) -> Void)? = nil) {
+        self.exercises = exercises
+        self.onComplete = onComplete
+    }
+    
     @State private var currentIndex = 0
     @State private var selectedAnswer: String?
     @State private var showFeedback = false
@@ -9,7 +16,7 @@ struct FillInTheBlankView: View {
     @State private var showResults = false
     @Environment(\.dismiss) private var dismiss
     
-    var body: some View {
+    public var body: some View {
         NavigationStack {
             ZStack {
                 if showResults {

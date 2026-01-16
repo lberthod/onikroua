@@ -24,14 +24,6 @@ struct CardView<Content: View>: View {
         content
             .background(backgroundColor)
             .cornerRadius(cornerRadius)
-            .if(shadow) { view in
-                view.shadow(
-                    color: .black.opacity(AppConstants.UI.cardShadowOpacity),
-                    radius: AppConstants.UI.cardShadowRadius,
-                    x: 0,
-                    y: 2
-                )
-            }
     }
 }
 
@@ -188,21 +180,5 @@ struct SectionHeaderView: View {
         }
         .padding(.horizontal, AppConstants.UI.padding)
         .padding(.vertical, 8)
-    }
-}
-
-// MARK: - Conditional View Modifier
-
-extension View {
-    @ViewBuilder
-    func `if`<Transform: View>(
-        _ condition: Bool,
-        transform: (Self) -> Transform
-    ) -> some View {
-        if condition {
-            transform(self)
-        } else {
-            self
-        }
     }
 }

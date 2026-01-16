@@ -147,7 +147,7 @@ extension Date {
         return Calendar.current.isDateInYesterday(self)
     }
     
-    var relativeDescription: String {
+    public var relativeDescription: String {
         if isToday {
             return "Aujourd'hui"
         } else if isYesterday {

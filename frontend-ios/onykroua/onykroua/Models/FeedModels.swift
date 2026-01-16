@@ -1,6 +1,6 @@
 import Foundation
 
-enum FeedItemType: String, CaseIterable {
+public enum FeedItemType: String, CaseIterable {
     case vocabulary
     case conjugation
     case expression
@@ -8,19 +8,19 @@ enum FeedItemType: String, CaseIterable {
     case quiz
 }
 
-struct FeedItem: Identifiable {
-    let id: String
-    let type: FeedItemType
-    let title: String
-    let content: String
-    let translation: String
-    let example: String?
-    let audioText: String?
-    var liked: Bool
-    var bookmarked: Bool
-    var likeCount: Int
+public struct FeedItem: Identifiable {
+    public let id: String
+    public let type: FeedItemType
+    public let title: String
+    public let content: String
+    public let translation: String
+    public let example: String?
+    public let audioText: String?
+    public var liked: Bool
+    public var bookmarked: Bool
+    public var likeCount: Int
     
-    init(id: String = UUID().uuidString,
+    public init(id: String = UUID().uuidString,
          type: FeedItemType,
          title: String,
          content: String,

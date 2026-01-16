@@ -1,7 +1,32 @@
 import SwiftUI
 import SwiftData
 
-struct ReviewSessionView: View {
+public struct ReviewSessionView: View {
+    public enum ReviewMode: Equatable {
+        case quick
+        case standard
+        case intensive
+        case custom(Int)
+        
+        public var itemCount: Int {
+            switch self {
+            case .quick: return 10
+            case .standard: return 20
+            case .intensive: return 50
+            case .custom(let count): return count
+            }
+        }
+        
+        public var title: String {
+            switch self {
+            case .quick: return "Révision Rapide"
+            case .standard: return "Révision Standard"
+            case .intensive: return "Révision Intensive"
+            case .custom: return "Révision Personnalisée"
+            }
+        }
+    }
+    
     @Environment(\.dismiss) private var dismiss
     @State private var reviewSystem: AdaptiveReviewSystem
     @State private var currentIndex = 0
@@ -10,12 +35,12 @@ struct ReviewSessionView: View {
     @State private var completedReviews = 0
     @State private var showResults = false
     
-    init(reviewSystem: AdaptiveReviewSystem = AdaptiveReviewSystem.shared, targetCount: Int = 30) {
+    public init(reviewSystem: AdaptiveReviewSystem = AdaptiveReviewSystem.shared, targetCount: Int = 30) {
         _reviewSystem = State(initialValue: reviewSystem)
         _reviewItems = State(initialValue: reviewSystem.generateDailyReviewSession(targetCount: targetCount))
     }
     
-    var body: some View {
+    public var body: some View {
         NavigationStack {
             ZStack {
                 if showResults {

@@ -1,7 +1,14 @@
 import SwiftUI
 
-struct FlashcardView: View {
-    let deck: FlashcardDeck
+public struct FlashcardView: View {
+    public let deck: FlashcardDeck
+    public var onComplete: ((ExerciseSession) -> Void)?
+    
+    public init(deck: FlashcardDeck, onComplete: ((ExerciseSession) -> Void)? = nil) {
+        self.deck = deck
+        self.onComplete = onComplete
+    }
+    
     @State private var currentIndex = 0
     @State private var isFlipped = false
     @State private var offset = CGSize.zero
@@ -9,7 +16,7 @@ struct FlashcardView: View {
     @State private var showResults = false
     @Environment(\.dismiss) private var dismiss
     
-    var body: some View {
+    public var body: some View {
         NavigationStack {
             ZStack {
                 if showResults {
@@ -203,16 +210,16 @@ struct FlashcardView: View {
     
     private var difficultyButtons: some View {
         HStack(spacing: 12) {
-            DifficultyButton(
+            FlashcardDifficultyButton(
                 title: "Difficile",
-                icon: "xmark.circle.fill",
+                icon: "❌",
                 color: .red,
                 action: { handleDifficulty(false) }
             )
             
-            DifficultyButton(
+            FlashcardDifficultyButton(
                 title: "Facile",
-                icon: "checkmark.circle.fill",
+                icon: "✅",
                 color: .green,
                 action: { handleDifficulty(true) }
             )
@@ -270,7 +277,9 @@ struct FlashcardView: View {
     }
 }
 
-struct DifficultyButton: View {
+// MARK: - Flashcard Difficulty Button
+
+struct FlashcardDifficultyButton: View {
     let title: String
     let icon: String
     let color: Color
@@ -279,18 +288,21 @@ struct DifficultyButton: View {
     var body: some View {
         Button(action: action) {
             VStack(spacing: 8) {
-                Image(systemName: icon)
+                Text(icon)
                     .font(.title2)
-                
                 Text(title)
-                    .font(.subheadline)
+                    .font(.caption)
                     .fontWeight(.semibold)
             }
             .frame(maxWidth: .infinity)
-            .padding()
-            .background(color.opacity(0.2))
+            .padding(.vertical, 12)
+            .background(color.opacity(0.1))
             .foregroundColor(color)
             .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(color.opacity(0.3), lineWidth: 1)
+            )
         }
     }
 }

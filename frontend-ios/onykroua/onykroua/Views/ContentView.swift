@@ -64,7 +64,7 @@ struct ContentView: View {
                                 CategoryCard(icon: "text.book.closed.fill", title: "Vocabulaire", color: .green)
                             }
                             
-                            NavigationLink(destination: EmojiView()) {
+                            NavigationLink(destination: EmojiView_Enhanced()) {
                                 CategoryCard(icon: "face.smiling.fill", title: "Emoji", color: .orange)
                             }
                             

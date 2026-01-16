@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - Exercise Types
 
-enum ExerciseType: String, Codable, CaseIterable {
+public enum ExerciseType: String, Codable, CaseIterable {
     case flashcard = "Flashcards"
     case fillInTheBlank = "Texte à trous"
     case matching = "Associations"
@@ -11,18 +11,18 @@ enum ExerciseType: String, Codable, CaseIterable {
     case pronunciation = "Prononciation"
     case dictation = "Dictée"
     
-    var icon: String {
+    public var icon: String {
         switch self {
         case .flashcard: return "rectangle.stack.fill"
         case .fillInTheBlank: return "doc.text.fill"
         case .matching: return "link"
-        case .listening: return "ear.fill"
-        case .pronunciation: return "waveform"
+        case .listening: return "ear"
+        case .pronunciation: return "mic"
         case .dictation: return "pencil.and.outline"
         }
     }
     
-    var color: Color {
+    public var color: Color {
         switch self {
         case .flashcard: return .blue
         case .fillInTheBlank: return .green
@@ -33,10 +33,10 @@ enum ExerciseType: String, Codable, CaseIterable {
         }
     }
     
-    var description: String {
+    public var description: String {
         switch self {
-        case .flashcard: return "Mémorise le vocabulaire avec des cartes"
-        case .fillInTheBlank: return "Complete les phrases avec les mots corrects"
+        case .flashcard: return "Révise ton vocabulaire avec des cartes"
+        case .fillInTheBlank: return "Complète les phrases avec le bon mot"
         case .matching: return "Associe les mots à leur traduction"
         case .listening: return "Écoute et comprends les phrases"
         case .pronunciation: return "Pratique ta prononciation"
@@ -47,18 +47,18 @@ enum ExerciseType: String, Codable, CaseIterable {
 
 // MARK: - Flashcard Models
 
-struct Flashcard: Identifiable, Codable {
-    let id: UUID
-    let front: String
-    let back: String
-    let imageURL: String?
-    let audioURL: String?
-    let example: String?
-    let category: String?
+public struct Flashcard: Identifiable, Codable {
+    public let id: UUID
+    public let front: String
+    public let back: String
+    public let imageURL: String?
+    public let audioURL: String?
+    public let example: String?
+    public let category: String?
     
-    init(id: UUID = UUID(), front: String, back: String, 
-         imageURL: String? = nil, audioURL: String? = nil,
-         example: String? = nil, category: String? = nil) {
+    public init(id: UUID = UUID(), front: String, back: String, 
+                imageURL: String? = nil, audioURL: String? = nil,
+                example: String? = nil, category: String? = nil) {
         self.id = id
         self.front = front
         self.back = back
@@ -69,22 +69,20 @@ struct Flashcard: Identifiable, Codable {
     }
 }
 
-struct FlashcardDeck: Identifiable, Codable {
-    let id: UUID
-    let title: String
-    let description: String
-    let icon: String
-    let cards: [Flashcard]
-    let category: String?
-    let difficulty: QuizDifficulty
+public struct FlashcardDeck: Identifiable, Codable {
+    public let id: UUID
+    public let title: String
+    public let description: String
+    public let cards: [Flashcard]
+    public let category: String?
+    public let difficulty: QuizDifficulty
     
-    init(id: UUID = UUID(), title: String, description: String, 
-         icon: String, cards: [Flashcard], category: String? = nil,
-         difficulty: QuizDifficulty = .beginner) {
+    public init(id: UUID = UUID(), title: String, description: String, 
+                cards: [Flashcard], category: String? = nil,
+                difficulty: QuizDifficulty = .beginner) {
         self.id = id
         self.title = title
         self.description = description
-        self.icon = icon
         self.cards = cards
         self.category = category
         self.difficulty = difficulty
@@ -93,14 +91,26 @@ struct FlashcardDeck: Identifiable, Codable {
 
 // MARK: - Fill in the Blank Exercise
 
-struct FillInTheBlankExercise: Identifiable, Codable {
-    let id: UUID
-    let sentence: String
-    let missingWord: String
-    let missingWordIndex: Int
-    let options: [String]
-    let translation: String?
-    let difficulty: QuizDifficulty
+public struct FillInTheBlankExercise: Identifiable, Codable {
+    public let id: UUID
+    public let sentence: String
+    public let missingWord: String
+    public let missingWordIndex: Int
+    public let options: [String]
+    public let translation: String?
+    public let difficulty: QuizDifficulty
+    
+    public init(id: UUID = UUID(), sentence: String, missingWord: String,
+                missingWordIndex: Int, options: [String], translation: String? = nil,
+                difficulty: QuizDifficulty = .beginner) {
+        self.id = id
+        self.sentence = sentence
+        self.missingWord = missingWord
+        self.missingWordIndex = missingWordIndex
+        self.options = options
+        self.translation = translation
+        self.difficulty = difficulty
+    }
     
     var sentenceWithBlank: String {
         let words = sentence.components(separatedBy: " ")
@@ -110,29 +120,17 @@ struct FillInTheBlankExercise: Identifiable, Codable {
         }
         return result.joined(separator: " ")
     }
-    
-    init(id: UUID = UUID(), sentence: String, missingWord: String,
-         missingWordIndex: Int, options: [String], translation: String? = nil,
-         difficulty: QuizDifficulty = .beginner) {
-        self.id = id
-        self.sentence = sentence
-        self.missingWord = missingWord
-        self.missingWordIndex = missingWordIndex
-        self.options = options
-        self.translation = translation
-        self.difficulty = difficulty
-    }
 }
 
 // MARK: - Matching Exercise
 
-struct MatchingPair: Identifiable, Codable {
-    let id: UUID
-    let left: String
-    let right: String
-    let category: String?
+public struct MatchingPair: Identifiable, Codable {
+    public let id: UUID
+    public let left: String
+    public let right: String
+    public let category: String?
     
-    init(id: UUID = UUID(), left: String, right: String, category: String? = nil) {
+    public init(id: UUID = UUID(), left: String, right: String, category: String? = nil) {
         self.id = id
         self.left = left
         self.right = right
@@ -140,14 +138,14 @@ struct MatchingPair: Identifiable, Codable {
     }
 }
 
-struct MatchingExercise: Identifiable, Codable {
-    let id: UUID
-    let title: String
-    let pairs: [MatchingPair]
-    let difficulty: QuizDifficulty
+public struct MatchingExercise: Identifiable, Codable {
+    public let id: UUID
+    public let title: String
+    public let pairs: [MatchingPair]
+    public let difficulty: QuizDifficulty
     
-    init(id: UUID = UUID(), title: String, pairs: [MatchingPair],
-         difficulty: QuizDifficulty = .beginner) {
+    public init(id: UUID = UUID(), title: String, pairs: [MatchingPair],
+                difficulty: QuizDifficulty = .beginner) {
         self.id = id
         self.title = title
         self.pairs = pairs
@@ -157,36 +155,48 @@ struct MatchingExercise: Identifiable, Codable {
 
 // MARK: - Exercise Session
 
-struct ExerciseSession: Identifiable, Codable {
-    let id: UUID
-    let type: ExerciseType
-    var currentIndex: Int
-    var correctCount: Int
-    var incorrectCount: Int
-    var startDate: Date
-    var endDate: Date?
+public struct ExerciseSession: Identifiable, Codable {
+    public let id: UUID
+    public let type: ExerciseType
+    public let startTime: Date
+    public var endTime: Date?
+    public var score: Double
+    public var completedItems: Int
+    public var totalItems: Int
+    public var correctCount: Int
+    public var incorrectCount: Int
     
-    var totalAttempts: Int {
-        correctCount + incorrectCount
+    public init(id: UUID = UUID(), type: ExerciseType, startTime: Date = Date(), endTime: Date? = nil, score: Double = 0, completedItems: Int = 0, totalItems: Int) {
+        self.id = id
+        self.type = type
+        self.startTime = startTime
+        self.endTime = endTime
+        self.score = score
+        self.completedItems = completedItems
+        self.totalItems = totalItems
+        self.correctCount = 0
+        self.incorrectCount = 0
+    }
+    
+    public init(id: UUID = UUID(), type: ExerciseType) {
+        self.id = id
+        self.type = type
+        self.startTime = Date()
+        self.endTime = nil
+        self.score = 0
+        self.completedItems = 0
+        self.totalItems = 0
+        self.correctCount = 0
+        self.incorrectCount = 0
     }
     
     var successRate: Double {
-        guard totalAttempts > 0 else { return 0 }
-        return Double(correctCount) / Double(totalAttempts) * 100
+        guard totalItems > 0 else { return 0 }
+        return Double(completedItems) / Double(totalItems) * 100
     }
     
     var xpEarned: Int {
         return correctCount * 5
-    }
-    
-    init(id: UUID = UUID(), type: ExerciseType) {
-        self.id = id
-        self.type = type
-        self.currentIndex = 0
-        self.correctCount = 0
-        self.incorrectCount = 0
-        self.startDate = Date()
-        self.endDate = nil
     }
     
     mutating func recordAnswer(isCorrect: Bool) {
@@ -195,24 +205,28 @@ struct ExerciseSession: Identifiable, Codable {
         } else {
             incorrectCount += 1
         }
+        completedItems += 1
     }
     
     mutating func complete() {
-        endDate = Date()
+        endTime = Date()
+        totalItems = correctCount + incorrectCount
     }
 }
 
-// MARK: - Exercise Data Manager
-
-class ExerciseDataManager: ObservableObject {
-    static let shared = ExerciseDataManager()
+public class ExerciseDataManager: ObservableObject {
+    public static let shared = ExerciseDataManager()
     
     private init() {}
     
     // MARK: - Flashcard Generation
     
-    func generateFlashcardDeck(from words: [VocabWord], title: String, difficulty: QuizDifficulty) -> FlashcardDeck {
-        let cards = words.map { word in
+    public func generateVocabularyFlashcards(language: String, category: String? = nil, limit: Int = 20) -> FlashcardDeck {
+        let words = VocabularyDataManager.shared.getAllWords(language: language)
+        let filteredWords = category != nil ? words.filter { $0.category == category } : words
+        let selectedWords = Array(filteredWords.shuffled().prefix(limit))
+        
+        let cards = selectedWords.map { word in
             Flashcard(
                 front: word.word,
                 back: word.translation,
@@ -222,31 +236,14 @@ class ExerciseDataManager: ObservableObject {
         }
         
         return FlashcardDeck(
-            title: title,
-            description: "\(cards.count) cartes de vocabulaire",
-            icon: "📚",
-            cards: cards,
-            difficulty: difficulty
-        )
-    }
-    
-    func generateVocabularyFlashcards(language: String, category: String? = nil, limit: Int = 20) -> FlashcardDeck {
-        var words = VocabularyDataManager.shared.getAllWords(language: language)
-        
-        if let category = category {
-            words = words.filter { $0.category == category }
-        }
-        
-        let selectedWords = Array(words.shuffled().prefix(limit))
-        
-        return generateFlashcardDeck(
-            from: selectedWords,
             title: category ?? "Vocabulaire général",
+            description: "\(cards.count) cartes de vocabulaire",
+            cards: cards,
             difficulty: .beginner
         )
     }
     
-    func generateConjugationFlashcards(language: String, limit: Int = 15) -> FlashcardDeck {
+    public func generateConjugationFlashcards(language: String, limit: Int = 15) -> FlashcardDeck {
         let verbs = language == "it" ? VerbData.getItalianVerbs() : VerbData.getSpanishVerbs()
         let selectedVerbs = Array(verbs.shuffled().prefix(limit))
         let tenses = ["Présent", "Passé composé", "Futur"]
@@ -261,7 +258,7 @@ class ExerciseDataManager: ObservableObject {
             }
             
             return Flashcard(
-                front: "\(verb.infinitive) - \(tense) - \(pronoun)",
+                front: "\(verb.verb) - \(tense) - \(pronoun)",
                 back: form,
                 example: "\(pronoun) \(form)",
                 category: "Conjugaison"
@@ -271,7 +268,6 @@ class ExerciseDataManager: ObservableObject {
         return FlashcardDeck(
             title: "Conjugaison",
             description: "\(cards.count) verbes à conjuguer",
-            icon: "✏️",
             cards: cards,
             difficulty: .intermediate
         )
@@ -279,7 +275,7 @@ class ExerciseDataManager: ObservableObject {
     
     // MARK: - Fill in the Blank Generation
     
-    func generateFillInTheBlankExercises(language: String, count: Int = 10) -> [FillInTheBlankExercise] {
+    public func generateFillInTheBlankExercises(language: String, count: Int = 10) -> [FillInTheBlankExercise] {
         let scenarios = ConversationData.getScenarios(for: language)
         let messages = scenarios.flatMap { $0.messages }
         let shuffled = messages.shuffled().prefix(count)
@@ -314,7 +310,7 @@ class ExerciseDataManager: ObservableObject {
     
     // MARK: - Matching Exercise Generation
     
-    func generateMatchingExercise(language: String, count: Int = 8) -> MatchingExercise {
+    public func generateMatchingExercise(language: String, count: Int = 8) -> MatchingExercise {
         let words = VocabularyDataManager.shared.getAllWords(language: language)
         let selectedWords = Array(words.shuffled().prefix(count))
         
@@ -333,7 +329,7 @@ class ExerciseDataManager: ObservableObject {
         )
     }
     
-    func generateConjugationMatching(language: String, count: Int = 6) -> MatchingExercise {
+    public func generateConjugationMatching(language: String, count: Int = 6) -> MatchingExercise {
         let verbs = language == "it" ? VerbData.getItalianVerbs() : VerbData.getSpanishVerbs()
         let selectedVerbs = Array(verbs.shuffled().prefix(count))
         let tense = "Présent"
@@ -346,7 +342,7 @@ class ExerciseDataManager: ObservableObject {
             }
             
             return MatchingPair(
-                left: verb.infinitive,
+                left: verb.verb,
                 right: form,
                 category: "Conjugaison"
             )
@@ -361,7 +357,7 @@ class ExerciseDataManager: ObservableObject {
     
     // MARK: - Daily Practice Generation
     
-    func generateDailyPractice(language: String) -> [Any] {
+    public func generateDailyPractice(language: String) -> [Any] {
         var exercises: [Any] = []
         
         // 1 deck de flashcards vocabulaire

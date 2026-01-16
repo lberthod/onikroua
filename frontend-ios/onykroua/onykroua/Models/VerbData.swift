@@ -6,7 +6,7 @@ public class VerbData {
     }
     
     // MARK: - Italian Verbs (21 verbs)
-    private static func getItalianVerbs() -> [Verb] {
+    public static func getItalianVerbs() -> [Verb] {
         return [
             // Auxiliaires
             Verb(
@@ -938,7 +938,7 @@ public class VerbData {
     }
     
     // MARK: - Spanish Verbs (24 verbs)
-    private static func getSpanishVerbs() -> [Verb] {
+    public static func getSpanishVerbs() -> [Verb] {
         return [
             // Auxiliaires / Verbes clés
             Verb(

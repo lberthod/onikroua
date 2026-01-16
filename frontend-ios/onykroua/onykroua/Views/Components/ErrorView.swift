@@ -1,11 +1,17 @@
 import SwiftUI
 
-struct ErrorView: View {
-    let error: AppError
-    let onRetry: (() -> Void)?
-    let onDismiss: () -> Void
+public struct ErrorView: View {
+    public let error: AppError
+    public let onRetry: (() -> Void)?
+    public let onDismiss: () -> Void
     
-    var body: some View {
+    public init(error: AppError, onRetry: (() -> Void)? = nil, onDismiss: @escaping () -> Void) {
+        self.error = error
+        self.onRetry = onRetry
+        self.onDismiss = onDismiss
+    }
+    
+    public var body: some View {
         VStack(spacing: 20) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 60))
@@ -94,10 +100,16 @@ struct ErrorBanner: View {
     }
 }
 
-struct ErrorOverlay: View {
-    @ObservedObject var errorManager: ErrorManager
+// MARK: - Error Overlay
+
+public struct ErrorOverlay: View {
+    @ObservedObject public var errorManager: ErrorManager
     
-    var body: some View {
+    public init(errorManager: ErrorManager) {
+        self.errorManager = errorManager
+    }
+    
+    public var body: some View {
         if errorManager.showError, let error = errorManager.currentError {
             ZStack {
                 Color.black.opacity(0.4)

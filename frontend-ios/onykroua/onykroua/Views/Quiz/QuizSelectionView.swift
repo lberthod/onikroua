@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct QuizSelectionView: View {
+public struct QuizSelectionView: View {
     @State private var selectedType: QuizType = .vocabulary
     @State private var selectedDifficulty: QuizDifficulty = .beginner
     @State private var showQuizView = false
@@ -8,7 +8,11 @@ struct QuizSelectionView: View {
     
     let language: String
     
-    var body: some View {
+    public init(language: String) {
+        self.language = language
+    }
+    
+    public var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
@@ -128,9 +132,9 @@ struct QuizSelectionView: View {
             }
             
             HStack(spacing: 12) {
-                StatCard(icon: "star.fill", value: "0", label: "Quiz complétés", color: .yellow)
-                StatCard(icon: "percent", value: "0%", label: "Taux de réussite", color: .green)
-                StatCard(icon: "flame.fill", value: "0", label: "Série", color: .orange)
+                StatItem(icon: "star.fill", value: "0", label: "Quiz complétés", color: .yellow)
+                StatItem(icon: "percent", value: "0%", label: "Taux de réussite", color: .green)
+                StatItem(icon: "flame.fill", value: "0", label: "Série", color: .orange)
             }
         }
         .padding()
@@ -156,6 +160,8 @@ struct QuizSelectionView: View {
             questions = QuizDataManager.shared.generateConversationQuiz(difficulty: selectedDifficulty, language: language)
         case .listening:
             questions = QuizDataManager.shared.generateMixedQuiz(difficulty: selectedDifficulty, language: language)
+        case .mixed:
+            questions = QuizDataManager.shared.generateMixedQuiz(difficulty: selectedDifficulty, language: language)
         }
         
         currentSession = QuizSession(type: selectedType, difficulty: selectedDifficulty, questions: questions)
@@ -163,12 +169,18 @@ struct QuizSelectionView: View {
     }
 }
 
-struct QuizTypeCard: View {
-    let type: QuizType
-    let isSelected: Bool
-    let action: () -> Void
+public struct QuizTypeCard: View {
+    public let type: QuizType
+    public let isSelected: Bool
+    public let action: () -> Void
     
-    var body: some View {
+    public init(type: QuizType, isSelected: Bool, action: @escaping () -> Void) {
+        self.type = type
+        self.isSelected = isSelected
+        self.action = action
+    }
+    
+    public var body: some View {
         Button(action: action) {
             VStack(spacing: 12) {
                 Text(type.icon)
@@ -194,12 +206,18 @@ struct QuizTypeCard: View {
     }
 }
 
-struct DifficultyCard: View {
-    let difficulty: QuizDifficulty
-    let isSelected: Bool
-    let action: () -> Void
+public struct DifficultyCard: View {
+    public let difficulty: QuizDifficulty
+    public let isSelected: Bool
+    public let action: () -> Void
     
-    var body: some View {
+    public init(difficulty: QuizDifficulty, isSelected: Bool, action: @escaping () -> Void) {
+        self.difficulty = difficulty
+        self.isSelected = isSelected
+        self.action = action
+    }
+    
+    public var body: some View {
         Button(action: action) {
             VStack(spacing: 8) {
                 Text(difficulty.icon)
@@ -221,33 +239,5 @@ struct DifficultyCard: View {
             )
         }
         .buttonStyle(.plain)
-    }
-}
-
-struct StatCard: View {
-    let icon: String
-    let value: String
-    let label: String
-    let color: Color
-    
-    var body: some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundColor(color)
-            
-            Text(value)
-                .font(.title3)
-                .fontWeight(.bold)
-            
-            Text(label)
-                .font(.caption2)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
     }
 }
