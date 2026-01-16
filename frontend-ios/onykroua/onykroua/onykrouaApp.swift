@@ -49,7 +49,9 @@ struct onykrouaApp: App {
             
             Task { @MainActor in
                 CloudSyncEngine.shared.configure(with: container)
-                print("✅ CloudSyncEngine configured with ModelContainer")
+                LearnedWordsManager.shared.configure(with: container)
+                GamificationSyncManager.shared.configure(with: container)
+                print("✅ CloudSyncEngine, LearnedWordsManager & GamificationSyncManager configured with ModelContainer")
             }
             
             return container

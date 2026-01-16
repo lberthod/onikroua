@@ -203,17 +203,15 @@ final class CachedSession {
         self.lastSyncAt = Date().toMilliseconds()
     }
     
-    func toDTO() -> SessionDTO {
-        return SessionDTO(
-            sessionId: sessionId,
-            startedAt: startedAt,
-            endedAt: endedAt,
-            itemsCount: itemsCount,
-            correctCount: correctCount,
-            xpGained: xpGained,
-            activityType: activityType,
-            updatedAt: updatedAt
-        )
+    func updateFrom(dto: SessionDTO) {
+        self.startedAt = dto.startedAt
+        self.endedAt = dto.endedAt
+        self.itemsCount = dto.itemsCount
+        self.correctCount = dto.correctCount
+        self.xpGained = dto.xpGained
+        self.activityType = dto.activityType
+        self.updatedAt = dto.updatedAt
+        self.lastSyncAt = Date().toMilliseconds()
     }
 }
 
@@ -229,11 +227,11 @@ final class SyncOutboxItem {
     var createdAt: Int64
     var lastAttemptAt: Int64?
     
-    init(userId: String, path: String, payload: [String: Any]) {
+    init(userId: String, path: String, payload: [String: Any], updatedAt: Int64? = nil) {
         self.id = UUID().uuidString
         self.userId = userId
         self.path = path
-        self.updatedAt = Date().toMilliseconds()
+        self.updatedAt = updatedAt ?? Date().toMilliseconds()
         self.attempts = 0
         self.createdAt = Date().toMilliseconds()
         

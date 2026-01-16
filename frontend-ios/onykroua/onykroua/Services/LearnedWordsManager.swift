@@ -1,15 +1,21 @@
-    import Foundation
+import Foundation
 import SwiftUI
+import SwiftData
 
 @MainActor
 class LearnedWordsManager: ObservableObject {
     static let shared = LearnedWordsManager()
     
+    private var vocabRepo: VocabRepository?
+    
     @Published var learnedWordIds: Set<String> = []
-    @Published var learnedWordsData: [String: [String: Any]] = [:]
     @Published var isLoading = false
     
-    private init() {
+    private init() {}
+    
+    /// Configure the manager with a ModelContainer
+    func configure(with container: ModelContainer) {
+        self.vocabRepo = VocabRepository(container: container)
         Task {
             await fetchLearnedWords()
         }
@@ -18,44 +24,26 @@ class LearnedWordsManager: ObservableObject {
     // MARK: - Fetch Learned Words
     
     func fetchLearnedWords() async {
+        guard let repo = vocabRepo else { return }
         isLoading = true
         defer { isLoading = false }
         
-        do {
-            let data = try await FirebaseSyncService.shared.fetchVocabularyStatus()
-            
-            learnedWordsData = data
-            learnedWordIds = Set(data.keys.filter { wordId in
-                if let wordData = data[wordId],
-                   let status = wordData["status"] as? String {
-                    return status == "learned"
-                }
-                return false
-            })
-            
-            print("✅ LearnedWordsManager: Fetched \(learnedWordIds.count) learned words")
-        } catch {
-            print("❌ LearnedWordsManager: Error fetching learned words - \(error)")
-        }
+        let words = repo.getWordsByStatus("known")
+        learnedWordIds = Set(words.map { $0.wordId })
+        print("✅ LearnedWordsManager: Loaded \(learnedWordIds.count) learned words from cache")
     }
     
     // MARK: - Mark Word as Learned
     
     func markWordAsLearned(wordId: String, word: String, translation: String) async {
+        guard let repo = vocabRepo else { return }
+        
         // Optimistic update
         learnedWordIds.insert(wordId)
         
         do {
-            try await FirebaseSyncService.shared.syncVocabularyWord(
-                wordId: wordId,
-                status: "learned",
-                reviewCount: 1,
-                lastReviewDate: Date()
-            )
+            try await repo.markWordAsKnown(wordId: wordId)
             print("✅ LearnedWordsManager: Marked '\(word)' as learned")
-            
-            // Refresh to get latest data
-            await fetchLearnedWords()
         } catch {
             // Rollback on error
             learnedWordIds.remove(wordId)
@@ -66,20 +54,14 @@ class LearnedWordsManager: ObservableObject {
     // MARK: - Unmark Word as Learned
     
     func unmarkWordAsLearned(wordId: String, word: String) async {
+        guard let repo = vocabRepo else { return }
+        
         // Optimistic update
         learnedWordIds.remove(wordId)
         
         do {
-            try await FirebaseSyncService.shared.syncVocabularyWord(
-                wordId: wordId,
-                status: "learning",
-                reviewCount: 0,
-                lastReviewDate: Date()
-            )
+            try await repo.markWordAsLearning(wordId: wordId)
             print("✅ LearnedWordsManager: Unmarked '\(word)' as learned")
-            
-            // Refresh to get latest data
-            await fetchLearnedWords()
         } catch {
             // Rollback on error
             learnedWordIds.insert(wordId)
@@ -105,12 +87,6 @@ class LearnedWordsManager: ObservableObject {
     // MARK: - Helper
     
     private func createWordId(word: String, translation: String) -> String {
-        return "\(word)_\(translation)"
-            .replacingOccurrences(of: ".", with: "_")
-            .replacingOccurrences(of: "$", with: "_")
-            .replacingOccurrences(of: "#", with: "_")
-            .replacingOccurrences(of: "[", with: "_")
-            .replacingOccurrences(of: "]", with: "_")
-            .replacingOccurrences(of: "/", with: "_")
+        return safeFirebaseKey("\(word)_\(translation)")
     }
 }

@@ -1,156 +1,93 @@
 import Foundation
 import SwiftData
+import FirebaseAuth
 
 @MainActor
 final class GamificationSyncManager: ObservableObject {
     static let shared = GamificationSyncManager()
     
-    private let syncService = FirebaseSyncService.shared
+    private var progressRepo: ProgressRepository?
+    private var achievementRepo: AchievementRepository?
+    private var vocabRepo: VocabRepository?
+    
     @Published var isSyncing = false
     @Published var lastSyncDate: Date?
-    @Published var syncError: Error?
+    @Published var syncError: String?
     
     private init() {}
     
-    // MARK: - Sync from Cloud
+    /// Configure the manager with a ModelContainer
+    func configure(with container: ModelContainer) {
+        self.progressRepo = ProgressRepository(container: container)
+        self.achievementRepo = AchievementRepository(container: container)
+        self.vocabRepo = VocabRepository(container: container)
+    }
     
-    func syncFromCloud(gamificationManager: GamificationManager) async {
+    // MARK: - Sync from Cloud (Legacy compatibility - now handled by CloudSyncEngine)
+    
+    func syncFromCloud() async {
         isSyncing = true
         defer { isSyncing = false }
         
-        do {
-            if let remoteProgress = try await syncService.fetchUserProgress() {
-                if let currentProgress = gamificationManager.currentProgress {
-                    if remoteProgress.totalXP > currentProgress.totalXP {
-                        mergeProgress(remote: remoteProgress, local: currentProgress)
-                        print("✅ Sync: Merged remote progress")
-                    }
-                }
-            }
-            
-            let remoteAchievements = try await syncService.fetchAchievements()
-            for (achievementId, unlockedAt) in remoteAchievements {
-                if let achievement = gamificationManager.achievements.first(where: { 
-                    String(describing: $0.type) == achievementId 
-                }), !achievement.isUnlocked {
-                    achievement.unlock()
-                    achievement.unlockedDate = unlockedAt
-                }
-            }
-            
-            lastSyncDate = Date()
-            print("✅ Sync: Sync from cloud completed")
-        } catch {
-            syncError = error
-            print("❌ Sync: Failed to sync from cloud - \(error.localizedDescription)")
-        }
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        await CloudSyncEngine.shared.bootstrap(userId: userId)
+        lastSyncDate = Date()
     }
     
-    // MARK: - Sync to Cloud
+    // MARK: - Sync to Cloud (Legacy compatibility - now handled by Repositories)
     
-    func syncToCloud(gamificationManager: GamificationManager) async {
-        guard let progress = gamificationManager.currentProgress else { return }
-        
-        isSyncing = true
-        defer { isSyncing = false }
-        
-        do {
-            try await syncService.syncUserProgress(progress)
-            
-            for achievement in gamificationManager.achievements where achievement.isUnlocked {
-                if let unlockedDate = achievement.unlockedDate {
-                    try await syncService.syncAchievement(
-                        achievement.type,
-                        unlockedAt: unlockedDate
-                    )
-                }
-            }
-            
-            lastSyncDate = Date()
-            print("✅ Sync: Sync to cloud completed")
-        } catch {
-            syncError = error
-            print("❌ Sync: Failed to sync to cloud - \(error.localizedDescription)")
-        }
-    }
-    
-    // MARK: - Full Sync
-    
-    func performFullSync(gamificationManager: GamificationManager) async {
-        await syncFromCloud(gamificationManager: gamificationManager)
-        await syncToCloud(gamificationManager: gamificationManager)
-    }
-    
-    // MARK: - Auto Sync on Action
-    
-    func autoSyncAfterAction(gamificationManager: GamificationManager) {
-        Task { @MainActor in
-            await syncToCloud(gamificationManager: gamificationManager)
-        }
-    }
-    
-    // MARK: - Merge Logic
-    
-    private func mergeProgress(remote: UserProgress, local: UserProgress) {
-        local.currentXP = max(local.currentXP, remote.currentXP)
-        local.totalXP = max(local.totalXP, remote.totalXP)
-        local.wordsLearned = max(local.wordsLearned, remote.wordsLearned)
-        local.verbsLearned = max(local.verbsLearned, remote.verbsLearned)
-        local.grammarRulesLearned = max(local.grammarRulesLearned, remote.grammarRulesLearned)
-        local.conversationsCompleted = max(local.conversationsCompleted, remote.conversationsCompleted)
-        local.quizzesCompleted = max(local.quizzesCompleted, remote.quizzesCompleted)
-        local.wordsReviewed = max(local.wordsReviewed, remote.wordsReviewed)
-        local.lessonsCompleted = max(local.lessonsCompleted, remote.lessonsCompleted)
-        local.longestStreak = max(local.longestStreak, remote.longestStreak)
-        
-        let remoteLevel = remote.level
-        if remoteLevel.xpRequired > local.level.xpRequired {
-            local.level = remoteLevel
-        }
+    func syncToCloud() async {
+        await CloudSyncEngine.shared.flushOutbox()
     }
     
     // MARK: - Activity Logging
     
-    func logStudySession(duration: Int, xpGained: Int, activityType: String) async {
+    func logStudySession(duration: Int, xpGained: Int, activityType: String, itemsCount: Int = 0, correctCount: Int = 0) async {
+        guard let repo = progressRepo else { return }
+        
         do {
-            try await syncService.logStudySession(
-                duration: duration,
+            try await repo.recordSessionCompleted(
                 xpGained: xpGained,
-                activityType: activityType
+                activityType: activityType,
+                itemsCount: itemsCount,
+                correctCount: correctCount,
+                durationSeconds: duration
             )
             print("✅ Sync: Study session logged")
         } catch {
             print("❌ Sync: Failed to log study session - \(error.localizedDescription)")
+            syncError = error.localizedDescription
         }
     }
     
     func logQuizResult(quizType: String, score: Int, totalQuestions: Int, difficulty: String) async {
+        guard let repo = progressRepo else { return }
+        
         do {
-            try await syncService.syncQuizResult(
-                quizType: quizType,
-                score: score,
-                totalQuestions: totalQuestions,
-                difficulty: difficulty
+            // Mapping quiz results to session records for now
+            try await repo.recordSessionCompleted(
+                xpGained: score * 5, // Example multiplier
+                activityType: "quiz_\(quizType)",
+                itemsCount: totalQuestions,
+                correctCount: score,
+                durationSeconds: 0 // Duration not always available here
             )
             print("✅ Sync: Quiz result logged")
         } catch {
             print("❌ Sync: Failed to log quiz result - \(error.localizedDescription)")
+            syncError = error.localizedDescription
         }
     }
     
-    func updateLeaderboard(username: String, gamificationManager: GamificationManager) async {
-        guard let progress = gamificationManager.currentProgress else { return }
+    func updateLeaderboard(username: String) async {
+        guard let repo = progressRepo else { return }
         
         do {
-            try await syncService.updateLeaderboard(
-                username: username,
-                totalXP: progress.totalXP,
-                level: progress.level.rawValue,
-                streak: progress.streak
-            )
+            try await repo.pushToLeaderboard(username: username)
             print("✅ Sync: Leaderboard updated")
         } catch {
             print("❌ Sync: Failed to update leaderboard - \(error.localizedDescription)")
+            syncError = error.localizedDescription
         }
     }
 }

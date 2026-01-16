@@ -15,8 +15,9 @@ class VocabRepository: ObservableObject {
     func getVocabWord(wordId: String) -> CachedVocabWord? {
         guard let userId = Auth.auth().currentUser?.uid else { return nil }
         
-        let context = ModelContext(modelContainer)
-        let id = "\(userId)_\(wordId)"
+        let safeWordId = safeFirebaseKey(wordId)
+        let context = modelContainer.mainContext
+        let id = "\(userId)_\(safeWordId)"
         let descriptor = FetchDescriptor<CachedVocabWord>(
             predicate: #Predicate { $0.id == id }
         )
@@ -27,7 +28,7 @@ class VocabRepository: ObservableObject {
     func getAllVocabWords() -> [CachedVocabWord] {
         guard let userId = Auth.auth().currentUser?.uid else { return [] }
         
-        let context = ModelContext(modelContainer)
+        let context = modelContainer.mainContext
         let descriptor = FetchDescriptor<CachedVocabWord>(
             predicate: #Predicate { $0.userId == userId },
             sortBy: [SortDescriptor(\CachedVocabWord.lastSeenAt, order: .reverse)]
@@ -39,7 +40,7 @@ class VocabRepository: ObservableObject {
     func getWordsByStatus(_ status: String) -> [CachedVocabWord] {
         guard let userId = Auth.auth().currentUser?.uid else { return [] }
         
-        let context = ModelContext(modelContainer)
+        let context = modelContainer.mainContext
         let descriptor = FetchDescriptor<CachedVocabWord>(
             predicate: #Predicate { $0.userId == userId && $0.status == status }
         )
@@ -53,7 +54,7 @@ class VocabRepository: ObservableObject {
         }
         
         let safeWordId = safeFirebaseKey(wordId)
-        let context = ModelContext(modelContainer)
+        let context = modelContainer.mainContext
         let id = "\(userId)_\(safeWordId)"
         let descriptor = FetchDescriptor<CachedVocabWord>(
             predicate: #Predicate { $0.id == id }
@@ -93,7 +94,7 @@ class VocabRepository: ObservableObject {
         }
         
         let safeWordId = safeFirebaseKey(wordId)
-        let context = ModelContext(modelContainer)
+        let context = modelContainer.mainContext
         let id = "\(userId)_\(safeWordId)"
         let descriptor = FetchDescriptor<CachedVocabWord>(
             predicate: #Predicate { $0.id == id }
@@ -133,7 +134,7 @@ class VocabRepository: ObservableObject {
         }
         
         let safeWordId = safeFirebaseKey(wordId)
-        let context = ModelContext(modelContainer)
+        let context = modelContainer.mainContext
         let id = "\(userId)_\(safeWordId)"
         let descriptor = FetchDescriptor<CachedVocabWord>(
             predicate: #Predicate { $0.id == id }
@@ -193,7 +194,7 @@ class VocabRepository: ObservableObject {
         let dto = cached.toDTO()
         let path = "users/\(userId)/vocab/\(dto.wordId)"
         
-        let context = ModelContext(modelContainer)
+        let context = modelContainer.mainContext
         try await enqueueWrite(userId: userId, path: path, payload: dto.toDictionary(), context: context)
     }
     
@@ -203,7 +204,13 @@ class VocabRepository: ObservableObject {
             print("✅ VocabRepository: Direct write succeeded - \(path)")
         } catch {
             print("⚠️ VocabRepository: Direct write failed, enqueueing - \(error)")
-            let outboxItem = SyncOutboxItem(userId: userId, path: path, payload: payload)
+            let updatedAt = payload["updatedAt"] as? Int64 ?? Date().toMilliseconds()
+            let outboxItem = SyncOutboxItem(
+                userId: userId,
+                path: path,
+                payload: payload,
+                updatedAt: updatedAt
+            )
             context.insert(outboxItem)
             try context.save()
         }

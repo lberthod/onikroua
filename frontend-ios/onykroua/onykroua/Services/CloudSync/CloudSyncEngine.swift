@@ -16,30 +16,58 @@ class CloudSyncEngine: ObservableObject {
     @Published var syncError: String?
     
     private var progressObserver: DatabaseHandle?
-    private var vocabObserver: DatabaseHandle?
-    private var achievementsObserver: DatabaseHandle?
-    private var sessionsObserver: DatabaseHandle?
     
-    private let syncQueue = DispatchQueue(label: "com.onykroua.sync", qos: .utility)
+    private var vocabAddedObserver: DatabaseHandle?
+    private var vocabChangedObserver: DatabaseHandle?
+    private var vocabRemovedObserver: DatabaseHandle?
     
+    private var achievementsAddedObserver: DatabaseHandle?
+    private var achievementsChangedObserver: DatabaseHandle?
+    private var achievementsRemovedObserver: DatabaseHandle?
+    
+    private var sessionsAddedObserver: DatabaseHandle?
+    private var sessionsChangedObserver: DatabaseHandle?
+    private var sessionsRemovedObserver: DatabaseHandle?
+    
+    private var userRef: DatabaseReference?
+    private var vocabRef: DatabaseReference?
+    private var achievementsRef: DatabaseReference?
+    private var sessionsRef: DatabaseReference?
+
     private init() {
         setupAuthListener()
     }
-    
+
     deinit {
         // Observers must be removed on MainActor, but deinit is nonisolated.
         // We use Task to hop to MainActor for cleanup.
+        let vRef = vocabRef
+        let aRef = achievementsRef
+        let sRef = sessionsRef
+        let uRef = userRef
+
         let progress = progressObserver
-        let vocab = vocabObserver
-        let achievements = achievementsObserver
-        let sessions = sessionsObserver
-        
+        let vocabAdded = vocabAddedObserver
+        let vocabChanged = vocabChangedObserver
+        let vocabRemoved = vocabRemovedObserver
+        let achievAdded = achievementsAddedObserver
+        let achievChanged = achievementsChangedObserver
+        let achievRemoved = achievementsRemovedObserver
+        let sessAdded = sessionsAddedObserver
+        let sessChanged = sessionsChangedObserver
+        let sessRemoved = sessionsRemovedObserver
+
         Task { @MainActor in
-            let database = Database.database().reference()
-            if let handle = progress { database.removeObserver(withHandle: handle) }
-            if let handle = vocab { database.removeObserver(withHandle: handle) }
-            if let handle = achievements { database.removeObserver(withHandle: handle) }
-            if let handle = sessions { database.removeObserver(withHandle: handle) }
+            if let handle = progress { uRef?.child("progress").removeObserver(withHandle: handle) }
+            if let handle = vocabAdded { vRef?.removeObserver(withHandle: handle) }
+            if let handle = vocabChanged { vRef?.removeObserver(withHandle: handle) }
+            if let handle = vocabRemoved { vRef?.removeObserver(withHandle: handle) }
+            if let handle = achievAdded { aRef?.removeObserver(withHandle: handle) }
+            if let handle = achievChanged { aRef?.removeObserver(withHandle: handle) }
+            if let handle = achievRemoved { aRef?.removeObserver(withHandle: handle) }
+            if let handle = sessAdded { sRef?.removeObserver(withHandle: handle) }
+            if let handle = sessChanged { sRef?.removeObserver(withHandle: handle) }
+            if let handle = sessRemoved { sRef?.removeObserver(withHandle: handle) }
         }
     }
     
@@ -84,16 +112,16 @@ class CloudSyncEngine: ObservableObject {
         
         print("🔄 CloudSync: Starting bootstrap for user \(userId)")
         
-        let context = ModelContext(container)
+        let context = container.mainContext
         
         do {
-            let cloudMeta = try await fetchUserMeta(userId: userId)
+            _ = try await fetchUserMeta(userId: userId)
             let cloudProgress = try await fetchUserProgress(userId: userId)
             
             if cloudProgress == nil {
                 print("📝 CloudSync: No cloud data found - initializing new user")
                 try await initializeNewUser(userId: userId, context: context)
-                try await bootstrap(userId: userId)
+                await bootstrap(userId: userId)
                 return
             }
             
@@ -102,12 +130,12 @@ class CloudSyncEngine: ObservableObject {
             }
             
             let vocabData = try await fetchAllVocab(userId: userId)
-            for (wordId, dto) in vocabData {
+            for (_, dto) in vocabData {
                 try await syncVocabToLocal(userId: userId, dto: dto, context: context)
             }
             
             let achievementsData = try await fetchAllAchievements(userId: userId)
-            for (achievementId, dto) in achievementsData {
+            for (_, dto) in achievementsData {
                 try await syncAchievementToLocal(userId: userId, dto: dto, context: context)
             }
             
@@ -166,53 +194,131 @@ class CloudSyncEngine: ObservableObject {
     private func setupRealtimeObservers(userId: String) {
         removeObservers()
         
-        let userRef = database.child("users").child(userId)
+        userRef = database.child("users").child(userId)
+        guard let userRef = userRef else { return }
         
+        // Progress: .value observer (entire progress object)
         progressObserver = userRef.child("progress").observe(.value) { [weak self] snapshot in
             Task { @MainActor in
                 await self?.handleProgressUpdate(userId: userId, snapshot: snapshot)
             }
         }
         
-        vocabObserver = userRef.child("vocab").observe(.childChanged) { [weak self] snapshot in
-            Task { @MainActor in
-                await self?.handleVocabUpdate(userId: userId, snapshot: snapshot)
+        // Vocab: .childAdded, .childChanged, .childRemoved
+        vocabRef = userRef.child("vocab")
+        if let vocabRef = vocabRef {
+            vocabAddedObserver = vocabRef.observe(.childAdded) { [weak self] snapshot in
+                Task { @MainActor in
+                    await self?.handleVocabAdded(userId: userId, snapshot: snapshot)
+                }
+            }
+            vocabChangedObserver = vocabRef.observe(.childChanged) { [weak self] snapshot in
+                Task { @MainActor in
+                    await self?.handleVocabChanged(userId: userId, snapshot: snapshot)
+                }
+            }
+            vocabRemovedObserver = vocabRef.observe(.childRemoved) { [weak self] snapshot in
+                Task { @MainActor in
+                    await self?.handleVocabRemoved(userId: userId, snapshot: snapshot)
+                }
             }
         }
         
-        achievementsObserver = userRef.child("achievements").observe(.childChanged) { [weak self] snapshot in
-            Task { @MainActor in
-                await self?.handleAchievementUpdate(userId: userId, snapshot: snapshot)
+        // Achievements: .childAdded, .childChanged, .childRemoved
+        achievementsRef = userRef.child("achievements")
+        if let achievementsRef = achievementsRef {
+            achievementsAddedObserver = achievementsRef.observe(.childAdded) { [weak self] snapshot in
+                Task { @MainActor in
+                    await self?.handleAchievementAdded(userId: userId, snapshot: snapshot)
+                }
+            }
+            achievementsChangedObserver = achievementsRef.observe(.childChanged) { [weak self] snapshot in
+                Task { @MainActor in
+                    await self?.handleAchievementChanged(userId: userId, snapshot: snapshot)
+                }
+            }
+            achievementsRemovedObserver = achievementsRef.observe(.childRemoved) { [weak self] snapshot in
+                Task { @MainActor in
+                    await self?.handleAchievementRemoved(userId: userId, snapshot: snapshot)
+                }
             }
         }
         
-        sessionsObserver = userRef.child("sessions").observe(.childAdded) { [weak self] snapshot in
-            Task { @MainActor in
-                await self?.handleSessionAdded(userId: userId, snapshot: snapshot)
+        // Sessions: .childAdded, .childChanged, .childRemoved
+        sessionsRef = userRef.child("sessions")
+        if let sessionsRef = sessionsRef {
+            sessionsAddedObserver = sessionsRef.observe(.childAdded) { [weak self] snapshot in
+                Task { @MainActor in
+                    await self?.handleSessionAdded(userId: userId, snapshot: snapshot)
+                }
+            }
+            sessionsChangedObserver = sessionsRef.observe(.childChanged) { [weak self] snapshot in
+                Task { @MainActor in
+                    await self?.handleSessionChanged(userId: userId, snapshot: snapshot)
+                }
+            }
+            sessionsRemovedObserver = sessionsRef.observe(.childRemoved) { [weak self] snapshot in
+                Task { @MainActor in
+                    await self?.handleSessionRemoved(userId: userId, snapshot: snapshot)
+                }
             }
         }
         
-        print("✅ CloudSync: Realtime observers setup for user \(userId)")
+        print("✅ CloudSync: Realtime observers setup for user \(userId) (all event types)")
     }
     
     private func removeObservers() {
         if let handle = progressObserver {
-            database.removeObserver(withHandle: handle)
+            userRef?.child("progress").removeObserver(withHandle: handle)
         }
-        if let handle = vocabObserver {
-            database.removeObserver(withHandle: handle)
+        
+        if let handle = vocabAddedObserver {
+            vocabRef?.removeObserver(withHandle: handle)
         }
-        if let handle = achievementsObserver {
-            database.removeObserver(withHandle: handle)
+        if let handle = vocabChangedObserver {
+            vocabRef?.removeObserver(withHandle: handle)
         }
-        if let handle = sessionsObserver {
-            database.removeObserver(withHandle: handle)
+        if let handle = vocabRemovedObserver {
+            vocabRef?.removeObserver(withHandle: handle)
+        }
+        
+        if let handle = achievementsAddedObserver {
+            achievementsRef?.removeObserver(withHandle: handle)
+        }
+        if let handle = achievementsChangedObserver {
+            achievementsRef?.removeObserver(withHandle: handle)
+        }
+        if let handle = achievementsRemovedObserver {
+            achievementsRef?.removeObserver(withHandle: handle)
+        }
+        
+        if let handle = sessionsAddedObserver {
+            sessionsRef?.removeObserver(withHandle: handle)
+        }
+        if let handle = sessionsChangedObserver {
+            sessionsRef?.removeObserver(withHandle: handle)
+        }
+        if let handle = sessionsRemovedObserver {
+            sessionsRef?.removeObserver(withHandle: handle)
         }
         
         progressObserver = nil
-        vocabObserver = nil
-        achievementsObserver = nil
-        sessionsObserver = nil
+        vocabAddedObserver = nil
+        vocabChangedObserver = nil
+        vocabRemovedObserver = nil
+        achievementsAddedObserver = nil
+        achievementsChangedObserver = nil
+        achievementsRemovedObserver = nil
+        sessionsAddedObserver = nil
+        sessionsChangedObserver = nil
+        sessionsRemovedObserver = nil
+        
+        userRef = nil
+        vocabRef = nil
+        achievementsRef = nil
+        sessionsRef = nil
+        
+        print("🧹 CloudSync: All observers removed")
     }
     
     private func handleProgressUpdate(userId: String, snapshot: DataSnapshot) async {
@@ -222,7 +328,7 @@ class CloudSyncEngine: ObservableObject {
             return
         }
         
-        let context = ModelContext(container)
+        let context = container.mainContext
         do {
             try await syncProgressToLocal(userId: userId, dto: dto, context: context)
             try context.save()
@@ -232,39 +338,121 @@ class CloudSyncEngine: ObservableObject {
         }
     }
     
-    private func handleVocabUpdate(userId: String, snapshot: DataSnapshot) async {
+    // MARK: - Vocab Handlers
+    
+    private func handleVocabAdded(userId: String, snapshot: DataSnapshot) async {
         guard snapshot.exists(), let dict = snapshot.value as? [String: Any],
               let dto = VocabWordDTO.fromDictionary(wordId: snapshot.key, dict),
               let container = modelContainer else {
             return
         }
         
-        let context = ModelContext(container)
+        let context = container.mainContext
         do {
             try await syncVocabToLocal(userId: userId, dto: dto, context: context)
             try context.save()
-            print("📥 CloudSync: Vocab word '\(snapshot.key)' updated from cloud")
+            print("📥 CloudSync: Vocab word '\(snapshot.key)' added from cloud")
         } catch {
-            print("❌ CloudSync: Failed to sync vocab - \(error)")
+            print("❌ CloudSync: Failed to sync vocab add - \(error)")
         }
     }
     
-    private func handleAchievementUpdate(userId: String, snapshot: DataSnapshot) async {
+    private func handleVocabChanged(userId: String, snapshot: DataSnapshot) async {
+        guard snapshot.exists(), let dict = snapshot.value as? [String: Any],
+              let dto = VocabWordDTO.fromDictionary(wordId: snapshot.key, dict),
+              let container = modelContainer else {
+            return
+        }
+        
+        let context = container.mainContext
+        do {
+            try await syncVocabToLocal(userId: userId, dto: dto, context: context)
+            try context.save()
+            print("📥 CloudSync: Vocab word '\(snapshot.key)' changed from cloud")
+        } catch {
+            print("❌ CloudSync: Failed to sync vocab change - \(error)")
+        }
+    }
+    
+    private func handleVocabRemoved(userId: String, snapshot: DataSnapshot) async {
+        guard let container = modelContainer else { return }
+        
+        let wordId = snapshot.key
+        let id = "\(userId)_\(wordId)"
+        let context = container.mainContext
+        
+        do {
+            let descriptor = FetchDescriptor<CachedVocabWord>(
+                predicate: #Predicate { $0.id == id }
+            )
+            if let cached = try context.fetch(descriptor).first {
+                context.delete(cached)
+                try context.save()
+                print("🗑️ CloudSync: Vocab word '\(wordId)' removed from local cache")
+            }
+        } catch {
+            print("❌ CloudSync: Failed to remove vocab - \(error)")
+        }
+    }
+    
+    // MARK: - Achievement Handlers
+    
+    private func handleAchievementAdded(userId: String, snapshot: DataSnapshot) async {
         guard snapshot.exists(), let dict = snapshot.value as? [String: Any],
               let dto = AchievementDTO.fromDictionary(achievementId: snapshot.key, dict),
               let container = modelContainer else {
             return
         }
         
-        let context = ModelContext(container)
+        let context = container.mainContext
         do {
             try await syncAchievementToLocal(userId: userId, dto: dto, context: context)
             try context.save()
-            print("📥 CloudSync: Achievement '\(snapshot.key)' updated from cloud")
+            print("📥 CloudSync: Achievement '\(snapshot.key)' added from cloud")
         } catch {
-            print("❌ CloudSync: Failed to sync achievement - \(error)")
+            print("❌ CloudSync: Failed to sync achievement add - \(error)")
         }
     }
+    
+    private func handleAchievementChanged(userId: String, snapshot: DataSnapshot) async {
+        guard snapshot.exists(), let dict = snapshot.value as? [String: Any],
+              let dto = AchievementDTO.fromDictionary(achievementId: snapshot.key, dict),
+              let container = modelContainer else {
+            return
+        }
+        
+        let context = container.mainContext
+        do {
+            try await syncAchievementToLocal(userId: userId, dto: dto, context: context)
+            try context.save()
+            print("📥 CloudSync: Achievement '\(snapshot.key)' changed from cloud")
+        } catch {
+            print("❌ CloudSync: Failed to sync achievement change - \(error)")
+        }
+    }
+    
+    private func handleAchievementRemoved(userId: String, snapshot: DataSnapshot) async {
+        guard let container = modelContainer else { return }
+        
+        let achievementId = snapshot.key
+        let id = "\(userId)_\(achievementId)"
+        let context = container.mainContext
+        
+        do {
+            let descriptor = FetchDescriptor<CachedAchievement>(
+                predicate: #Predicate { $0.id == id }
+            )
+            if let cached = try context.fetch(descriptor).first {
+                context.delete(cached)
+                try context.save()
+                print("🗑️ CloudSync: Achievement '\(achievementId)' removed from local cache")
+            }
+        } catch {
+            print("❌ CloudSync: Failed to remove achievement - \(error)")
+        }
+    }
+    
+    // MARK: - Session Handlers
     
     private func handleSessionAdded(userId: String, snapshot: DataSnapshot) async {
         guard snapshot.exists(), let dict = snapshot.value as? [String: Any],
@@ -273,13 +461,51 @@ class CloudSyncEngine: ObservableObject {
             return
         }
         
-        let context = ModelContext(container)
+        let context = container.mainContext
         do {
             try await syncSessionToLocal(userId: userId, dto: dto, context: context)
             try context.save()
             print("📥 CloudSync: Session '\(snapshot.key)' added from cloud")
         } catch {
-            print("❌ CloudSync: Failed to sync session - \(error)")
+            print("❌ CloudSync: Failed to sync session add - \(error)")
+        }
+    }
+    
+    private func handleSessionChanged(userId: String, snapshot: DataSnapshot) async {
+        guard snapshot.exists(), let dict = snapshot.value as? [String: Any],
+              let dto = SessionDTO.fromDictionary(sessionId: snapshot.key, dict),
+              let container = modelContainer else {
+            return
+        }
+        
+        let context = container.mainContext
+        do {
+            try await syncSessionToLocal(userId: userId, dto: dto, context: context)
+            try context.save()
+            print("📥 CloudSync: Session '\(snapshot.key)' changed from cloud")
+        } catch {
+            print("❌ CloudSync: Failed to sync session change - \(error)")
+        }
+    }
+    
+    private func handleSessionRemoved(userId: String, snapshot: DataSnapshot) async {
+        guard let container = modelContainer else { return }
+        
+        let sessionId = snapshot.key
+        let id = "\(userId)_\(sessionId)"
+        let context = container.mainContext
+        
+        do {
+            let descriptor = FetchDescriptor<CachedSession>(
+                predicate: #Predicate { $0.id == id }
+            )
+            if let cached = try context.fetch(descriptor).first {
+                context.delete(cached)
+                try context.save()
+                print("🗑️ CloudSync: Session '\(sessionId)' removed from local cache")
+            }
+        } catch {
+            print("❌ CloudSync: Failed to remove session - \(error)")
         }
     }
     
@@ -294,7 +520,9 @@ class CloudSyncEngine: ObservableObject {
                 cached.updateFrom(dto: dto)
                 print("🔄 CloudSync: Progress updated (cloud wins)")
             } else {
-                print("⏭️ CloudSync: Local progress is newer, skipping")
+                // Local is newer - ensure it's queued to push
+                print("⚠️ CloudSync: Local progress is newer (\(cached.updatedAt) > \(dto.updatedAt)), ensuring push queued")
+                try await ensureProgressInOutbox(userId: userId, cached: cached, context: context)
             }
         } else {
             let newCache = CachedUserProgress(userId: userId, dto: dto)
@@ -313,6 +541,10 @@ class CloudSyncEngine: ObservableObject {
         if let cached = existing {
             if dto.updatedAt >= cached.updatedAt {
                 cached.updateFrom(dto: dto)
+            } else {
+                // Local is newer - ensure push queued
+                print("⚠️ CloudSync: Local vocab '\(dto.wordId)' is newer, ensuring push queued")
+                try await ensureVocabInOutbox(userId: userId, cached: cached, context: context)
             }
         } else {
             let newCache = CachedVocabWord(userId: userId, dto: dto)
@@ -330,6 +562,10 @@ class CloudSyncEngine: ObservableObject {
         if let cached = existing {
             if dto.updatedAt >= cached.updatedAt {
                 cached.updateFrom(dto: dto)
+            } else {
+                // Local is newer - ensure push queued
+                print("⚠️ CloudSync: Local achievement '\(dto.achievementId)' is newer, ensuring push queued")
+                try await ensureAchievementInOutbox(userId: userId, cached: cached, context: context)
             }
         } else {
             let newCache = CachedAchievement(userId: userId, dto: dto)
@@ -344,9 +580,15 @@ class CloudSyncEngine: ObservableObject {
         )
         let existing = try context.fetch(descriptor).first
         
-        if existing == nil {
+        if let cached = existing {
+            if dto.updatedAt >= cached.updatedAt {
+                cached.updateFrom(dto: dto)
+                print("🔄 CloudSync: Session '\(dto.sessionId)' updated (cloud wins)")
+            }
+        } else {
             let newCache = CachedSession(userId: userId, dto: dto)
             context.insert(newCache)
+            print("📝 CloudSync: Session '\(dto.sessionId)' cached locally")
         }
     }
     
@@ -413,13 +655,81 @@ class CloudSyncEngine: ObservableObject {
         return result
     }
     
+    // MARK: - Outbox Helpers
+    
+    private func ensureProgressInOutbox(userId: String, cached: CachedUserProgress, context: ModelContext) async throws {
+        let path = "users/\(userId)/progress"
+        
+        // Check if already in outbox
+        let descriptor = FetchDescriptor<SyncOutboxItem>(
+            predicate: #Predicate { $0.userId == userId && $0.path == path }
+        )
+        let existing = try context.fetch(descriptor).first
+        
+        if existing == nil {
+            let dto = cached.toDTO()
+            let outboxItem = SyncOutboxItem(
+                userId: userId,
+                path: path,
+                payload: dto.toDictionary(),
+                updatedAt: cached.updatedAt
+            )
+            context.insert(outboxItem)
+            print("📤 CloudSync: Progress queued to outbox for push")
+        }
+    }
+    
+    private func ensureVocabInOutbox(userId: String, cached: CachedVocabWord, context: ModelContext) async throws {
+        let path = "users/\(userId)/vocab/\(cached.wordId)"
+        
+        // Check if already in outbox
+        let descriptor = FetchDescriptor<SyncOutboxItem>(
+            predicate: #Predicate { $0.userId == userId && $0.path == path }
+        )
+        let existing = try context.fetch(descriptor).first
+        
+        if existing == nil {
+            let dto = cached.toDTO()
+            let outboxItem = SyncOutboxItem(
+                userId: userId,
+                path: path,
+                payload: dto.toDictionary(),
+                updatedAt: cached.updatedAt
+            )
+            context.insert(outboxItem)
+            print("📤 CloudSync: Vocab '\(cached.wordId)' queued to outbox for push")
+        }
+    }
+    
+    private func ensureAchievementInOutbox(userId: String, cached: CachedAchievement, context: ModelContext) async throws {
+        let path = "users/\(userId)/achievements/\(cached.achievementId)"
+        
+        // Check if already in outbox
+        let descriptor = FetchDescriptor<SyncOutboxItem>(
+            predicate: #Predicate { $0.userId == userId && $0.path == path }
+        )
+        let existing = try context.fetch(descriptor).first
+        
+        if existing == nil {
+            let dto = cached.toDTO()
+            let outboxItem = SyncOutboxItem(
+                userId: userId,
+                path: path,
+                payload: dto.toDictionary(),
+                updatedAt: cached.updatedAt
+            )
+            context.insert(outboxItem)
+            print("📤 CloudSync: Achievement '\(cached.achievementId)' queued to outbox for push")
+        }
+    }
+    
     func flushOutbox() async {
         guard let container = modelContainer,
               let userId = Auth.auth().currentUser?.uid else {
             return
         }
         
-        let context = ModelContext(container)
+        let context = container.mainContext
         let descriptor = FetchDescriptor<SyncOutboxItem>(
             predicate: #Predicate { $0.userId == userId && $0.attempts < 10 },
             sortBy: [SortDescriptor(\SyncOutboxItem.createdAt)]

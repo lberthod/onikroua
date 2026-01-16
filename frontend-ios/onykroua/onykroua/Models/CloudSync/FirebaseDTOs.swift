@@ -2,6 +2,15 @@ import Foundation
 
 // MARK: - Firebase DTOs (Data Transfer Objects)
 
+// Helper to convert Any to Int64 (handles Int, Double, String)
+private func toInt64(_ value: Any?) -> Int64? {
+    if let int64 = value as? Int64 { return int64 }
+    if let int = value as? Int { return Int64(int) }
+    if let double = value as? Double { return Int64(double) }
+    if let string = value as? String, let parsed = Int64(string) { return parsed }
+    return nil
+}
+
 struct UserMetaDTO: Codable {
     let schemaVersion: Int
     let createdAt: Int64
@@ -23,18 +32,20 @@ struct UserMetaDTO: Codable {
     }
     
     static func fromDictionary(_ dict: [String: Any]) -> UserMetaDTO? {
-        guard let schemaVersion = dict["schemaVersion"] as? Int,
-              let createdAt = dict["createdAt"] as? Int64,
-              let lastLoginAt = dict["lastLoginAt"] as? Int64,
-              let updatedAt = dict["updatedAt"] as? Int64 else {
+        guard let schemaVersion = dict["schemaVersion"] as? Int else { return nil }
+        
+        guard let createdAtValue = toInt64(dict["createdAt"]),
+              let lastLoginAtValue = toInt64(dict["lastLoginAt"]),
+              let updatedAtValue = toInt64(dict["updatedAt"]) else {
             return nil
         }
+        
         return UserMetaDTO(
             schemaVersion: schemaVersion,
-            createdAt: createdAt,
-            lastLoginAt: lastLoginAt,
+            createdAt: createdAtValue,
+            lastLoginAt: lastLoginAtValue,
             activeDeviceId: dict["activeDeviceId"] as? String,
-            updatedAt: updatedAt
+            updatedAt: updatedAtValue
         )
     }
 }
@@ -79,24 +90,42 @@ struct UserProgressDTO: Codable {
     }
     
     static func fromDictionary(_ dict: [String: Any]) -> UserProgressDTO? {
-        guard let level = dict["level"] as? Int,
-              let xp = dict["xp"] as? Int,
-              let streakDays = dict["streakDays"] as? Int,
-              let longestStreak = dict["longestStreak"] as? Int,
-              let lastStudyAt = dict["lastStudyAt"] as? Int64,
-              let wordsLearned = dict["wordsLearned"] as? Int,
-              let wordsReviewed = dict["wordsReviewed"] as? Int,
-              let lessonsCompleted = dict["lessonsCompleted"] as? Int,
-              let quizzesCompleted = dict["quizzesCompleted"] as? Int,
-              let quizzesCorrect = dict["quizzesCorrect"] as? Int,
-              let conversationsCompleted = dict["conversationsCompleted"] as? Int,
-              let grammarRulesLearned = dict["grammarRulesLearned"] as? Int,
-              let verbsLearned = dict["verbsLearned"] as? Int,
-              let studyTimeMinutes = dict["studyTimeMinutes"] as? Int,
-              let sessionsCompleted = dict["sessionsCompleted"] as? Int,
-              let updatedAt = dict["updatedAt"] as? Int64 else {
+        let levelValue = dict["level"] as? Int
+        let xpValue = dict["xp"] as? Int
+        let streakDaysValue = dict["streakDays"] as? Int
+        let longestStreakValue = dict["longestStreak"] as? Int
+        let lastStudyAtValue = toInt64(dict["lastStudyAt"])
+        let wordsLearnedValue = dict["wordsLearned"] as? Int
+        let wordsReviewedValue = dict["wordsReviewed"] as? Int
+        let lessonsCompletedValue = dict["lessonsCompleted"] as? Int
+        let quizzesCompletedValue = dict["quizzesCompleted"] as? Int
+        let quizzesCorrectValue = dict["quizzesCorrect"] as? Int
+        let conversationsCompletedValue = dict["conversationsCompleted"] as? Int
+        let grammarRulesLearnedValue = dict["grammarRulesLearned"] as? Int
+        let verbsLearnedValue = dict["verbsLearned"] as? Int
+        let studyTimeMinutesValue = dict["studyTimeMinutes"] as? Int
+        let sessionsCompletedValue = dict["sessionsCompleted"] as? Int
+        let updatedAtValue = toInt64(dict["updatedAt"])
+        
+        guard let level = levelValue,
+              let xp = xpValue,
+              let streakDays = streakDaysValue,
+              let longestStreak = longestStreakValue,
+              let lastStudyAt = lastStudyAtValue,
+              let wordsLearned = wordsLearnedValue,
+              let wordsReviewed = wordsReviewedValue,
+              let lessonsCompleted = lessonsCompletedValue,
+              let quizzesCompleted = quizzesCompletedValue,
+              let quizzesCorrect = quizzesCorrectValue,
+              let conversationsCompleted = conversationsCompletedValue,
+              let grammarRulesLearned = grammarRulesLearnedValue,
+              let verbsLearned = verbsLearnedValue,
+              let studyTimeMinutes = studyTimeMinutesValue,
+              let sessionsCompleted = sessionsCompletedValue,
+              let updatedAt = updatedAtValue else {
             return nil
         }
+        
         return UserProgressDTO(
             level: level,
             xp: xp,
@@ -139,12 +168,19 @@ struct VocabWordDTO: Codable {
     }
     
     static func fromDictionary(wordId: String, _ dict: [String: Any]) -> VocabWordDTO? {
-        guard let status = dict["status"] as? String,
-              let strength = dict["strength"] as? Int,
-              let lastSeenAt = dict["lastSeenAt"] as? Int64,
-              let reviewCount = dict["reviewCount"] as? Int,
-              let correctCount = dict["correctCount"] as? Int,
-              let updatedAt = dict["updatedAt"] as? Int64 else {
+        let statusValue = dict["status"] as? String
+        let strengthValue = dict["strength"] as? Int
+        let lastSeenAtValue = toInt64(dict["lastSeenAt"])
+        let reviewCountValue = dict["reviewCount"] as? Int
+        let correctCountValue = dict["correctCount"] as? Int
+        let updatedAtValue = toInt64(dict["updatedAt"])
+        
+        guard let status = statusValue,
+              let strength = strengthValue,
+              let lastSeenAt = lastSeenAtValue,
+              let reviewCount = reviewCountValue,
+              let correctCount = correctCountValue,
+              let updatedAt = updatedAtValue else {
             return nil
         }
         return VocabWordDTO(
@@ -179,15 +215,20 @@ struct AchievementDTO: Codable {
     }
     
     static func fromDictionary(achievementId: String, _ dict: [String: Any]) -> AchievementDTO? {
-        guard let unlocked = dict["unlocked"] as? Bool,
-              let progress = dict["progress"] as? Int,
-              let updatedAt = dict["updatedAt"] as? Int64 else {
+        let unlockedValue = dict["unlocked"] as? Bool
+        let progressValue = dict["progress"] as? Int
+        let updatedAtValue = toInt64(dict["updatedAt"])
+        let unlockedAtValue = toInt64(dict["unlockedAt"])
+        
+        guard let unlocked = unlockedValue,
+              let progress = progressValue,
+              let updatedAt = updatedAtValue else {
             return nil
         }
         return AchievementDTO(
             achievementId: achievementId,
             unlocked: unlocked,
-            unlockedAt: dict["unlockedAt"] as? Int64,
+            unlockedAt: unlockedAtValue,
             progress: progress,
             updatedAt: updatedAt
         )
@@ -217,13 +258,21 @@ struct SessionDTO: Codable {
     }
     
     static func fromDictionary(sessionId: String, _ dict: [String: Any]) -> SessionDTO? {
-        guard let startedAt = dict["startedAt"] as? Int64,
-              let endedAt = dict["endedAt"] as? Int64,
-              let itemsCount = dict["itemsCount"] as? Int,
-              let correctCount = dict["correctCount"] as? Int,
-              let xpGained = dict["xpGained"] as? Int,
-              let activityType = dict["activityType"] as? String,
-              let updatedAt = dict["updatedAt"] as? Int64 else {
+        let startedAtValue = toInt64(dict["startedAt"])
+        let endedAtValue = toInt64(dict["endedAt"])
+        let itemsCountValue = dict["itemsCount"] as? Int
+        let correctCountValue = dict["correctCount"] as? Int
+        let xpGainedValue = dict["xpGained"] as? Int
+        let activityTypeValue = dict["activityType"] as? String
+        let updatedAtValue = toInt64(dict["updatedAt"])
+        
+        guard let startedAt = startedAtValue,
+              let endedAt = endedAtValue,
+              let itemsCount = itemsCountValue,
+              let correctCount = correctCountValue,
+              let xpGained = xpGainedValue,
+              let activityType = activityTypeValue,
+              let updatedAt = updatedAtValue else {
             return nil
         }
         return SessionDTO(
@@ -256,10 +305,15 @@ struct LeaderboardEntryDTO: Codable {
     }
     
     static func fromDictionary(uid: String, _ dict: [String: Any]) -> LeaderboardEntryDTO? {
-        guard let xp = dict["xp"] as? Int,
-              let level = dict["level"] as? Int,
-              let username = dict["username"] as? String,
-              let updatedAt = dict["updatedAt"] as? Int64 else {
+        let xpValue = dict["xp"] as? Int
+        let levelValue = dict["level"] as? Int
+        let usernameValue = dict["username"] as? String
+        let updatedAtValue = toInt64(dict["updatedAt"])
+        
+        guard let xp = xpValue,
+              let level = levelValue,
+              let username = usernameValue,
+              let updatedAt = updatedAtValue else {
             return nil
         }
         return LeaderboardEntryDTO(

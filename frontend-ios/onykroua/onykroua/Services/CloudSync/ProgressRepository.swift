@@ -15,7 +15,7 @@ class ProgressRepository: ObservableObject {
     func getProgress() -> CachedUserProgress? {
         guard let userId = Auth.auth().currentUser?.uid else { return nil }
         
-        let context = ModelContext(modelContainer)
+        let context = modelContainer.mainContext
         let descriptor = FetchDescriptor<CachedUserProgress>(
             predicate: #Predicate { $0.userId == userId }
         )
@@ -28,7 +28,7 @@ class ProgressRepository: ObservableObject {
             throw RepositoryError.userNotAuthenticated
         }
         
-        let context = ModelContext(modelContainer)
+        let context = modelContainer.mainContext
         let descriptor = FetchDescriptor<CachedUserProgress>(
             predicate: #Predicate { $0.userId == userId }
         )
@@ -50,7 +50,7 @@ class ProgressRepository: ObservableObject {
             throw RepositoryError.userNotAuthenticated
         }
         
-        let context = ModelContext(modelContainer)
+        let context = modelContainer.mainContext
         let descriptor = FetchDescriptor<CachedUserProgress>(
             predicate: #Predicate { $0.userId == userId }
         )
@@ -76,7 +76,7 @@ class ProgressRepository: ObservableObject {
             throw RepositoryError.userNotAuthenticated
         }
         
-        let context = ModelContext(modelContainer)
+        let context = modelContainer.mainContext
         let descriptor = FetchDescriptor<CachedUserProgress>(
             predicate: #Predicate { $0.userId == userId }
         )
@@ -98,7 +98,7 @@ class ProgressRepository: ObservableObject {
             throw RepositoryError.userNotAuthenticated
         }
         
-        let context = ModelContext(modelContainer)
+        let context = modelContainer.mainContext
         let descriptor = FetchDescriptor<CachedUserProgress>(
             predicate: #Predicate { $0.userId == userId }
         )
@@ -120,7 +120,7 @@ class ProgressRepository: ObservableObject {
             throw RepositoryError.userNotAuthenticated
         }
         
-        let context = ModelContext(modelContainer)
+        let context = modelContainer.mainContext
         let descriptor = FetchDescriptor<CachedUserProgress>(
             predicate: #Predicate { $0.userId == userId }
         )
@@ -159,11 +159,38 @@ class ProgressRepository: ObservableObject {
         try await enqueueWrite(userId: userId, path: path, payload: sessionDTO.toDictionary(), context: context)
     }
     
+    func pushToLeaderboard(username: String) async throws {
+        guard let userId = Auth.auth().currentUser?.uid else {
+            throw RepositoryError.userNotAuthenticated
+        }
+        
+        let context = modelContainer.mainContext
+        let descriptor = FetchDescriptor<CachedUserProgress>(
+            predicate: #Predicate { $0.userId == userId }
+        )
+        
+        guard let cached = try context.fetch(descriptor).first else {
+            throw RepositoryError.dataNotFound
+        }
+        
+        let nowMs = Date().toMilliseconds()
+        let leaderboardDTO = LeaderboardEntryDTO(
+            uid: userId,
+            xp: cached.xp,
+            level: cached.level,
+            username: username,
+            updatedAt: nowMs
+        )
+        
+        let path = "leaderboards/global/\(userId)"
+        try await enqueueWrite(userId: userId, path: path, payload: leaderboardDTO.toDictionary(), context: context)
+    }
+    
     private func pushProgressToCloud(userId: String, cached: CachedUserProgress) async throws {
         let dto = cached.toDTO()
         let path = "users/\(userId)/progress"
         
-        let context = ModelContext(modelContainer)
+        let context = modelContainer.mainContext
         try await enqueueWrite(userId: userId, path: path, payload: dto.toDictionary(), context: context)
     }
     
@@ -173,7 +200,13 @@ class ProgressRepository: ObservableObject {
             print("✅ ProgressRepository: Direct write succeeded - \(path)")
         } catch {
             print("⚠️ ProgressRepository: Direct write failed, enqueueing - \(error)")
-            let outboxItem = SyncOutboxItem(userId: userId, path: path, payload: payload)
+            let updatedAt = payload["updatedAt"] as? Int64 ?? Date().toMilliseconds()
+            let outboxItem = SyncOutboxItem(
+                userId: userId,
+                path: path,
+                payload: payload,
+                updatedAt: updatedAt
+            )
             context.insert(outboxItem)
             try context.save()
         }

@@ -27,7 +27,7 @@ class AchievementRepository: ObservableObject {
     func getAllAchievements() -> [CachedAchievement] {
         guard let userId = Auth.auth().currentUser?.uid else { return [] }
         
-        let context = ModelContext(modelContainer)
+        let context = modelContainer.mainContext
         let descriptor = FetchDescriptor<CachedAchievement>(
             predicate: #Predicate { $0.userId == userId }
         )
@@ -38,7 +38,7 @@ class AchievementRepository: ObservableObject {
     func getUnlockedAchievements() -> [CachedAchievement] {
         guard let userId = Auth.auth().currentUser?.uid else { return [] }
         
-        let context = ModelContext(modelContainer)
+        let context = modelContainer.mainContext
         let descriptor = FetchDescriptor<CachedAchievement>(
             predicate: #Predicate { $0.userId == userId && $0.unlocked == true }
         )
@@ -51,8 +51,9 @@ class AchievementRepository: ObservableObject {
             throw RepositoryError.userNotAuthenticated
         }
         
-        let context = ModelContext(modelContainer)
-        let id = "\(userId)_\(achievementId)"
+        let safeId = safeFirebaseKey(achievementId)
+        let context = modelContainer.mainContext
+        let id = "\(userId)_\(safeId)"
         let descriptor = FetchDescriptor<CachedAchievement>(
             predicate: #Predicate { $0.id == id }
         )
@@ -72,7 +73,7 @@ class AchievementRepository: ObservableObject {
             }
         } else {
             let dto = AchievementDTO(
-                achievementId: achievementId,
+                achievementId: safeId,
                 unlocked: true,
                 unlockedAt: nowMs,
                 progress: 100,
@@ -92,8 +93,9 @@ class AchievementRepository: ObservableObject {
             throw RepositoryError.userNotAuthenticated
         }
         
-        let context = ModelContext(modelContainer)
-        let id = "\(userId)_\(achievementId)"
+        let safeId = safeFirebaseKey(achievementId)
+        let context = modelContainer.mainContext
+        let id = "\(userId)_\(safeId)"
         let descriptor = FetchDescriptor<CachedAchievement>(
             predicate: #Predicate { $0.id == id }
         )
@@ -182,7 +184,7 @@ class AchievementRepository: ObservableObject {
         let dto = cached.toDTO()
         let path = "users/\(userId)/achievements/\(dto.achievementId)"
         
-        let context = ModelContext(modelContainer)
+        let context = modelContainer.mainContext
         try await enqueueWrite(userId: userId, path: path, payload: dto.toDictionary(), context: context)
     }
     
@@ -192,7 +194,13 @@ class AchievementRepository: ObservableObject {
             print("✅ AchievementRepository: Direct write succeeded - \(path)")
         } catch {
             print("⚠️ AchievementRepository: Direct write failed, enqueueing - \(error)")
-            let outboxItem = SyncOutboxItem(userId: userId, path: path, payload: payload)
+            let updatedAt = payload["updatedAt"] as? Int64 ?? Date().toMilliseconds()
+            let outboxItem = SyncOutboxItem(
+                userId: userId,
+                path: path,
+                payload: payload,
+                updatedAt: updatedAt
+            )
             context.insert(outboxItem)
             try context.save()
         }

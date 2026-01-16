@@ -33,7 +33,6 @@ class AppEnvironment: ObservableObject {
     // MARK: - Network & Sync
     
     let networkMonitor: NetworkMonitor
-    let syncManager: OfflineSyncManager
     let learnedWordsManager: LearnedWordsManager
     
     // MARK: - Review System
@@ -60,7 +59,6 @@ class AppEnvironment: ObservableObject {
         
         // Network & Sync
         self.networkMonitor = NetworkMonitor.shared
-        self.syncManager = OfflineSyncManager.shared
         self.learnedWordsManager = LearnedWordsManager.shared
         
         // Review System

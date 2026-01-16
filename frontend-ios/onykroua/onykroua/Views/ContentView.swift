@@ -12,7 +12,7 @@ struct ContentView: View {
                 OfflineBanner(networkMonitor: env.networkMonitor)
                 
                 // Sync status
-                SyncStatusView(syncManager: env.syncManager, networkMonitor: env.networkMonitor)
+                SyncStatusView(networkMonitor: env.networkMonitor)
                 
             ScrollView {
                 VStack(spacing: 24) {

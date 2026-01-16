@@ -1,23 +1,27 @@
 import SwiftUI
-
-// MARK: - Sync Status View
+import SwiftData
 
 struct SyncStatusView: View {
-    @ObservedObject var syncManager: OfflineSyncManager
+    @ObservedObject var syncEngine = CloudSyncEngine.shared
     @ObservedObject var networkMonitor: NetworkMonitor
+    @Query(filter: #Predicate<SyncOutboxItem> { $0.attempts < 10 }) private var outboxItems: [SyncOutboxItem]
+    
+    var outboxCount: Int {
+        outboxItems.count
+    }
     
     var body: some View {
-        if syncManager.isSyncing {
+        if syncEngine.isSyncing {
             HStack(spacing: 8) {
                 ProgressView()
                     .scaleEffect(0.8)
                 
-                Text("Synchronisation en cours...")
+                Text("Synchronisation...")
                     .font(.caption)
                     .foregroundColor(.secondary)
                 
-                if syncManager.pendingActions > 0 {
-                    Text("(\(syncManager.pendingActions) actions)")
+                if outboxCount > 0 {
+                    Text("(\(outboxCount))")
                         .font(.caption2)
                         .foregroundColor(.secondary)
                 }
@@ -26,12 +30,12 @@ struct SyncStatusView: View {
             .padding(.vertical, 6)
             .background(Color.blue.opacity(0.1))
             .cornerRadius(8)
-        } else if syncManager.pendingActions > 0 && !networkMonitor.isConnected {
+        } else if outboxCount > 0 && !networkMonitor.isConnected {
             HStack(spacing: 8) {
                 Image(systemName: "icloud.slash")
                     .foregroundColor(.orange)
                 
-                Text("\(syncManager.pendingActions) action(s) en attente")
+                Text("\(outboxCount) en attente")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
