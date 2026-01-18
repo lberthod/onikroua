@@ -1,16 +1,17 @@
 import SwiftUI
 import SwiftData
+import onykroua
 
 struct LearningPathView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var userProgressEntries: [UserProgress]
+    @State private var progressStore: UserProgressStore?
     
     @State private var learningPathManager: LearningPathManager?
     @State private var selectedChapter: Chapter?
     @State private var isLoading = true
     
     private var userProgress: UserProgress? {
-        userProgressEntries.first
+        progressStore?.progress
     }
     
     var body: some View {
@@ -27,6 +28,9 @@ struct LearningPathView: View {
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationTitle("Mon Parcours")
         .onAppear {
+            if progressStore == nil {
+                progressStore = UserProgressStore(modelContext: modelContext)
+            }
             setupLearningPath()
         }
         .sheet(item: $selectedChapter) { chapter in
@@ -100,7 +104,7 @@ struct LearningPathView: View {
         if learningPathManager == nil {
             let manager = LearningPathManager(modelContext: modelContext)
             manager.initializeLearningPath(
-                userId: progress.id.uuidString,
+                userId: progress.userId,
                 userLevel: progress.level
             )
             learningPathManager = manager

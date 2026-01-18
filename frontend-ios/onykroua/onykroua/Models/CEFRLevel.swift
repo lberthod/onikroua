@@ -11,6 +11,17 @@ public enum CEFRLevel: String, Codable, CaseIterable, Identifiable {
     
     public var id: String { rawValue }
     
+    public var levelNumber: Int {
+        switch self {
+        case .a1: return 1
+        case .a2: return 2
+        case .b1: return 3
+        case .b2: return 4
+        case .c1: return 5
+        case .c2: return 6
+        }
+    }
+    
     public var displayName: String {
         switch self {
         case .a1: return "A1 - Débutant"
@@ -133,5 +144,16 @@ public enum CEFRLevel: String, Codable, CaseIterable, Identifiable {
     
     public static func fromString(_ string: String) -> CEFRLevel {
         return CEFRLevel(rawValue: string.uppercased()) ?? .a1
+    }
+    
+    public static func fromLevelNumber(_ level: Int) -> CEFRLevel {
+        switch level {
+        case 1: return .a1
+        case 2: return .a2
+        case 3: return .b1
+        case 4: return .b2
+        case 5: return .c1
+        default: return .c2
+        }
     }
 }

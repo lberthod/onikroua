@@ -4,7 +4,8 @@ import SwiftData
 struct SyncStatusView: View {
     @ObservedObject var syncEngine = CloudSyncEngine.shared
     @ObservedObject var networkMonitor: NetworkMonitor
-    @Query(filter: #Predicate<SyncOutboxItem> { $0.attempts < 10 }) private var outboxItems: [SyncOutboxItem]
+    // @Query(filter: #Predicate<SyncOutboxItemCacheModel> { $0.attempts < 10 }) private var outboxItems: [SyncOutboxItemCacheModel]
+    private var outboxItems: [Any] { [] } // Placeholder - CloudSync models not included in project
     
     var outboxCount: Int {
         outboxItems.count

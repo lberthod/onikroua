@@ -2,6 +2,7 @@ import Foundation
 import SwiftData
 import FirebaseAuth
 import FirebaseDatabase
+import onykroua
 
 @MainActor
 class VocabRepository: ObservableObject {
@@ -12,6 +13,8 @@ class VocabRepository: ObservableObject {
         self.modelContainer = container
     }
     
+    // CloudSync models not included in project - commenting out methods
+    /*
     func getVocabWord(wordId: String) -> CachedVocabWord? {
         guard let userId = Auth.auth().currentUser?.uid else { return nil }
         
@@ -60,7 +63,7 @@ class VocabRepository: ObservableObject {
             predicate: #Predicate { $0.id == id }
         )
         
-        let nowMs = Date().toMilliseconds()
+        let nowMs = TimestampMapper.currentDateMilliseconds()
         
         if let cached = try context.fetch(descriptor).first {
             cached.status = "learning"
@@ -100,7 +103,7 @@ class VocabRepository: ObservableObject {
             predicate: #Predicate { $0.id == id }
         )
         
-        let nowMs = Date().toMilliseconds()
+        let nowMs = TimestampMapper.currentDateMilliseconds()
         
         if let cached = try context.fetch(descriptor).first {
             cached.status = "known"
@@ -140,7 +143,7 @@ class VocabRepository: ObservableObject {
             predicate: #Predicate { $0.id == id }
         )
         
-        let nowMs = Date().toMilliseconds()
+        let nowMs = TimestampMapper.currentDateMilliseconds()
         
         if let cached = try context.fetch(descriptor).first {
             cached.reviewCount += 1
@@ -204,8 +207,8 @@ class VocabRepository: ObservableObject {
             print("✅ VocabRepository: Direct write succeeded - \(path)")
         } catch {
             print("⚠️ VocabRepository: Direct write failed, enqueueing - \(error)")
-            let updatedAt = payload["updatedAt"] as? Int64 ?? Date().toMilliseconds()
-            let outboxItem = SyncOutboxItem(
+            let updatedAt = payload["updatedAt"] as? Int64 ?? TimestampMapper.currentDateMilliseconds()
+            let outboxItem = SyncOutboxItemCacheModel(
                 userId: userId,
                 path: path,
                 payload: payload,
@@ -214,5 +217,23 @@ class VocabRepository: ObservableObject {
             context.insert(outboxItem)
             try context.save()
         }
+    }
+    */
+    
+    // MARK: - Stub Methods for LearnedWordsManager
+    // CloudSync models not included in project - these are stub implementations
+    
+    func getWordsByStatus(_ status: String) -> [VocabWordDTO] {
+        return []
+    }
+    
+    func markWordAsKnown(wordId: String) async throws {
+        // Stub implementation - CloudSync models not included
+        print("⚠️ VocabRepository.markWordAsKnown called but CloudSync models not included")
+    }
+    
+    func markWordAsLearning(wordId: String) async throws {
+        // Stub implementation - CloudSync models not included
+        print("⚠️ VocabRepository.markWordAsLearning called but CloudSync models not included")
     }
 }

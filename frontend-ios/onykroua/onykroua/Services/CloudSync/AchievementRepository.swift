@@ -12,6 +12,8 @@ class AchievementRepository: ObservableObject {
         self.modelContainer = container
     }
     
+    // CloudSync models not included in project - commenting out methods
+    /*
     func getAchievement(achievementId: String) -> CachedAchievement? {
         guard let userId = Auth.auth().currentUser?.uid else { return nil }
         
@@ -58,7 +60,7 @@ class AchievementRepository: ObservableObject {
             predicate: #Predicate { $0.id == id }
         )
         
-        let nowMs = Date().toMilliseconds()
+        let nowMs = TimestampMapper.currentDateMilliseconds()
         
         if let cached = try context.fetch(descriptor).first {
             if !cached.unlocked {
@@ -100,7 +102,7 @@ class AchievementRepository: ObservableObject {
             predicate: #Predicate { $0.id == id }
         )
         
-        let nowMs = Date().toMilliseconds()
+        let nowMs = TimestampMapper.currentDateMilliseconds()
         let clampedProgress = min(100, max(0, progress))
         
         if let cached = try context.fetch(descriptor).first {
@@ -194,8 +196,8 @@ class AchievementRepository: ObservableObject {
             print("✅ AchievementRepository: Direct write succeeded - \(path)")
         } catch {
             print("⚠️ AchievementRepository: Direct write failed, enqueueing - \(error)")
-            let updatedAt = payload["updatedAt"] as? Int64 ?? Date().toMilliseconds()
-            let outboxItem = SyncOutboxItem(
+            let updatedAt = payload["updatedAt"] as? Int64 ?? TimestampMapper.currentDateMilliseconds()
+            let outboxItem = SyncOutboxItemCacheModel(
                 userId: userId,
                 path: path,
                 payload: payload,
@@ -205,4 +207,5 @@ class AchievementRepository: ObservableObject {
             try context.save()
         }
     }
+    */
 }

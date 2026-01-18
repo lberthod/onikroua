@@ -1,7 +1,9 @@
 import Foundation
 import SwiftData
+import onykroua
 
 // MARK: - Vocabulary Persistence Manager
+// NOTE: This file now uses the new Cache models from Models/Cache/
 
 @MainActor
 class VocabularyPersistenceManager: ObservableObject {
@@ -27,14 +29,19 @@ class VocabularyPersistenceManager: ObservableObject {
     private func setupModelContainer() {
         do {
             let schema = Schema([
-                VocabularyWordModel.self,
-                VocabCategoryModel.self,
-                LearnedWordModel.self,
-                UserProgressModel.self,
-                StudySessionModel.self,
+                // New Cache models from PR#1
+                UserProgressCacheModel.self,
+                VocabWordCacheModel.self,
+                StudySessionCacheModel.self,
+                // Existing models (out of PR#1 scope)
                 GrammarRuleModel.self,
                 ConjugationModel.self,
                 FeedItemModel.self
+                // CloudSync models (not yet included in project)
+                // CachedAchievement.self,
+                // CachedSession.self,
+                // SyncOutboxItemCacheModel.self,
+                // SyncMetadata.self
             ])
             
             let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
@@ -76,17 +83,27 @@ class VocabularyPersistenceManager: ObservableObject {
             for (_, words) in vocabularyData {
                 totalItems += words.count
             }
-            for (_, cats) in categories {
-                totalItems += cats.count
-            }
             
-            print("🔄 Starting migration of \(totalItems) items...")
+            print("🔄 Starting migration of \(totalItems) vocabulary items...")
             
-            // Migrate vocabulary words
+            // Migrate vocabulary words to VocabWordCacheModel
             for (language, words) in vocabularyData {
                 for word in words {
-                    let model = VocabularyWordModel.from(word, language: language)
-                    context.insert(model)
+                    let safeWordId = safeFirebaseKey(word.word)
+                    let cacheId = "system_\(safeWordId)"
+                    
+                    let cacheModel = VocabWordCacheModel(
+                        id: cacheId,
+                        userId: "system",
+                        wordId: safeWordId,
+                        status: "new",
+                        strength: 0,
+                        lastSeenAt: 0,
+                        reviewCount: 0,
+                        correctCount: 0
+                    )
+                    
+                    context.insert(cacheModel)
                     
                     processedItems += 1
                     migrationProgress = Double(processedItems) / Double(totalItems)
@@ -96,17 +113,6 @@ class VocabularyPersistenceManager: ObservableObject {
                         try context.save()
                         print("💾 Saved batch: \(processedItems)/\(totalItems)")
                     }
-                }
-            }
-            
-            // Migrate categories
-            for (language, cats) in categories {
-                for category in cats {
-                    let model = VocabCategoryModel.from(category, language: language)
-                    context.insert(model)
-                    
-                    processedItems += 1
-                    migrationProgress = Double(processedItems) / Double(totalItems)
                 }
             }
             
@@ -131,164 +137,49 @@ class VocabularyPersistenceManager: ObservableObject {
     // MARK: - Fetch Operations
     
     func fetchVocabulary(language: String) -> [VocabWord] {
-        guard let context = modelContext else {
-            print("❌ ModelContext not available")
-            return []
-        }
-        
-        let predicate = #Predicate<VocabularyWordModel> { word in
-            word.language == language
-        }
-        
-        let descriptor = FetchDescriptor<VocabularyWordModel>(predicate: predicate)
-        
-        do {
-            let models = try context.fetch(descriptor)
-            print("✅ Fetched \(models.count) words for language: \(language)")
-            return models.map { $0.toVocabWord() }
-        } catch {
-            print("❌ Failed to fetch vocabulary: \(error)")
-            return []
-        }
+        // Note: Vocabulary words are now loaded from JSON files directly
+        // This method returns an empty array as vocabulary is managed externally
+        print("ℹ️ Vocabulary is now loaded from JSON files, not from Cache")
+        return []
     }
     
     func fetchCategories(language: String) -> [VocabCategory] {
-        guard let context = modelContext else {
-            print("❌ ModelContext not available")
-            return []
-        }
-        
-        let predicate = #Predicate<VocabCategoryModel> { category in
-            category.language == language
-        }
-        
-        let descriptor = FetchDescriptor<VocabCategoryModel>(predicate: predicate)
-        
-        do {
-            let models = try context.fetch(descriptor)
-            print("✅ Fetched \(models.count) categories for language: \(language)")
-            return models.map { $0.toVocabCategory() }
-        } catch {
-            print("❌ Failed to fetch categories: \(error)")
-            return []
-        }
+        // Note: Categories are now loaded from JSON files directly
+        // This method returns an empty array as categories are managed externally
+        print("ℹ️ Categories are now loaded from JSON files, not from Cache")
+        return []
     }
     
     func fetchWordsByCategory(language: String, category: String) -> [VocabWord] {
-        guard let context = modelContext else {
-            print("❌ ModelContext not available")
-            return []
-        }
-        
-        let predicate = #Predicate<VocabularyWordModel> { word in
-            word.language == language && word.category == category
-        }
-        
-        let descriptor = FetchDescriptor<VocabularyWordModel>(predicate: predicate)
-        
-        do {
-            let models = try context.fetch(descriptor)
-            return models.map { $0.toVocabWord() }
-        } catch {
-            print("❌ Failed to fetch words by category: \(error)")
-            return []
-        }
+        // Note: Words are now loaded from JSON files directly
+        print("ℹ️ Words are now loaded from JSON files, not from Cache")
+        return []
     }
     
     func searchWords(language: String, query: String) -> [VocabWord] {
-        guard let context = modelContext else {
-            print("❌ ModelContext not available")
-            return []
-        }
-        
-        // SwiftData predicates don't support .lowercased(), do filtering in memory
-        let predicate = #Predicate<VocabularyWordModel> { word in
-            word.language == language
-        }
-        
-        let descriptor = FetchDescriptor<VocabularyWordModel>(predicate: predicate)
-        
-        do {
-            let models = try context.fetch(descriptor)
-            
-            // Filter in memory for case-insensitive search
-            let lowercaseQuery = query.lowercased()
-            let filtered = models.filter { model in
-                model.word.lowercased().contains(lowercaseQuery) ||
-                model.translation.lowercased().contains(lowercaseQuery)
-            }
-            
-            print("🔍 Found \(filtered.count) words matching '\(query)'")
-            return filtered.map { $0.toVocabWord() }
-        } catch {
-            print("❌ Failed to search words: \(error)")
-            return []
-        }
+        // Note: Words are now loaded from JSON files directly
+        print("ℹ️ Words are now loaded from JSON files, not from Cache")
+        return []
     }
     
     // MARK: - Insert/Update Operations
     
     func saveWord(_ word: VocabWord, language: String) {
-        guard let context = modelContext else {
-            print("❌ ModelContext not available")
-            return
-        }
-        
-        let model = VocabularyWordModel.from(word, language: language)
-        context.insert(model)
-        
-        do {
-            try context.save()
-            print("✅ Saved word: \(word.word)")
-        } catch {
-            print("❌ Failed to save word: \(error)")
-        }
+        // Note: Words are now loaded from JSON files directly
+        print("ℹ️ Words are now loaded from JSON files, not from Cache")
     }
     
     func deleteWord(id: String) {
-        guard let context = modelContext else {
-            print("❌ ModelContext not available")
-            return
-        }
-        
-        let predicate = #Predicate<VocabularyWordModel> { word in
-            word.id == id
-        }
-        
-        let descriptor = FetchDescriptor<VocabularyWordModel>(predicate: predicate)
-        
-        do {
-            let models = try context.fetch(descriptor)
-            if let model = models.first {
-                context.delete(model)
-                try context.save()
-                print("✅ Deleted word with id: \(id)")
-            }
-        } catch {
-            print("❌ Failed to delete word: \(error)")
-        }
+        // Note: Words are now loaded from JSON files directly
+        print("ℹ️ Words are now loaded from JSON files, not from Cache")
     }
     
     // MARK: - Statistics
     
     func getWordCount(language: String) -> Int {
-        guard let context = modelContext else {
-            return 0
-        }
-        
-        let predicate = #Predicate<VocabularyWordModel> { word in
-            word.language == language
-        }
-        
-        let descriptor = FetchDescriptor<VocabularyWordModel>(predicate: predicate)
-        
-        do {
-            let count = try context.fetchCount(descriptor)
-            return count
-        } catch {
-            print("❌ Failed to get word count: \(error)")
-            return 0
-        }
+        // Note: Words are now loaded from JSON files directly
+        print("ℹ️ Words are now loaded from JSON files, not from Cache")
+        return 0
     }
     
     // MARK: - Reset
@@ -306,8 +197,7 @@ class VocabularyPersistenceManager: ObservableObject {
         }
         
         do {
-            try context.delete(model: VocabularyWordModel.self)
-            try context.delete(model: VocabCategoryModel.self)
+            try context.delete(model: VocabWordCacheModel.self)
             try context.save()
             
             resetMigration()

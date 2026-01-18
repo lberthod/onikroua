@@ -11,7 +11,6 @@
 		A1000003000000000000001 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000004000000000000001 /* ContentView.swift */; };
 		A1000005000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000006000000000000001 /* Assets.xcassets */; };
 		E02D54672F16B22000F31467 /* vocabulary_it.json in Resources */ = {isa = PBXBuildFile; fileRef = E02D54662F16B22000F31467 /* vocabulary_it.json */; };
-		E02D54D42F16BFD300F31467 /* VocabularyModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54D22F16BFD300F31467 /* VocabularyModels.swift */; };
 		E02D54D82F16BFD500F31467 /* ProgressTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54D52F16BFD500F31467 /* ProgressTracker.swift */; };
 		E02D54D92F16BFD500F31467 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54D62F16BFD500F31467 /* SpeechService.swift */; };
 		E02D54E42F16C41A00F31467 /* ConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54DB2F16C41A00F31467 /* ConversationView.swift */; };
@@ -40,8 +39,6 @@
 		E02D552D2F18520B00F31467 /* ErrorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D552C2F18520B00F31467 /* ErrorManager.swift */; };
 		E02D552F2F18521400F31467 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D552E2F18521400F31467 /* ErrorView.swift */; };
 		E02D55312F18521800F31467 /* LoadingScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55302F18521800F31467 /* LoadingScreen.swift */; };
-		E02D55362F18565200F31467 /* VocabularyWord+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55342F18565200F31467 /* VocabularyWord+Model.swift */; };
-		E02D55372F18565200F31467 /* UserProgress+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55332F18565200F31467 /* UserProgress+Model.swift */; };
 		E02D55382F18565200F31467 /* GrammarRule+Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55322F18565200F31467 /* GrammarRule+Model.swift */; };
 		E02D553A2F18566C00F31467 /* VocabularyPersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55392F18566C00F31467 /* VocabularyPersistenceManager.swift */; };
 		E02D553C2F18567200F31467 /* CrashReportingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D553B2F18567200F31467 /* CrashReportingService.swift */; };
@@ -55,14 +52,9 @@
 		E02D55572F185E0600F31467 /* AppleSignInManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55562F185E0600F31467 /* AppleSignInManager.swift */; };
 		E02D55592F185E0F00F31467 /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55582F185E0F00F31467 /* FirebaseManager.swift */; };
 		E02D555C2F185E3800F31467 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D555A2F185E3800F31467 /* LoginView.swift */; };
-		E02D555F2F185F5800F31467 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = E02D555E2F185F5800F31467 /* FirebaseAnalytics */; };
-		E02D55612F185F5800F31467 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = E02D55602F185F5800F31467 /* FirebaseAuth */; };
-		E02D55632F185F5800F31467 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = E02D55622F185F5800F31467 /* FirebaseCore */; };
-		E02D55652F185F5800F31467 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = E02D55642F185F5800F31467 /* FirebaseDatabase */; };
 		E02D55672F18635F00F31467 /* EmailSignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55662F18635F00F31467 /* EmailSignInView.swift */; };
 		E02D556A2F1868DB00F31467 /* CEFRLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55692F1868DB00F31467 /* CEFRLevel.swift */; };
 		E02D556B2F1868DB00F31467 /* Achievement.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55682F1868DB00F31467 /* Achievement.swift */; };
-		E02D556D2F1868E000F31467 /* UserProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D556C2F1868E000F31467 /* UserProgress.swift */; };
 		E02D556F2F1868ED00F31467 /* OnboardingData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D556E2F1868ED00F31467 /* OnboardingData.swift */; };
 		E02D55712F18693900F31467 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55702F18693900F31467 /* AnalyticsService.swift */; };
 		E02D55732F18694200F31467 /* GamificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55722F18694200F31467 /* GamificationManager.swift */; };
@@ -80,11 +72,8 @@
 		E02D558E2F186A0D00F31467 /* ProgressDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D558C2F186A0D00F31467 /* ProgressDashboardView.swift */; };
 		E02D55912F186AE500F31467 /* LevelAssessmentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55902F186AE500F31467 /* LevelAssessmentService.swift */; };
 		E02D55952F186B0B00F31467 /* VocabularyView_Enhanced.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55942F186B0B00F31467 /* VocabularyView_Enhanced.swift */; };
-		E02D55982F1992DC00F31467 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = E02D55972F1992DC00F31467 /* FirebaseFirestore */; };
 		E02D559E2F199CA900F31467 /* VocabularyLearnedTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D559D2F199CA900F31467 /* VocabularyLearnedTab.swift */; };
 		E02D55A02F19A44F00F31467 /* LearnedWordsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D559F2F19A44F00F31467 /* LearnedWordsManager.swift */; };
-		E02D55A32F1A4A8300F31467 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = E02D55A22F1A4A8300F31467 /* GoogleSignIn */; };
-		E02D55A52F1A4A8300F31467 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E02D55A42F1A4A8300F31467 /* GoogleSignInSwift */; };
 		E02D55A72F1A4BF200F31467 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E02D55A62F1A4BF200F31467 /* GoogleService-Info.plist */; };
 		E02D55AA2F1A4D2D00F31467 /* SignInWithGoogleButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55A92F1A4D2D00F31467 /* SignInWithGoogleButton.swift */; };
 		E02D55AC2F1A525400F31467 /* EmojiView_Enhanced.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D55AB2F1A525400F31467 /* EmojiView_Enhanced.swift */; };
@@ -121,10 +110,30 @@
 		E02D560A2F1AB32E00F31467 /* CloudSyncEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D56032F1AB32E00F31467 /* CloudSyncEngine.swift */; };
 		E02D560B2F1AB32E00F31467 /* ProgressRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D56042F1AB32E00F31467 /* ProgressRepository.swift */; };
 		E02D560C2F1AB32E00F31467 /* VocabRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D56062F1AB32E00F31467 /* VocabRepository.swift */; };
-		E02D56102F1AB33900F31467 /* CacheModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D560D2F1AB33900F31467 /* CacheModels.swift */; };
 		E02D56112F1AB33900F31467 /* FirebaseDTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D560E2F1AB33900F31467 /* FirebaseDTOs.swift */; };
 		E02D56132F1AD51500F31467 /* GamificationSyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D56122F1AD51500F31467 /* GamificationSyncManager.swift */; };
 		E02D56162F1ADD5600F31467 /* OnykrouaUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D56142F1ADD5600F31467 /* OnykrouaUI.swift */; };
+		E0E5B0292F1D6DD50004A0FE /* StudySessionCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E5B0182F1D6DD50004A0FE /* StudySessionCacheModel.swift */; };
+		E0E5B02A2F1D6DD50004A0FE /* Timestamps.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E5B0252F1D6DD50004A0FE /* Timestamps.swift */; };
+		E0E5B02B2F1D6DD50004A0FE /* UserProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E5B01D2F1D6DD50004A0FE /* UserProgress.swift */; };
+		E0E5B02C2F1D6DD50004A0FE /* StudySessionMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E5B0242F1D6DD50004A0FE /* StudySessionMapper.swift */; };
+		E0E5B02D2F1D6DD50004A0FE /* UserProgressCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E5B0192F1D6DD50004A0FE /* UserProgressCacheModel.swift */; };
+		E0E5B02E2F1D6DD50004A0FE /* StudySessionDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E5B0202F1D6DD50004A0FE /* StudySessionDTO.swift */; };
+		E0E5B02F2F1D6DD50004A0FE /* VocabWordCacheModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E5B01A2F1D6DD50004A0FE /* VocabWordCacheModel.swift */; };
+		E0E5B0302F1D6DD50004A0FE /* UserProgressMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E5B0262F1D6DD50004A0FE /* UserProgressMapper.swift */; };
+		E0E5B0312F1D6DD50004A0FE /* StudySession.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E5B01C2F1D6DD50004A0FE /* StudySession.swift */; };
+		E0E5B0322F1D6DD50004A0FE /* VocabWord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E5B01E2F1D6DD50004A0FE /* VocabWord.swift */; };
+		E0E5B0332F1D6DD50004A0FE /* VocabWordDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E5B0222F1D6DD50004A0FE /* VocabWordDTO.swift */; };
+		E0E5B0342F1D6DD50004A0FE /* UserProgressDTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E5B0212F1D6DD50004A0FE /* UserProgressDTO.swift */; };
+		E0E5B0352F1D6DD50004A0FE /* VocabWordMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E5B0272F1D6DD50004A0FE /* VocabWordMapper.swift */; };
+		E0EB4B702F1D7F0900D0ED44 /* UserProgressStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0EB4B6E2F1D7F0900D0ED44 /* UserProgressStore.swift */; };
+		E0EB4B832F1D823700D0ED44 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = E0EB4B822F1D823700D0ED44 /* FirebaseAnalytics */; };
+		E0EB4B852F1D823700D0ED44 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = E0EB4B842F1D823700D0ED44 /* FirebaseAuth */; };
+		E0EB4B872F1D823700D0ED44 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = E0EB4B862F1D823700D0ED44 /* FirebaseCore */; };
+		E0EB4B892F1D823700D0ED44 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = E0EB4B882F1D823700D0ED44 /* FirebaseDatabase */; };
+		E0EB4B8B2F1D823700D0ED44 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = E0EB4B8A2F1D823700D0ED44 /* FirebaseFirestore */; };
+		E0EB4B8D2F1D827700D0ED44 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = E0EB4B8C2F1D827700D0ED44 /* GoogleSignIn */; };
+		E0EB4B8F2F1D827A00D0ED44 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E0EB4B8E2F1D827A00D0ED44 /* GoogleSignInSwift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -133,7 +142,6 @@
 		A1000006000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1000007000000000000001 /* onykroua.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = onykroua.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E02D54662F16B22000F31467 /* vocabulary_it.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = vocabulary_it.json; sourceTree = "<group>"; };
-		E02D54D22F16BFD300F31467 /* VocabularyModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyModels.swift; sourceTree = "<group>"; };
 		E02D54D52F16BFD500F31467 /* ProgressTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressTracker.swift; sourceTree = "<group>"; };
 		E02D54D62F16BFD500F31467 /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
 		E02D54DA2F16C41A00F31467 /* ConjugationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConjugationView.swift; sourceTree = "<group>"; };
@@ -163,8 +171,6 @@
 		E02D552E2F18521400F31467 /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
 		E02D55302F18521800F31467 /* LoadingScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingScreen.swift; sourceTree = "<group>"; };
 		E02D55322F18565200F31467 /* GrammarRule+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GrammarRule+Model.swift"; sourceTree = "<group>"; };
-		E02D55332F18565200F31467 /* UserProgress+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserProgress+Model.swift"; sourceTree = "<group>"; };
-		E02D55342F18565200F31467 /* VocabularyWord+Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VocabularyWord+Model.swift"; sourceTree = "<group>"; };
 		E02D55392F18566C00F31467 /* VocabularyPersistenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyPersistenceManager.swift; sourceTree = "<group>"; };
 		E02D553B2F18567200F31467 /* CrashReportingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrashReportingService.swift; sourceTree = "<group>"; };
 		E02D553D2F18568900F31467 /* ProgressPersistenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressPersistenceManager.swift; sourceTree = "<group>"; };
@@ -180,7 +186,6 @@
 		E02D55662F18635F00F31467 /* EmailSignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailSignInView.swift; sourceTree = "<group>"; };
 		E02D55682F1868DB00F31467 /* Achievement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Achievement.swift; sourceTree = "<group>"; };
 		E02D55692F1868DB00F31467 /* CEFRLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CEFRLevel.swift; sourceTree = "<group>"; };
-		E02D556C2F1868E000F31467 /* UserProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProgress.swift; sourceTree = "<group>"; };
 		E02D556E2F1868ED00F31467 /* OnboardingData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingData.swift; sourceTree = "<group>"; };
 		E02D55702F18693900F31467 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		E02D55722F18694200F31467 /* GamificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamificationManager.swift; sourceTree = "<group>"; };
@@ -237,10 +242,23 @@
 		E02D56042F1AB32E00F31467 /* ProgressRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressRepository.swift; sourceTree = "<group>"; };
 		E02D56052F1AB32E00F31467 /* RepositoryError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryError.swift; sourceTree = "<group>"; };
 		E02D56062F1AB32E00F31467 /* VocabRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabRepository.swift; sourceTree = "<group>"; };
-		E02D560D2F1AB33900F31467 /* CacheModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheModels.swift; sourceTree = "<group>"; };
 		E02D560E2F1AB33900F31467 /* FirebaseDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseDTOs.swift; sourceTree = "<group>"; };
 		E02D56122F1AD51500F31467 /* GamificationSyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamificationSyncManager.swift; sourceTree = "<group>"; };
 		E02D56142F1ADD5600F31467 /* OnykrouaUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnykrouaUI.swift; sourceTree = "<group>"; };
+		E0E5B0182F1D6DD50004A0FE /* StudySessionCacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudySessionCacheModel.swift; sourceTree = "<group>"; };
+		E0E5B0192F1D6DD50004A0FE /* UserProgressCacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProgressCacheModel.swift; sourceTree = "<group>"; };
+		E0E5B01A2F1D6DD50004A0FE /* VocabWordCacheModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabWordCacheModel.swift; sourceTree = "<group>"; };
+		E0E5B01C2F1D6DD50004A0FE /* StudySession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudySession.swift; sourceTree = "<group>"; };
+		E0E5B01D2F1D6DD50004A0FE /* UserProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProgress.swift; sourceTree = "<group>"; };
+		E0E5B01E2F1D6DD50004A0FE /* VocabWord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabWord.swift; sourceTree = "<group>"; };
+		E0E5B0202F1D6DD50004A0FE /* StudySessionDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudySessionDTO.swift; sourceTree = "<group>"; };
+		E0E5B0212F1D6DD50004A0FE /* UserProgressDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProgressDTO.swift; sourceTree = "<group>"; };
+		E0E5B0222F1D6DD50004A0FE /* VocabWordDTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabWordDTO.swift; sourceTree = "<group>"; };
+		E0E5B0242F1D6DD50004A0FE /* StudySessionMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudySessionMapper.swift; sourceTree = "<group>"; };
+		E0E5B0252F1D6DD50004A0FE /* Timestamps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Timestamps.swift; sourceTree = "<group>"; };
+		E0E5B0262F1D6DD50004A0FE /* UserProgressMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProgressMapper.swift; sourceTree = "<group>"; };
+		E0E5B0272F1D6DD50004A0FE /* VocabWordMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabWordMapper.swift; sourceTree = "<group>"; };
+		E0EB4B6E2F1D7F0900D0ED44 /* UserProgressStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProgressStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -248,13 +266,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E02D555F2F185F5800F31467 /* FirebaseAnalytics in Frameworks */,
-				E02D55632F185F5800F31467 /* FirebaseCore in Frameworks */,
-				E02D55A52F1A4A8300F31467 /* GoogleSignInSwift in Frameworks */,
-				E02D55652F185F5800F31467 /* FirebaseDatabase in Frameworks */,
-				E02D55982F1992DC00F31467 /* FirebaseFirestore in Frameworks */,
-				E02D55612F185F5800F31467 /* FirebaseAuth in Frameworks */,
-				E02D55A32F1A4A8300F31467 /* GoogleSignIn in Frameworks */,
+				E0EB4B832F1D823700D0ED44 /* FirebaseAnalytics in Frameworks */,
+				E0EB4B872F1D823700D0ED44 /* FirebaseCore in Frameworks */,
+				E0EB4B8F2F1D827A00D0ED44 /* GoogleSignInSwift in Frameworks */,
+				E0EB4B892F1D823700D0ED44 /* FirebaseDatabase in Frameworks */,
+				E0EB4B8B2F1D823700D0ED44 /* FirebaseFirestore in Frameworks */,
+				E0EB4B852F1D823700D0ED44 /* FirebaseAuth in Frameworks */,
+				E0EB4B8D2F1D827700D0ED44 /* GoogleSignIn in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -267,6 +285,7 @@
 				A1000010000000000000001 /* onykroua */,
 				E02D55962F1992DC00F31467 /* Frameworks */,
 				A1000011000000000000001 /* Products */,
+				E0EB4B6D2F1D7E1F00D0ED44 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -299,6 +318,11 @@
 		E02D54D32F16BFD300F31467 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				E0E5B01B2F1D6DD50004A0FE /* Cache */,
+				E0E5B01F2F1D6DD50004A0FE /* Domain */,
+				E0E5B0232F1D6DD50004A0FE /* DTO */,
+				E0EB4B6F2F1D7F0900D0ED44 /* Stores */,
+				E0E5B0282F1D6DD50004A0FE /* Mappers */,
 				E02D55352F18565200F31467 /* SwiftData */,
 				E02D55682F1868DB00F31467 /* Achievement.swift */,
 				E02D55692F1868DB00F31467 /* CEFRLevel.swift */,
@@ -314,9 +338,7 @@
 				E02D55FD2F1A9EB500F31467 /* QuizStatistics.swift */,
 				E02D556E2F1868ED00F31467 /* OnboardingData.swift */,
 				E02D55C02F1A612900F31467 /* Recommendation.swift */,
-				E02D556C2F1868E000F31467 /* UserProgress.swift */,
 				E02D55022F16D00400F31467 /* VerbData.swift */,
-				E02D54D22F16BFD300F31467 /* VocabularyModels.swift */,
 				E02D550B2F16D2D400F31467 /* VocabularyDataManager.swift */,
 				E02D560F2F1AB33900F31467 /* CloudSync */,
 			);
@@ -427,8 +449,6 @@
 			isa = PBXGroup;
 			children = (
 				E02D55322F18565200F31467 /* GrammarRule+Model.swift */,
-				E02D55332F18565200F31467 /* UserProgress+Model.swift */,
-				E02D55342F18565200F31467 /* VocabularyWord+Model.swift */,
 			);
 			path = SwiftData;
 			sourceTree = "<group>";
@@ -566,7 +586,6 @@
 		E02D560F2F1AB33900F31467 /* CloudSync */ = {
 			isa = PBXGroup;
 			children = (
-				E02D560D2F1AB33900F31467 /* CacheModels.swift */,
 				E02D560E2F1AB33900F31467 /* FirebaseDTOs.swift */,
 			);
 			path = CloudSync;
@@ -578,6 +597,62 @@
 				E02D56142F1ADD5600F31467 /* OnykrouaUI.swift */,
 			);
 			path = DesignSystem;
+			sourceTree = "<group>";
+		};
+		E0E5B01B2F1D6DD50004A0FE /* Cache */ = {
+			isa = PBXGroup;
+			children = (
+				E0E5B0182F1D6DD50004A0FE /* StudySessionCacheModel.swift */,
+				E0E5B0192F1D6DD50004A0FE /* UserProgressCacheModel.swift */,
+				E0E5B01A2F1D6DD50004A0FE /* VocabWordCacheModel.swift */,
+			);
+			path = Cache;
+			sourceTree = "<group>";
+		};
+		E0E5B01F2F1D6DD50004A0FE /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				E0E5B01C2F1D6DD50004A0FE /* StudySession.swift */,
+				E0E5B01D2F1D6DD50004A0FE /* UserProgress.swift */,
+				E0E5B01E2F1D6DD50004A0FE /* VocabWord.swift */,
+			);
+			path = Domain;
+			sourceTree = "<group>";
+		};
+		E0E5B0232F1D6DD50004A0FE /* DTO */ = {
+			isa = PBXGroup;
+			children = (
+				E0E5B0202F1D6DD50004A0FE /* StudySessionDTO.swift */,
+				E0E5B0212F1D6DD50004A0FE /* UserProgressDTO.swift */,
+				E0E5B0222F1D6DD50004A0FE /* VocabWordDTO.swift */,
+			);
+			path = DTO;
+			sourceTree = "<group>";
+		};
+		E0E5B0282F1D6DD50004A0FE /* Mappers */ = {
+			isa = PBXGroup;
+			children = (
+				E0E5B0242F1D6DD50004A0FE /* StudySessionMapper.swift */,
+				E0E5B0252F1D6DD50004A0FE /* Timestamps.swift */,
+				E0E5B0262F1D6DD50004A0FE /* UserProgressMapper.swift */,
+				E0E5B0272F1D6DD50004A0FE /* VocabWordMapper.swift */,
+			);
+			path = Mappers;
+			sourceTree = "<group>";
+		};
+		E0EB4B6D2F1D7E1F00D0ED44 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		E0EB4B6F2F1D7F0900D0ED44 /* Stores */ = {
+			isa = PBXGroup;
+			children = (
+				E0EB4B6E2F1D7F0900D0ED44 /* UserProgressStore.swift */,
+			);
+			path = Stores;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -625,8 +700,8 @@
 			);
 			mainGroup = A1000009000000000000001;
 			packageReferences = (
-				E02D555D2F185F5800F31467 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				E02D55A12F1A4A8300F31467 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				E0EB4B712F1D807D00D0ED44 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				E0EB4B812F1D823700D0ED44 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = A1000011000000000000001 /* Products */;
 			projectDirPath = "";
@@ -678,7 +753,19 @@
 				E02D54EB2F16C41A00F31467 /* PhoneticView.swift in Sources */,
 				E02D54F22F16C9EF00F31467 /* ConversationModels.swift in Sources */,
 				E02D552F2F18521400F31467 /* ErrorView.swift in Sources */,
-				E02D556D2F1868E000F31467 /* UserProgress.swift in Sources */,
+				E0E5B0292F1D6DD50004A0FE /* StudySessionCacheModel.swift in Sources */,
+				E0E5B02A2F1D6DD50004A0FE /* Timestamps.swift in Sources */,
+				E0E5B02B2F1D6DD50004A0FE /* UserProgress.swift in Sources */,
+				E0E5B02C2F1D6DD50004A0FE /* StudySessionMapper.swift in Sources */,
+				E0E5B02D2F1D6DD50004A0FE /* UserProgressCacheModel.swift in Sources */,
+				E0E5B02E2F1D6DD50004A0FE /* StudySessionDTO.swift in Sources */,
+				E0E5B02F2F1D6DD50004A0FE /* VocabWordCacheModel.swift in Sources */,
+				E0E5B0302F1D6DD50004A0FE /* UserProgressMapper.swift in Sources */,
+				E0E5B0312F1D6DD50004A0FE /* StudySession.swift in Sources */,
+				E0E5B0322F1D6DD50004A0FE /* VocabWord.swift in Sources */,
+				E0E5B0332F1D6DD50004A0FE /* VocabWordDTO.swift in Sources */,
+				E0E5B0342F1D6DD50004A0FE /* UserProgressDTO.swift in Sources */,
+				E0E5B0352F1D6DD50004A0FE /* VocabWordMapper.swift in Sources */,
 				E02D55802F18699300F31467 /* OnboardingContainerView.swift in Sources */,
 				E02D55912F186AE500F31467 /* LevelAssessmentService.swift in Sources */,
 				E02D55812F18699300F31467 /* GoalSelectionScreen.swift in Sources */,
@@ -707,12 +794,11 @@
 				E02D55292F16E4ED00F31467 /* SharedComponents.swift in Sources */,
 				E02D55752F18694B00F31467 /* NotificationManager.swift in Sources */,
 				E02D55CB2F1A636800F31467 /* AppRootView.swift in Sources */,
-				E02D55362F18565200F31467 /* VocabularyWord+Model.swift in Sources */,
 				E02D55442F1857F700F31467 /* SyncStatusView.swift in Sources */,
 				E02D55AE2F1A58DD00F31467 /* TodayContentView.swift in Sources */,
-				E02D55372F18565200F31467 /* UserProgress+Model.swift in Sources */,
 				E02D553C2F18567200F31467 /* CrashReportingService.swift in Sources */,
 				E02D55382F18565200F31467 /* GrammarRule+Model.swift in Sources */,
+				E0EB4B702F1D7F0900D0ED44 /* UserProgressStore.swift in Sources */,
 				E02D550C2F16D2D400F31467 /* VocabularyDataManager.swift in Sources */,
 				E02D550E2F16D43600F31467 /* VocabularyPracticeTab.swift in Sources */,
 				E02D554E2F1859AC00F31467 /* AdvancedSearchView.swift in Sources */,
@@ -746,10 +832,8 @@
 				A1000001000000000000001 /* onykrouaApp.swift in Sources */,
 				E02D55C72F1A62DE00F31467 /* DashboardComponents.swift in Sources */,
 				E02D56162F1ADD5600F31467 /* OnykrouaUI.swift in Sources */,
-				E02D56102F1AB33900F31467 /* CacheModels.swift in Sources */,
 				E02D56112F1AB33900F31467 /* FirebaseDTOs.swift in Sources */,
 				E02D558A2F1869EE00F31467 /* AchievementsView.swift in Sources */,
-				E02D54D42F16BFD300F31467 /* VocabularyModels.swift in Sources */,
 				E02D55BF2F1A60ED00F31467 /* AdaptiveReviewSystem.swift in Sources */,
 				E02D55732F18694200F31467 /* GamificationManager.swift in Sources */,
 				E02D55E62F1A63E300F31467 /* InsightsView.swift in Sources */,
@@ -974,15 +1058,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		E02D555D2F185F5800F31467 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 12.8.0;
-			};
-		};
-		E02D55A12F1A4A8300F31467 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+		E0EB4B712F1D807D00D0ED44 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
 			requirement = {
@@ -990,42 +1066,50 @@
 				minimumVersion = 9.1.0;
 			};
 		};
+		E0EB4B812F1D823700D0ED44 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.8.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		E02D555E2F185F5800F31467 /* FirebaseAnalytics */ = {
+		E0EB4B822F1D823700D0ED44 /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E02D555D2F185F5800F31467 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = E0EB4B812F1D823700D0ED44 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalytics;
 		};
-		E02D55602F185F5800F31467 /* FirebaseAuth */ = {
+		E0EB4B842F1D823700D0ED44 /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E02D555D2F185F5800F31467 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = E0EB4B812F1D823700D0ED44 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAuth;
 		};
-		E02D55622F185F5800F31467 /* FirebaseCore */ = {
+		E0EB4B862F1D823700D0ED44 /* FirebaseCore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E02D555D2F185F5800F31467 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = E0EB4B812F1D823700D0ED44 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCore;
 		};
-		E02D55642F185F5800F31467 /* FirebaseDatabase */ = {
+		E0EB4B882F1D823700D0ED44 /* FirebaseDatabase */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E02D555D2F185F5800F31467 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = E0EB4B812F1D823700D0ED44 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseDatabase;
 		};
-		E02D55972F1992DC00F31467 /* FirebaseFirestore */ = {
+		E0EB4B8A2F1D823700D0ED44 /* FirebaseFirestore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E02D555D2F185F5800F31467 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = E0EB4B812F1D823700D0ED44 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
 		};
-		E02D55A22F1A4A8300F31467 /* GoogleSignIn */ = {
+		E0EB4B8C2F1D827700D0ED44 /* GoogleSignIn */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E02D55A12F1A4A8300F31467 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			package = E0EB4B712F1D807D00D0ED44 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignIn;
 		};
-		E02D55A42F1A4A8300F31467 /* GoogleSignInSwift */ = {
+		E0EB4B8E2F1D827A00D0ED44 /* GoogleSignInSwift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E02D55A12F1A4A8300F31467 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			package = E0EB4B712F1D807D00D0ED44 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignInSwift;
 		};
 /* End XCSwiftPackageProductDependency section */

@@ -2,6 +2,7 @@ import Foundation
 import SwiftData
 import FirebaseAuth
 import FirebaseDatabase
+import onykroua
 
 @MainActor
 class ProgressRepository: ObservableObject {
@@ -12,6 +13,8 @@ class ProgressRepository: ObservableObject {
         self.modelContainer = container
     }
     
+    // CloudSync models not included in project - commenting out methods
+    /*
     func getProgress() -> CachedUserProgress? {
         guard let userId = Auth.auth().currentUser?.uid else { return nil }
         
@@ -38,7 +41,7 @@ class ProgressRepository: ObservableObject {
         }
         
         cached.xp += amount
-        cached.updatedAt = Date().toMilliseconds()
+        cached.updatedAt = TimestampMapper.currentDateMilliseconds()
         
         try context.save()
         
@@ -63,8 +66,8 @@ class ProgressRepository: ObservableObject {
         if cached.streakDays > cached.longestStreak {
             cached.longestStreak = cached.streakDays
         }
-        cached.lastStudyAt = Date().toMilliseconds()
-        cached.updatedAt = Date().toMilliseconds()
+        cached.lastStudyAt = TimestampMapper.currentDateMilliseconds()
+        cached.updatedAt = TimestampMapper.currentDateMilliseconds()
         
         try context.save()
         
@@ -86,7 +89,7 @@ class ProgressRepository: ObservableObject {
         }
         
         cached.wordsLearned += 1
-        cached.updatedAt = Date().toMilliseconds()
+        cached.updatedAt = TimestampMapper.currentDateMilliseconds()
         
         try context.save()
         
@@ -108,7 +111,7 @@ class ProgressRepository: ObservableObject {
         }
         
         cached.wordsReviewed += 1
-        cached.updatedAt = Date().toMilliseconds()
+        cached.updatedAt = TimestampMapper.currentDateMilliseconds()
         
         try context.save()
         
@@ -132,15 +135,15 @@ class ProgressRepository: ObservableObject {
         cached.xp += xpGained
         cached.sessionsCompleted += 1
         cached.studyTimeMinutes += durationSeconds / 60
-        cached.lastStudyAt = Date().toMilliseconds()
-        cached.updatedAt = Date().toMilliseconds()
+        cached.lastStudyAt = TimestampMapper.currentDateMilliseconds()
+        cached.updatedAt = TimestampMapper.currentDateMilliseconds()
         
         try context.save()
         
         try await pushProgressToCloud(userId: userId, cached: cached)
         
-        let nowMs = Date().toMilliseconds()
-        let sessionDTO = SessionDTO(
+        let nowMs = TimestampMapper.currentDateMilliseconds()
+        let sessionDTO = StudySessionDTO(
             sessionId: database.child("users").child(userId).child("sessions").childByAutoId().key ?? UUID().uuidString,
             startedAt: nowMs - Int64(durationSeconds * 1000),
             endedAt: nowMs,
@@ -173,7 +176,7 @@ class ProgressRepository: ObservableObject {
             throw RepositoryError.dataNotFound
         }
         
-        let nowMs = Date().toMilliseconds()
+        let nowMs = TimestampMapper.currentDateMilliseconds()
         let leaderboardDTO = LeaderboardEntryDTO(
             uid: userId,
             xp: cached.xp,
@@ -200,8 +203,8 @@ class ProgressRepository: ObservableObject {
             print("✅ ProgressRepository: Direct write succeeded - \(path)")
         } catch {
             print("⚠️ ProgressRepository: Direct write failed, enqueueing - \(error)")
-            let updatedAt = payload["updatedAt"] as? Int64 ?? Date().toMilliseconds()
-            let outboxItem = SyncOutboxItem(
+            let updatedAt = payload["updatedAt"] as? Int64 ?? TimestampMapper.currentDateMilliseconds()
+            let outboxItem = SyncOutboxItemCacheModel(
                 userId: userId,
                 path: path,
                 payload: payload,
@@ -211,4 +214,5 @@ class ProgressRepository: ObservableObject {
             try context.save()
         }
     }
+    */
 }

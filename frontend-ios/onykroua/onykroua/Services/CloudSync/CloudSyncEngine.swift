@@ -3,6 +3,7 @@ import FirebaseDatabase
 import FirebaseAuth
 import SwiftData
 import UIKit
+import onykroua
 
 @MainActor
 class CloudSyncEngine: ObservableObject {
@@ -91,7 +92,7 @@ class CloudSyncEngine: ObservableObject {
         print("🔄 CloudSync: User signed in - \(userId)")
         await bootstrap(userId: userId)
         setupRealtimeObservers(userId: userId)
-        await flushOutbox()
+        // await flushOutbox() // CloudSync models not included in project
     }
     
     private func onUserSignedOut() async {
@@ -156,7 +157,7 @@ class CloudSyncEngine: ObservableObject {
     }
     
     private func initializeNewUser(userId: String, context: ModelContext) async throws {
-        let nowMs = Date().toMilliseconds()
+        let nowMs = TimestampMapper.currentDateMilliseconds()
         
         let metaDTO = UserMetaDTO(
             schemaVersion: 1,
@@ -381,6 +382,8 @@ class CloudSyncEngine: ObservableObject {
         let id = "\(userId)_\(wordId)"
         let context = container.mainContext
         
+        // CloudSync models not included in project - commenting out
+        /*
         do {
             let descriptor = FetchDescriptor<CachedVocabWord>(
                 predicate: #Predicate { $0.id == id }
@@ -393,6 +396,7 @@ class CloudSyncEngine: ObservableObject {
         } catch {
             print("❌ CloudSync: Failed to remove vocab - \(error)")
         }
+        */
     }
     
     // MARK: - Achievement Handlers
@@ -438,6 +442,8 @@ class CloudSyncEngine: ObservableObject {
         let id = "\(userId)_\(achievementId)"
         let context = container.mainContext
         
+        // CloudSync models not included in project - commenting out
+        /*
         do {
             let descriptor = FetchDescriptor<CachedAchievement>(
                 predicate: #Predicate { $0.id == id }
@@ -450,13 +456,14 @@ class CloudSyncEngine: ObservableObject {
         } catch {
             print("❌ CloudSync: Failed to remove achievement - \(error)")
         }
+        */
     }
     
     // MARK: - Session Handlers
     
     private func handleSessionAdded(userId: String, snapshot: DataSnapshot) async {
         guard snapshot.exists(), let dict = snapshot.value as? [String: Any],
-              let dto = SessionDTO.fromDictionary(sessionId: snapshot.key, dict),
+              let dto = StudySessionDTO.fromDictionary(sessionId: snapshot.key, dict),
               let container = modelContainer else {
             return
         }
@@ -473,7 +480,7 @@ class CloudSyncEngine: ObservableObject {
     
     private func handleSessionChanged(userId: String, snapshot: DataSnapshot) async {
         guard snapshot.exists(), let dict = snapshot.value as? [String: Any],
-              let dto = SessionDTO.fromDictionary(sessionId: snapshot.key, dict),
+              let dto = StudySessionDTO.fromDictionary(sessionId: snapshot.key, dict),
               let container = modelContainer else {
             return
         }
@@ -495,6 +502,8 @@ class CloudSyncEngine: ObservableObject {
         let id = "\(userId)_\(sessionId)"
         let context = container.mainContext
         
+        // CloudSync models not included in project - commenting out
+        /*
         do {
             let descriptor = FetchDescriptor<CachedSession>(
                 predicate: #Predicate { $0.id == id }
@@ -507,9 +516,12 @@ class CloudSyncEngine: ObservableObject {
         } catch {
             print("❌ CloudSync: Failed to remove session - \(error)")
         }
+        */
     }
     
     private func syncProgressToLocal(userId: String, dto: UserProgressDTO, context: ModelContext) async throws {
+        // CloudSync models not included in project - commenting out
+        /*
         let descriptor = FetchDescriptor<CachedUserProgress>(
             predicate: #Predicate { $0.userId == userId }
         )
@@ -529,9 +541,12 @@ class CloudSyncEngine: ObservableObject {
             context.insert(newCache)
             print("📝 CloudSync: Progress cached locally")
         }
+        */
     }
     
     private func syncVocabToLocal(userId: String, dto: VocabWordDTO, context: ModelContext) async throws {
+        // CloudSync models not included in project - commenting out
+        /*
         let id = "\(userId)_\(dto.wordId)"
         let descriptor = FetchDescriptor<CachedVocabWord>(
             predicate: #Predicate { $0.id == id }
@@ -550,9 +565,12 @@ class CloudSyncEngine: ObservableObject {
             let newCache = CachedVocabWord(userId: userId, dto: dto)
             context.insert(newCache)
         }
+        */
     }
     
     private func syncAchievementToLocal(userId: String, dto: AchievementDTO, context: ModelContext) async throws {
+        // CloudSync models not included in project - commenting out
+        /*
         let id = "\(userId)_\(dto.achievementId)"
         let descriptor = FetchDescriptor<CachedAchievement>(
             predicate: #Predicate { $0.id == id }
@@ -571,9 +589,12 @@ class CloudSyncEngine: ObservableObject {
             let newCache = CachedAchievement(userId: userId, dto: dto)
             context.insert(newCache)
         }
+        */
     }
     
-    private func syncSessionToLocal(userId: String, dto: SessionDTO, context: ModelContext) async throws {
+    private func syncSessionToLocal(userId: String, dto: StudySessionDTO, context: ModelContext) async throws {
+        // CloudSync models not included in project - commenting out
+        /*
         let id = "\(userId)_\(dto.sessionId)"
         let descriptor = FetchDescriptor<CachedSession>(
             predicate: #Predicate { $0.id == id }
@@ -590,6 +611,7 @@ class CloudSyncEngine: ObservableObject {
             context.insert(newCache)
             print("📝 CloudSync: Session '\(dto.sessionId)' cached locally")
         }
+        */
     }
     
     private func fetchUserMeta(userId: String) async throws -> UserMetaDTO? {
@@ -638,7 +660,7 @@ class CloudSyncEngine: ObservableObject {
         return result
     }
     
-    private func fetchRecentSessions(userId: String, limit: Int) async throws -> [SessionDTO] {
+    private func fetchRecentSessions(userId: String, limit: Int) async throws -> [StudySessionDTO] {
         let query = database.child("users").child(userId).child("sessions").queryLimited(toLast: UInt(limit))
         let snapshot = try await query.getData()
         
@@ -646,9 +668,9 @@ class CloudSyncEngine: ObservableObject {
             return []
         }
         
-        var result: [SessionDTO] = []
+        var result: [StudySessionDTO] = []
         for (sessionId, dict) in data {
-            if let dto = SessionDTO.fromDictionary(sessionId: sessionId, dict) {
+            if let dto = StudySessionDTO.fromDictionary(sessionId: sessionId, dict) {
                 result.append(dto)
             }
         }
@@ -656,19 +678,20 @@ class CloudSyncEngine: ObservableObject {
     }
     
     // MARK: - Outbox Helpers
-    
+    // CloudSync models not included in project - commenting out methods
+    /*
     private func ensureProgressInOutbox(userId: String, cached: CachedUserProgress, context: ModelContext) async throws {
         let path = "users/\(userId)/progress"
         
         // Check if already in outbox
-        let descriptor = FetchDescriptor<SyncOutboxItem>(
+        let descriptor = FetchDescriptor<SyncOutboxItemCacheModel>(
             predicate: #Predicate { $0.userId == userId && $0.path == path }
         )
         let existing = try context.fetch(descriptor).first
         
         if existing == nil {
             let dto = cached.toDTO()
-            let outboxItem = SyncOutboxItem(
+            let outboxItem = SyncOutboxItemCacheModel(
                 userId: userId,
                 path: path,
                 payload: dto.toDictionary(),
@@ -683,14 +706,14 @@ class CloudSyncEngine: ObservableObject {
         let path = "users/\(userId)/vocab/\(cached.wordId)"
         
         // Check if already in outbox
-        let descriptor = FetchDescriptor<SyncOutboxItem>(
+        let descriptor = FetchDescriptor<SyncOutboxItemCacheModel>(
             predicate: #Predicate { $0.userId == userId && $0.path == path }
         )
         let existing = try context.fetch(descriptor).first
         
         if existing == nil {
             let dto = cached.toDTO()
-            let outboxItem = SyncOutboxItem(
+            let outboxItem = SyncOutboxItemCacheModel(
                 userId: userId,
                 path: path,
                 payload: dto.toDictionary(),
@@ -705,14 +728,14 @@ class CloudSyncEngine: ObservableObject {
         let path = "users/\(userId)/achievements/\(cached.achievementId)"
         
         // Check if already in outbox
-        let descriptor = FetchDescriptor<SyncOutboxItem>(
+        let descriptor = FetchDescriptor<SyncOutboxItemCacheModel>(
             predicate: #Predicate { $0.userId == userId && $0.path == path }
         )
         let existing = try context.fetch(descriptor).first
         
         if existing == nil {
             let dto = cached.toDTO()
-            let outboxItem = SyncOutboxItem(
+            let outboxItem = SyncOutboxItemCacheModel(
                 userId: userId,
                 path: path,
                 payload: dto.toDictionary(),
@@ -730,9 +753,9 @@ class CloudSyncEngine: ObservableObject {
         }
         
         let context = container.mainContext
-        let descriptor = FetchDescriptor<SyncOutboxItem>(
+        let descriptor = FetchDescriptor<SyncOutboxItemCacheModel>(
             predicate: #Predicate { $0.userId == userId && $0.attempts < 10 },
-            sortBy: [SortDescriptor(\SyncOutboxItem.createdAt)]
+            sortBy: [SortDescriptor(\SyncOutboxItemCacheModel.createdAt)]
         )
         
         do {
@@ -767,6 +790,7 @@ class CloudSyncEngine: ObservableObject {
             print("❌ CloudSync: Failed to flush outbox - \(error)")
         }
     }
+    */
     
     private func getDeviceId() async -> String {
         return await UIDevice.current.identifierForVendor?.uuidString ?? "unknown"

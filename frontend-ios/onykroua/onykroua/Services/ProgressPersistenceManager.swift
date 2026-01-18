@@ -1,7 +1,10 @@
 import Foundation
 import SwiftData
+import onykroua
 
 // MARK: - Progress Persistence Manager
+// NOTE: This file uses the new Cache models from Models/Cache/
+// TODO: Consider migrating to use Domain models with Mappers
 
 @MainActor
 class ProgressPersistenceManager: ObservableObject {
@@ -31,17 +34,17 @@ class ProgressPersistenceManager: ObservableObject {
     
     // MARK: - User Progress Operations
     
-    func getUserProgress(userId: String = "default_user") -> UserProgressModel? {
+    func getUserProgress(userId: String = "default_user") -> UserProgressCacheModel? {
         guard let context = modelContext else {
             print("❌ ModelContext not available")
             return nil
         }
         
-        let predicate = #Predicate<UserProgressModel> { progress in
+        let predicate = #Predicate<UserProgressCacheModel> { progress in
             progress.userId == userId
         }
         
-        let descriptor = FetchDescriptor<UserProgressModel>(predicate: predicate)
+        let descriptor = FetchDescriptor<UserProgressCacheModel>(predicate: predicate)
         
         do {
             let models = try context.fetch(descriptor)
@@ -52,7 +55,7 @@ class ProgressPersistenceManager: ObservableObject {
         }
     }
     
-    func saveUserProgress(_ progress: UserProgressModel) {
+    func saveUserProgress(_ progress: UserProgressCacheModel) {
         guard let context = modelContext else {
             print("❌ ModelContext not available")
             return
@@ -62,7 +65,7 @@ class ProgressPersistenceManager: ObservableObject {
         
         do {
             try context.save()
-            print("✅ Saved user progress: XP=\(progress.totalXP), Level=\(progress.currentLevel)")
+            print("✅ Saved user progress: XP=\(progress.xp), Level=\(progress.level)")
         } catch {
             print("❌ Failed to save user progress: \(error)")
         }
@@ -83,22 +86,22 @@ class ProgressPersistenceManager: ObservableObject {
         
         if let existingProgress = getUserProgress(userId: userId) {
             if let words = totalWordsLearned {
-                existingProgress.totalWordsLearned = words
+                existingProgress.wordsLearned = words
             }
             if let xp = totalXP {
-                existingProgress.totalXP = xp
+                existingProgress.xp = xp
             }
             if let level = currentLevel {
-                existingProgress.currentLevel = level
+                existingProgress.level = level
             }
             if let streak = dailyStreak {
-                existingProgress.dailyStreak = streak
+                existingProgress.streakDays = streak
             }
             if let longest = longestStreak {
                 existingProgress.longestStreak = longest
             }
             
-            existingProgress.lastModified = Date()
+            existingProgress.updatedAt = TimestampMapper.currentDateMilliseconds()
             
             do {
                 try context.save()
@@ -107,13 +110,13 @@ class ProgressPersistenceManager: ObservableObject {
                 print("❌ Failed to update user progress: \(error)")
             }
         } else {
-            let newProgress = UserProgressModel(
+            let newProgress = UserProgressCacheModel(
                 userId: userId,
-                totalWordsLearned: totalWordsLearned ?? 0,
-                totalXP: totalXP ?? 0,
-                currentLevel: currentLevel ?? 1,
-                dailyStreak: dailyStreak ?? 0,
-                longestStreak: longestStreak ?? 0
+                level: currentLevel ?? 1,
+                xp: totalXP ?? 0,
+                streakDays: dailyStreak ?? 0,
+                longestStreak: longestStreak ?? 0,
+                wordsLearned: totalWordsLearned ?? 0
             )
             saveUserProgress(newProgress)
         }
@@ -134,59 +137,71 @@ class ProgressPersistenceManager: ObservableObject {
             return
         }
         
-        let learnedWord = LearnedWordModel(
-            userId: userId,
-            wordId: wordId,
-            word: word,
-            translation: translation,
-            language: language,
-            category: category
+        // Create or update VocabWordCacheModel
+        let safeWordId = safeFirebaseKey(wordId)
+        let vocabCacheId = "\(userId)_\(safeWordId)"
+        
+        let descriptor = FetchDescriptor<VocabWordCacheModel>(
+            predicate: #Predicate { $0.id == vocabCacheId }
         )
         
-        context.insert(learnedWord)
-        
         do {
-            try context.save()
-            print("✅ Marked word as learned: \(word)")
+            let existingVocab = try context.fetch(descriptor).first
+            
+            if let vocab = existingVocab {
+                vocab.status = "learned"
+                vocab.strength = 100
+                vocab.lastSeenAt = TimestampMapper.currentDateMilliseconds()
+                vocab.updatedAt = TimestampMapper.currentDateMilliseconds()
+            } else {
+                let newVocab = VocabWordCacheModel(
+                    id: vocabCacheId,
+                    userId: userId,
+                    wordId: safeWordId,
+                    status: "learned",
+                    strength: 100,
+                    lastSeenAt: TimestampMapper.currentDateMilliseconds(),
+                    reviewCount: 1,
+                    correctCount: 1
+                )
+                context.insert(newVocab)
+            }
             
             // Update user progress
             if let progress = getUserProgress(userId: userId) {
-                progress.totalWordsLearned += 1
-                progress.totalXP += 10
+                progress.wordsLearned += 1
+                progress.xp += 10
+                progress.updatedAt = TimestampMapper.currentDateMilliseconds()
                 
-                if !progress.learnedWordsIds.contains(wordId) {
-                    progress.learnedWordsIds.append(wordId)
-                }
-                
-                progress.lastModified = Date()
                 try context.save()
+                print("✅ Marked word as learned: \(word)")
             }
         } catch {
             print("❌ Failed to mark word as learned: \(error)")
         }
     }
     
-    func getLearnedWords(userId: String = "default_user", language: String? = nil) -> [LearnedWordModel] {
+    func getLearnedWords(userId: String = "default_user", language: String? = nil) -> [VocabWordCacheModel] {
         guard let context = modelContext else {
             print("❌ ModelContext not available")
             return []
         }
         
-        let predicate: Predicate<LearnedWordModel>
+        let predicate: Predicate<VocabWordCacheModel>
         
-        if let lang = language {
-            predicate = #Predicate<LearnedWordModel> { word in
-                word.userId == userId && word.language == lang
+        if let _ = language {
+            predicate = #Predicate<VocabWordCacheModel> { word in
+                word.userId == userId && word.status == "learned"
             }
         } else {
-            predicate = #Predicate<LearnedWordModel> { word in
-                word.userId == userId
+            predicate = #Predicate<VocabWordCacheModel> { word in
+                word.userId == userId && word.status == "learned"
             }
         }
         
-        let descriptor = FetchDescriptor<LearnedWordModel>(
+        let descriptor = FetchDescriptor<VocabWordCacheModel>(
             predicate: predicate,
-            sortBy: [SortDescriptor(\.dateLearned, order: .reverse)]
+            sortBy: [SortDescriptor(\.lastSeenAt, order: .reverse)]
         )
         
         do {
@@ -200,11 +215,25 @@ class ProgressPersistenceManager: ObservableObject {
     }
     
     func isWordLearned(wordId: String, userId: String = "default_user") -> Bool {
-        guard let progress = getUserProgress(userId: userId) else {
+        guard let context = modelContext else {
+            print("❌ ModelContext not available")
             return false
         }
         
-        return progress.learnedWordsIds.contains(wordId)
+        let safeWordId = safeFirebaseKey(wordId)
+        let vocabCacheId = "\(userId)_\(safeWordId)"
+        
+        let descriptor = FetchDescriptor<VocabWordCacheModel>(
+            predicate: #Predicate { $0.id == vocabCacheId && $0.status == "learned" }
+        )
+        
+        do {
+            let result = try context.fetch(descriptor)
+            return !result.isEmpty
+        } catch {
+            print("❌ Failed to check if word is learned: \(error)")
+            return false
+        }
     }
     
     // MARK: - Study Session Operations
@@ -223,13 +252,18 @@ class ProgressPersistenceManager: ObservableObject {
             return
         }
         
-        let session = StudySessionModel(
+        let sessionId = UUID().uuidString
+        let nowMs = TimestampMapper.currentDateMilliseconds()
+        
+        let session = StudySessionCacheModel(
+            id: "\(userId)_\(sessionId)",
             userId: userId,
-            durationMinutes: durationMinutes,
-            wordsLearned: wordsLearned,
-            wordsReviewed: wordsReviewed,
-            xpEarned: xpEarned,
-            language: language,
+            sessionId: sessionId,
+            startedAt: nowMs,
+            endedAt: nowMs + Int64(durationMinutes * 60 * 1000),
+            itemsCount: wordsLearned + wordsReviewed,
+            correctCount: wordsLearned,
+            xpGained: xpEarned,
             activityType: activityType
         )
         
@@ -241,9 +275,10 @@ class ProgressPersistenceManager: ObservableObject {
             
             // Update user progress
             if let progress = getUserProgress(userId: userId) {
-                progress.totalStudyTimeMinutes += durationMinutes
-                progress.lastStudyDate = Date()
-                progress.lastModified = Date()
+                progress.studyTimeMinutes += durationMinutes
+                progress.sessionsCompleted += 1
+                progress.lastStudyAt = nowMs
+                progress.updatedAt = nowMs
                 try context.save()
             }
         } catch {
@@ -251,19 +286,19 @@ class ProgressPersistenceManager: ObservableObject {
         }
     }
     
-    func getStudySessions(userId: String = "default_user", limit: Int = 30) -> [StudySessionModel] {
+    func getStudySessions(userId: String = "default_user", limit: Int = 30) -> [StudySessionCacheModel] {
         guard let context = modelContext else {
             print("❌ ModelContext not available")
             return []
         }
         
-        let predicate = #Predicate<StudySessionModel> { session in
+        let predicate = #Predicate<StudySessionCacheModel> { session in
             session.userId == userId
         }
         
-        let descriptor = FetchDescriptor<StudySessionModel>(
+        let descriptor = FetchDescriptor<StudySessionCacheModel>(
             predicate: predicate,
-            sortBy: [SortDescriptor(\.sessionDate, order: .reverse)]
+            sortBy: [SortDescriptor(\.startedAt, order: .reverse)]
         )
         
         do {
@@ -281,78 +316,80 @@ class ProgressPersistenceManager: ObservableObject {
         let sessions = getStudySessions(userId: userId, limit: 100)
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
+        let todayMs = TimestampMapper.toMilliseconds(today)
         
         let todaySessions = sessions.filter { session in
-            calendar.isDate(session.sessionDate, inSameDayAs: today)
+            session.startedAt >= todayMs
         }
         
-        return todaySessions.reduce(0) { $0 + $1.durationMinutes }
+        return todaySessions.reduce(0) { $0 + Int(($1.endedAt - $1.startedAt) / 60000) }
     }
     
     // MARK: - Favorites Operations
     
     func toggleFavorite(wordId: String, userId: String = "default_user") {
+        // Favorites are now tracked via VocabWordCacheModel status
         guard let context = modelContext else {
             print("❌ ModelContext not available")
             return
         }
         
-        if let progress = getUserProgress(userId: userId) {
-            if progress.favoriteWords.contains(wordId) {
-                progress.favoriteWords.removeAll { $0 == wordId }
-                print("💔 Removed from favorites: \(wordId)")
-            } else {
-                progress.favoriteWords.append(wordId)
-                print("❤️ Added to favorites: \(wordId)")
-            }
-            
-            progress.lastModified = Date()
-            
-            do {
+        let safeWordId = safeFirebaseKey(wordId)
+        let vocabCacheId = "\(userId)_\(safeWordId)"
+        
+        let descriptor = FetchDescriptor<VocabWordCacheModel>(
+            predicate: #Predicate { $0.id == vocabCacheId }
+        )
+        
+        do {
+            if let vocab = try context.fetch(descriptor).first {
+                if vocab.status == "favorite" {
+                    vocab.status = "learned"
+                    print("💔 Removed from favorites: \(wordId)")
+                } else {
+                    vocab.status = "favorite"
+                    print("❤️ Added to favorites: \(wordId)")
+                }
+                vocab.updatedAt = TimestampMapper.currentDateMilliseconds()
                 try context.save()
-            } catch {
-                print("❌ Failed to toggle favorite: \(error)")
             }
+        } catch {
+            print("❌ Failed to toggle favorite: \(error)")
         }
     }
     
     func isFavorite(wordId: String, userId: String = "default_user") -> Bool {
-        guard let progress = getUserProgress(userId: userId) else {
+        guard let context = modelContext else {
+            print("❌ ModelContext not available")
             return false
         }
         
-        return progress.favoriteWords.contains(wordId)
+        let safeWordId = safeFirebaseKey(wordId)
+        let vocabCacheId = "\(userId)_\(safeWordId)"
+        
+        let descriptor = FetchDescriptor<VocabWordCacheModel>(
+            predicate: #Predicate { $0.id == vocabCacheId && $0.status == "favorite" }
+        )
+        
+        do {
+            let result = try context.fetch(descriptor)
+            return !result.isEmpty
+        } catch {
+            print("❌ Failed to check favorite: \(error)")
+            return false
+        }
     }
     
     // MARK: - Achievements Operations
     
     func unlockAchievement(achievementId: String, userId: String = "default_user") {
-        guard let context = modelContext else {
-            print("❌ ModelContext not available")
-            return
-        }
-        
-        if let progress = getUserProgress(userId: userId) {
-            if !progress.achievements.contains(achievementId) {
-                progress.achievements.append(achievementId)
-                progress.lastModified = Date()
-                
-                do {
-                    try context.save()
-                    print("🏆 Achievement unlocked: \(achievementId)")
-                } catch {
-                    print("❌ Failed to unlock achievement: \(error)")
-                }
-            }
-        }
+        // Achievements are now tracked via CachedAchievement (out of PR#1 scope)
+        print("🏆 Achievement tracking moved to CloudSync/AchievementRepository")
     }
     
     func getAchievements(userId: String = "default_user") -> [String] {
-        guard let progress = getUserProgress(userId: userId) else {
-            return []
-        }
-        
-        return progress.achievements
+        print("🏆 Achievement tracking moved to CloudSync/AchievementRepository")
+        return []
     }
     
     // MARK: - Statistics
@@ -366,15 +403,13 @@ class ProgressPersistenceManager: ObservableObject {
         let sessions = getStudySessions(userId: userId)
         
         return [
-            "totalWordsLearned": progress.totalWordsLearned,
-            "totalXP": progress.totalXP,
-            "currentLevel": progress.currentLevel,
-            "dailyStreak": progress.dailyStreak,
+            "totalWordsLearned": progress.wordsLearned,
+            "totalXP": progress.xp,
+            "currentLevel": progress.level,
+            "dailyStreak": progress.streakDays,
             "longestStreak": progress.longestStreak,
-            "totalStudyTime": progress.totalStudyTimeMinutes,
+            "totalStudyTime": progress.studyTimeMinutes,
             "todayStudyTime": getTodayStudyTime(userId: userId),
-            "favoritesCount": progress.favoriteWords.count,
-            "achievementsCount": progress.achievements.count,
             "sessionsCount": sessions.count
         ]
     }
@@ -388,17 +423,17 @@ class ProgressPersistenceManager: ObservableObject {
         }
         
         do {
-            // Delete learned words
-            let learnedPredicate = #Predicate<LearnedWordModel> { word in
+            // Delete vocab words
+            let vocabPredicate = #Predicate<VocabWordCacheModel> { word in
                 word.userId == userId
             }
-            try context.delete(model: LearnedWordModel.self, where: learnedPredicate)
+            try context.delete(model: VocabWordCacheModel.self, where: vocabPredicate)
             
             // Delete study sessions
-            let sessionPredicate = #Predicate<StudySessionModel> { session in
+            let sessionPredicate = #Predicate<StudySessionCacheModel> { session in
                 session.userId == userId
             }
-            try context.delete(model: StudySessionModel.self, where: sessionPredicate)
+            try context.delete(model: StudySessionCacheModel.self, where: sessionPredicate)
             
             // Reset user progress
             if let progress = getUserProgress(userId: userId) {

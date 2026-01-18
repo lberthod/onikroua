@@ -1,6 +1,7 @@
 import Foundation
 import SwiftUI
 import SwiftData
+import FirebaseAuth
 
 @Observable
 final class GamificationManager {
@@ -21,14 +22,21 @@ final class GamificationManager {
     }
     
     private func loadOrCreateProgress() {
-        let descriptor = FetchDescriptor<UserProgress>()
+        guard let userId = Auth.auth().currentUser?.uid else {
+            print("⚠️ No user logged in, skipping progress load")
+            return
+        }
+        
+        let descriptor = FetchDescriptor<UserProgressCacheModel>(
+            predicate: #Predicate { $0.userId == userId }
+        )
         if let existing = try? modelContext.fetch(descriptor).first {
-            currentProgress = existing
+            currentProgress = UserProgressMapper.fromCache(existing)
         } else {
-            let newProgress = UserProgress()
-            modelContext.insert(newProgress)
-            currentProgress = newProgress
+            let newCache = UserProgressCacheModel(userId: userId)
+            modelContext.insert(newCache)
             try? modelContext.save()
+            currentProgress = UserProgressMapper.fromCache(newCache)
         }
     }
     
@@ -55,12 +63,23 @@ final class GamificationManager {
     }
     
     func addXP(_ amount: Int) {
-        guard let progress = currentProgress else { return }
+        guard let progress = currentProgress, let userId = Auth.auth().currentUser?.uid else { return }
         
         lastXPGained = amount
-        let oldLevel = progress.level
+        let oldLevel = progress.levelNumber
         
-        progress.addXP(amount)
+        var mutableProgress = progress
+        mutableProgress.addXP(amount)
+        currentProgress = mutableProgress
+        
+        // Update cache
+        let descriptor = FetchDescriptor<UserProgressCacheModel>(
+            predicate: #Predicate { $0.userId == userId }
+        )
+        if let cached = try? modelContext.fetch(descriptor).first {
+            let updatedCache = UserProgressMapper.toCache(mutableProgress, into: cached)
+            try? modelContext.save()
+        }
         
         withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
             showXPAnimation = true
@@ -70,9 +89,9 @@ final class GamificationManager {
             self.showXPAnimation = false
         }
         
-        if progress.level != oldLevel {
+        if progress.levelNumber != oldLevel {
             showLevelUpModal = true
-            checkLevelAchievements(progress.level)
+            checkLevelAchievements(CEFRLevel.fromLevelNumber(progress.levelNumber))
         }
         
         try? modelContext.save()
@@ -178,8 +197,19 @@ final class GamificationManager {
         achievement.unlock()
         lastUnlockedAchievement = achievement
         
-        if let progress = currentProgress {
-            progress.addXP(type.xpReward)
+        if let progress = currentProgress, let userId = Auth.auth().currentUser?.uid {
+            var mutableProgress = progress
+            mutableProgress.addXP(type.xpReward)
+            currentProgress = mutableProgress
+            
+            // Update cache
+            let descriptor = FetchDescriptor<UserProgressCacheModel>(
+                predicate: #Predicate { $0.userId == userId }
+            )
+            if let cached = try? modelContext.fetch(descriptor).first {
+                let updatedCache = UserProgressMapper.toCache(mutableProgress, into: cached)
+                try? modelContext.save()
+            }
         }
         
         withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {

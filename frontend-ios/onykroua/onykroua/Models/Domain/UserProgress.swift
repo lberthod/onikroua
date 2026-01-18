@@ -1,9 +1,8 @@
 import Foundation
-import SwiftData
 
-@Model
-public final class UserProgress {
-    @Attribute(.unique) public var id: UUID
+public struct UserProgress: Equatable, Identifiable, Codable {
+    public let id: String
+    public let userId: String
     public var currentLevel: String
     public var currentXP: Int
     public var totalXP: Int
@@ -24,20 +23,9 @@ public final class UserProgress {
     public var studyTimeMinutes: Int
     public var sessionsCompleted: Int
     
-    public var levelNumber: Int {
-        // Logique simple pour calculer le numéro du niveau basé sur l'XP
-        // Par exemple : Niveau 1 = 0-100 XP, Niveau 2 = 101-250 XP, etc.
-        let xp = totalXP
-        if xp < 100 { return 1 }
-        if xp < 250 { return 2 }
-        if xp < 500 { return 3 }
-        if xp < 1000 { return 4 }
-        if xp < 2000 { return 5 }
-        return 6 + (xp - 2000) / 1000
-    }
-    
     public init(
-        id: UUID = UUID(),
+        id: String = UUID().uuidString,
+        userId: String,
         currentLevel: String = CEFRLevel.a1.rawValue,
         currentXP: Int = 0,
         totalXP: Int = 0,
@@ -53,9 +41,12 @@ public final class UserProgress {
         grammarRulesLearned: Int = 0,
         verbsLearned: Int = 0,
         studyTimeMinutes: Int = 0,
-        sessionsCompleted: Int = 0
+        sessionsCompleted: Int = 0,
+        createdAt: Date = Date(),
+        updatedAt: Date = Date()
     ) {
         self.id = id
+        self.userId = userId
         self.currentLevel = currentLevel
         self.currentXP = currentXP
         self.totalXP = totalXP
@@ -72,13 +63,23 @@ public final class UserProgress {
         self.verbsLearned = verbsLearned
         self.studyTimeMinutes = studyTimeMinutes
         self.sessionsCompleted = sessionsCompleted
-        self.createdAt = Date()
-        self.updatedAt = Date()
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
     }
     
     public var level: CEFRLevel {
         get { CEFRLevel.fromString(currentLevel) }
         set { currentLevel = newValue.rawValue }
+    }
+    
+    public var levelNumber: Int {
+        let xp = totalXP
+        if xp < 100 { return 1 }
+        if xp < 250 { return 2 }
+        if xp < 500 { return 3 }
+        if xp < 1000 { return 4 }
+        if xp < 2000 { return 5 }
+        return 6 + (xp - 2000) / 1000
     }
     
     public var progressPercentage: Double {
@@ -95,21 +96,21 @@ public final class UserProgress {
         return Double(quizzesCorrect) / Double(quizzesCompleted)
     }
     
-    public func addXP(_ amount: Int) {
+    public mutating func addXP(_ amount: Int) {
         currentXP += amount
         totalXP += amount
         updatedAt = Date()
         checkLevelUp()
     }
     
-    public func checkLevelUp() {
+    public mutating func checkLevelUp() {
         while currentXP >= level.xpRequired, let nextLevel = level.nextLevel {
             currentXP -= level.xpRequired
             level = nextLevel
         }
     }
     
-    public func incrementStreak() {
+    public mutating func incrementStreak() {
         streak += 1
         if streak > longestStreak {
             longestStreak = streak
@@ -118,12 +119,12 @@ public final class UserProgress {
         updatedAt = Date()
     }
     
-    public func resetStreak() {
+    public mutating func resetStreak() {
         streak = 0
         updatedAt = Date()
     }
     
-    public func checkAndUpdateStreak() {
+    public mutating func checkAndUpdateStreak() {
         guard let lastDate = lastStudyDate else {
             incrementStreak()
             return
@@ -144,23 +145,23 @@ public final class UserProgress {
         }
     }
     
-    public func recordWordLearned() {
+    public mutating func recordWordLearned() {
         wordsLearned += 1
         updatedAt = Date()
     }
     
-    public func recordWordReviewed() {
+    public mutating func recordWordReviewed() {
         wordsReviewed += 1
         updatedAt = Date()
     }
     
-    public func recordLessonCompleted() {
+    public mutating func recordLessonCompleted() {
         lessonsCompleted += 1
         sessionsCompleted += 1
         updatedAt = Date()
     }
     
-    public func recordQuizCompleted(correct: Int, total: Int) {
+    public mutating func recordQuizCompleted(correct: Int, total: Int) {
         quizzesCompleted += 1
         quizzesCorrect += correct
         sessionsCompleted += 1
@@ -175,26 +176,26 @@ public final class UserProgress {
         }
     }
     
-    public func recordConversationCompleted() {
+    public mutating func recordConversationCompleted() {
         conversationsCompleted += 1
         sessionsCompleted += 1
         updatedAt = Date()
         addXP(40)
     }
     
-    public func recordGrammarRuleLearned() {
+    public mutating func recordGrammarRuleLearned() {
         grammarRulesLearned += 1
         updatedAt = Date()
         addXP(15)
     }
     
-    public func recordVerbLearned() {
+    public mutating func recordVerbLearned() {
         verbsLearned += 1
         updatedAt = Date()
         addXP(20)
     }
     
-    public func recordStudyTime(minutes: Int) {
+    public mutating func recordStudyTime(minutes: Int) {
         studyTimeMinutes += minutes
         updatedAt = Date()
     }

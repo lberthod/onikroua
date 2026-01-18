@@ -63,7 +63,7 @@ struct VocabularyExplorerTab: View {
     @State private var searchText = ""
     @State private var selectedLevel: String? = nil
 
-    private var filteredWords: [VocabularyWord] {
+    private var filteredWords: [VocabWord] {
         var words = env.vocabularyManager.getAllWords(language: language)
 
         if let level = selectedLevel {
@@ -128,7 +128,7 @@ struct VocabularyExplorerTab: View {
         .background(Color(.systemGroupedBackground))
     }
 
-    private func getCEFRLevel(for word: VocabularyWord) -> CEFRLevel {
+    private func getCEFRLevel(for word: VocabWord) -> CEFRLevel {
         let words = env.vocabularyManager.getAllWords(language: language)
         let wordIndex = words.firstIndex(where: { $0.word == word.word }) ?? 0
         let percentage = Double(wordIndex) / Double(max(1, words.count))
@@ -144,20 +144,20 @@ struct VocabularyExplorerTab: View {
 
 struct EnhancedDictionaryTab: View {
     let language: String
-    let words: [VocabularyWord]
+    let words: [VocabWord]
     let gamificationManager: GamificationManager?
     
     @EnvironmentObject var env: AppEnvironment
     @State private var searchText = ""
-    @State private var randomWord: VocabularyWord? = nil
+    @State private var randomWord: VocabWord? = nil
     @State private var showRandomDetail = false
     @State private var isRandomWordLearned = false
     
-    private var uniqueSortedWords: [VocabularyWord] {
+    private var uniqueSortedWords: [VocabWord] {
         // Obtenir tous les mots, supprimer les doublons par texte de mot, et trier A-Z
         let allWords = words
         var seenWords = Set<String>()
-        var uniqueWords = [VocabularyWord]()
+        var uniqueWords = [VocabWord]()
         
         for word in allWords {
             let normalizedWord = word.word.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
@@ -170,7 +170,7 @@ struct EnhancedDictionaryTab: View {
         return uniqueWords.sorted { $0.word.lowercased() < $1.word.lowercased() }
     }
     
-    private var searchResults: [VocabularyWord] {
+    private var searchResults: [VocabWord] {
         let baseWords = uniqueSortedWords
         if searchText.isEmpty {
             return baseWords
@@ -291,7 +291,7 @@ struct EnhancedDictionaryTab: View {
 }
 
 struct EnhancedDictionaryRow: View {
-    let word: VocabularyWord
+    let word: VocabWord
     let gamificationManager: GamificationManager?
     
     @EnvironmentObject var env: AppEnvironment
@@ -439,7 +439,7 @@ struct EnhancedDictionaryRow: View {
 }
 
 struct WordDetailView: View {
-    @State var word: VocabularyWord
+    @State var word: VocabWord
     @Binding var isLearned: Bool
     let gamificationManager: GamificationManager?
     var onNextRandom: (() -> Void)? = nil

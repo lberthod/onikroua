@@ -37,7 +37,9 @@ final class GamificationSyncManager: ObservableObject {
     // MARK: - Sync to Cloud (Legacy compatibility - now handled by Repositories)
     
     func syncToCloud() async {
-        await CloudSyncEngine.shared.flushOutbox()
+        // CloudSync models not included in project - flushOutbox is commented out
+        // await CloudSyncEngine.shared.flushOutbox()
+        print("⚠️ GamificationSyncManager.syncToCloud called but CloudSync models not included")
     }
     
     // MARK: - Activity Logging
@@ -45,6 +47,8 @@ final class GamificationSyncManager: ObservableObject {
     func logStudySession(duration: Int, xpGained: Int, activityType: String, itemsCount: Int = 0, correctCount: Int = 0) async {
         guard let repo = progressRepo else { return }
         
+        // CloudSync models not included in project - recordSessionCompleted is commented out
+        /*
         do {
             try await repo.recordSessionCompleted(
                 xpGained: xpGained,
@@ -58,11 +62,15 @@ final class GamificationSyncManager: ObservableObject {
             print("❌ Sync: Failed to log study session - \(error.localizedDescription)")
             syncError = error.localizedDescription
         }
+        */
+        print("⚠️ GamificationSyncManager.logStudySession called but CloudSync models not included")
     }
     
     func logQuizResult(quizType: String, score: Int, totalQuestions: Int, difficulty: String) async {
         guard let repo = progressRepo else { return }
         
+        // CloudSync models not included in project - recordSessionCompleted is commented out
+        /*
         do {
             // Mapping quiz results to session records for now
             try await repo.recordSessionCompleted(
@@ -77,11 +85,15 @@ final class GamificationSyncManager: ObservableObject {
             print("❌ Sync: Failed to log quiz result - \(error.localizedDescription)")
             syncError = error.localizedDescription
         }
+        */
+        print("⚠️ GamificationSyncManager.logQuizResult called but CloudSync models not included")
     }
     
     func updateLeaderboard(username: String) async {
         guard let repo = progressRepo else { return }
         
+        // CloudSync models not included in project - pushToLeaderboard is commented out
+        /*
         do {
             try await repo.pushToLeaderboard(username: username)
             print("✅ Sync: Leaderboard updated")
@@ -89,5 +101,7 @@ final class GamificationSyncManager: ObservableObject {
             print("❌ Sync: Failed to update leaderboard - \(error.localizedDescription)")
             syncError = error.localizedDescription
         }
+        */
+        print("⚠️ GamificationSyncManager.updateLeaderboard called but CloudSync models not included")
     }
 }

@@ -1,9 +1,11 @@
 import SwiftUI
 import SwiftData
+import onykroua
 
 struct OnboardingContainerView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @State private var progressStore: UserProgressStore?
     
     @State private var currentPage: Int = 0
     @State private var onboardingData = OnboardingData()
@@ -99,6 +101,11 @@ struct OnboardingContainerView: View {
                 skipOnboarding()
             }
         }
+        .onAppear {
+            if progressStore == nil {
+                progressStore = UserProgressStore(modelContext: modelContext)
+            }
+        }
     }
     
     private func canProceed() -> Bool {
@@ -147,9 +154,31 @@ struct OnboardingContainerView: View {
         modelContext.insert(data)
         print("✅ Default onboarding data created")
         
-        // Créer une progression par défaut
-        let progress = UserProgress()
-        modelContext.insert(progress)
+        // Créer une progression par défaut (Domain model)
+        let level = CEFRLevel.a1
+        let progress = UserProgress(
+            id: UUID().uuidString,
+            userId: "default_user",
+            currentLevel: level.rawValue,
+            currentXP: 0,
+            totalXP: 0,
+            wordsLearned: 0,
+            wordsReviewed: 0,
+            lessonsCompleted: 0,
+            lastStudyDate: Date(),
+            streak: 0,
+            longestStreak: 0,
+            quizzesCompleted: 0,
+            quizzesCorrect: 0,
+            conversationsCompleted: 0,
+            grammarRulesLearned: 0,
+            verbsLearned: 0,
+            studyTimeMinutes: 0,
+            sessionsCompleted: 0,
+            createdAt: Date(),
+            updatedAt: Date()
+        )
+        progressStore?.saveProgress(progress)
         print("✅ Default user progress created")
         
         do {
@@ -203,9 +232,31 @@ struct OnboardingContainerView: View {
         modelContext.insert(data)
         print("✅ Onboarding data prepared: language=\(data.selectedLanguage), level=\(data.initialLevel)")
         
-        // Créer la progression utilisateur
-        let progress = UserProgress(currentLevel: data.initialLevel.isEmpty ? CEFRLevel.a1.rawValue : data.initialLevel)
-        modelContext.insert(progress)
+        // Créer la progression utilisateur (Domain model)
+        let level = CEFRLevel.fromString(data.initialLevel.isEmpty ? CEFRLevel.a1.rawValue : data.initialLevel)
+        let progress = UserProgress(
+            id: UUID().uuidString,
+            userId: "default_user",
+            currentLevel: level.rawValue,
+            currentXP: 0,
+            totalXP: 0,
+            wordsLearned: 0,
+            wordsReviewed: 0,
+            lessonsCompleted: 0,
+            lastStudyDate: Date(),
+            streak: 0,
+            longestStreak: 0,
+            quizzesCompleted: 0,
+            quizzesCorrect: 0,
+            conversationsCompleted: 0,
+            grammarRulesLearned: 0,
+            verbsLearned: 0,
+            studyTimeMinutes: 0,
+            sessionsCompleted: 0,
+            createdAt: Date(),
+            updatedAt: Date()
+        )
+        progressStore?.saveProgress(progress)
         print("✅ User progress created")
         
         // Sauvegarder

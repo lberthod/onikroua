@@ -25,17 +25,17 @@ struct onykrouaApp: App {
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            UserProgress.self,
             Achievement.self,
             OnboardingData.self,
             LearningPath.self,
-            DailySession.self,
-            CachedUserProgress.self,
-            CachedVocabWord.self,
-            CachedAchievement.self,
-            CachedSession.self,
-            SyncOutboxItem.self,
-            SyncMetadata.self
+            DailySession.self
+            // CloudSync models (not yet included in project)
+            // CachedUserProgress.self,
+            // CachedVocabWord.self,
+            // CachedAchievement.self,
+            // CachedSession.self,
+            // SyncOutboxItemCacheModel.self,
+            // SyncMetadata.self
         ])
         let modelConfiguration = ModelConfiguration(
             schema: schema,

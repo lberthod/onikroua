@@ -204,15 +204,15 @@ public class VocabularyDataManager: ObservableObject {
 // MARK: - Legacy Support
 
 public class VocabularyLoader {
-    public static func loadVocabulary() -> [VocabularyCategory] {
+    public static func loadVocabulary() -> [VocabCategory] {
         return VocabularyDataManager.shared.getVocabularyByLanguage("it")
     }
     
-    public static func getAllWords() -> [VocabularyWord] {
+    public static func getAllWords() -> [VocabWord] {
         return VocabularyDataManager.shared.getAllWords(language: "it")
     }
     
-    public static func getWords(forCategory category: String) -> [VocabularyWord] {
+    public static func getWords(forCategory category: String) -> [VocabWord] {
         return VocabularyDataManager.shared.getWordsByCategory(language: "it", categoryName: category)
     }
 }

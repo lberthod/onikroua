@@ -6,7 +6,7 @@ struct SyncDebugView: View {
     @Environment(\.modelContext) private var modelContext
     @StateObject private var syncEngine = CloudSyncEngine.shared
     @State private var userId: String = ""
-    @State private var localProgress: CachedUserProgress?
+    // @State private var localProgress: CachedUserProgress? // CloudSync models not included in project
     @State private var localVocabCount: Int = 0
     @State private var localAchievementsCount: Int = 0
     @State private var localSessionsCount: Int = 0
@@ -32,15 +32,15 @@ struct SyncDebugView: View {
                 }
                 
                 Section("Local Cache Stats") {
-                    InfoRow(title: "Progress Cached", value: localProgress != nil ? "Yes" : "No")
-                    if let progress = localProgress {
-                        InfoRow(title: "XP", value: "\(progress.xp)")
-                        InfoRow(title: "Level", value: "\(progress.level)")
-                        InfoRow(title: "Words Learned", value: "\(progress.wordsLearned)")
-                        InfoRow(title: "Streak", value: "\(progress.streakDays) days")
-                        InfoRow(title: "Last Updated", value: formatTimestamp(progress.updatedAt))
-                        InfoRow(title: "Last Synced", value: formatTimestamp(progress.lastSyncAt))
-                    }
+                    // InfoRow(title: "Progress Cached", value: localProgress != nil ? "Yes" : "No")
+                    // if let progress = localProgress {
+                    //     InfoRow(title: "XP", value: "\(progress.xp)")
+                    //     InfoRow(title: "Level", value: "\(progress.level)")
+                    //     InfoRow(title: "Words Learned", value: "\(progress.wordsLearned)")
+                    //     InfoRow(title: "Streak", value: "\(progress.streakDays) days")
+                    //     InfoRow(title: "Last Updated", value: formatTimestamp(progress.updatedAt))
+                    //     InfoRow(title: "Last Synced", value: formatTimestamp(progress.lastSyncAt))
+                    // }
                     
                     InfoRow(title: "Vocab Words", value: "\(localVocabCount)")
                     InfoRow(title: "Achievements", value: "\(localAchievementsCount)")
@@ -115,6 +115,8 @@ struct SyncDebugView: View {
         if let uid = Auth.auth().currentUser?.uid {
             userId = uid
             
+            // CloudSync models not included in project - commenting out
+            /*
             let progressDescriptor = FetchDescriptor<CachedUserProgress>(
                 predicate: #Predicate { $0.userId == uid }
             )
@@ -135,10 +137,11 @@ struct SyncDebugView: View {
             )
             localSessionsCount = (try? modelContext.fetchCount(sessionsDescriptor)) ?? 0
             
-            let outboxDescriptor = FetchDescriptor<SyncOutboxItem>(
+            let outboxDescriptor = FetchDescriptor<SyncOutboxItemCacheModel>(
                 predicate: #Predicate { $0.userId == uid }
             )
             outboxCount = (try? modelContext.fetchCount(outboxDescriptor)) ?? 0
+            */
         }
     }
     
@@ -168,10 +171,11 @@ struct SyncDebugView: View {
         statusMessage = "Flushing outbox..."
         
         Task {
-            await syncEngine.flushOutbox()
+            // CloudSync models not included in project - flushOutbox is commented out
+            // await syncEngine.flushOutbox()
             await MainActor.run {
                 loadStats()
-                statusMessage = "Outbox flushed at \(formatDate(Date()))"
+                statusMessage = "Outbox flush not available (CloudSync models not included)"
             }
         }
     }
@@ -185,7 +189,7 @@ struct SyncDebugView: View {
     }
     
     private func formatTimestamp(_ timestamp: Int64) -> String {
-        let date = Date.fromMilliseconds(timestamp)
+        let date = TimestampMapper.fromMilliseconds(timestamp)
         return formatDate(date)
     }
 }

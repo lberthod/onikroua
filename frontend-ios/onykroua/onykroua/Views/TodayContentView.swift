@@ -5,7 +5,7 @@ struct TodayContentView: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject var env: AppEnvironment
     @EnvironmentObject var firebaseManager: FirebaseManager
-    @Query private var userProgressEntries: [UserProgress]
+    @State private var progressStore: UserProgressStore?
     
     @State private var showProfile = false
     @State private var dailySessionService: DailySessionService?
@@ -30,7 +30,7 @@ struct TodayContentView: View {
     @State private var reviewMode: ReviewSessionView.ReviewMode = .standard
     
     private var userProgress: UserProgress? {
-        userProgressEntries.first
+        progressStore?.progress
     }
     
     var body: some View {
@@ -296,8 +296,8 @@ struct TodayContentView: View {
         }
         
         pathManager.initializeLearningPath(
-            userId: progress.id.uuidString,
-            userLevel: progress.level
+            userId: progress.userId,
+            userLevel: CEFRLevel.fromLevelNumber(progress.levelNumber)
         )
         
         sessionService.startNewDay(

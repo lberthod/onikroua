@@ -1,9 +1,7 @@
 import Foundation
 
-// MARK: - Vocabulary Models (matching Android VocabularyModels.kt)
-
-public struct VocabWord: Codable, Identifiable, Hashable {
-    public let id = UUID()
+public struct VocabWord: Codable, Identifiable, Hashable, Equatable {
+    public let id: String
     public let word: String
     public let translation: String
     public let gender: String?
@@ -15,22 +13,29 @@ public struct VocabWord: Codable, Identifiable, Hashable {
     public let subCategory: String?
     
     enum CodingKeys: String, CodingKey {
-        case word, translation, gender, example, exampleTranslation
+        case id, word, translation, gender, example, exampleTranslation
         case category, categoryIcon, mainCategory = "main_category", subCategory = "sub_category"
     }
     
     public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
         hasher.combine(word)
         hasher.combine(translation)
     }
     
-    public static func == (lhs: VocabWord, rhs: VocabWord) -> Bool {
-        lhs.word == rhs.word && lhs.translation == rhs.translation
-    }
-    
-    public init(word: String, translation: String, gender: String? = nil, example: String? = nil, 
-                exampleTranslation: String? = nil, category: String? = nil, categoryIcon: String? = nil,
-                mainCategory: String? = nil, subCategory: String? = nil) {
+    public init(
+        id: String = UUID().uuidString,
+        word: String,
+        translation: String,
+        gender: String? = nil,
+        example: String? = nil,
+        exampleTranslation: String? = nil,
+        category: String? = nil,
+        categoryIcon: String? = nil,
+        mainCategory: String? = nil,
+        subCategory: String? = nil
+    ) {
+        self.id = id
         self.word = word
         self.translation = translation
         self.gender = gender
@@ -43,8 +48,8 @@ public struct VocabWord: Codable, Identifiable, Hashable {
     }
 }
 
-public struct VocabCategory: Codable, Identifiable {
-    public let id = UUID()
+public struct VocabCategory: Codable, Identifiable, Equatable {
+    public let id: String
     public let name: String
     public let icon: String
     public let words: [VocabWord]
@@ -52,12 +57,20 @@ public struct VocabCategory: Codable, Identifiable {
     public let subCategory: String?
     
     enum CodingKeys: String, CodingKey {
-        case name, icon, words
+        case id, name, icon, words
         case mainCategory = "main_category"
         case subCategory = "sub_category"
     }
     
-    public init(name: String, icon: String, words: [VocabWord], mainCategory: String? = nil, subCategory: String? = nil) {
+    public init(
+        id: String = UUID().uuidString,
+        name: String,
+        icon: String,
+        words: [VocabWord] = [],
+        mainCategory: String? = nil,
+        subCategory: String? = nil
+    ) {
+        self.id = id
         self.name = name
         self.icon = icon
         self.words = words
@@ -65,8 +78,3 @@ public struct VocabCategory: Codable, Identifiable {
         self.subCategory = subCategory
     }
 }
-
-// Legacy support for old VocabularyWord name
-public typealias VocabularyWord = VocabWord
-public typealias VocabularyCategory = VocabCategory
-

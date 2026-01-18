@@ -4,7 +4,7 @@ import SwiftData
 struct TodayDashboardView: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject var env: AppEnvironment
-    @Query private var userProgressEntries: [UserProgress]
+    @Query private var userProgressEntries: [UserProgressCacheModel]
     
     @State private var dailySessionService: DailySessionService?
     @State private var learningPathManager: LearningPathManager?
