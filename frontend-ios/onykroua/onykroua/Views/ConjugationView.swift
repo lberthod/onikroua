@@ -5,37 +5,31 @@ struct ConjugationView: View {
     @EnvironmentObject var env: AppEnvironment
     @State private var selectedTab = 0
     @State private var currentLanguage = "it"
-    
+
     var body: some View {
-        VStack(spacing: 0) {
-            Picker("", selection: $selectedTab) {
-                Text("📖 Explorer").tag(0)
-                Text("🗂️ Temps").tag(1)
-                Text("🎯 Pratique").tag(2)
-            }
-            .pickerStyle(.segmented)
-            .padding()
-            .background(Color(.systemGroupedBackground))
-            
-            TabView(selection: $selectedTab) {
-                ConjugationExplorerTab(language: currentLanguage)
-                    .tag(0)
-                
-                ConjugationTensesTab(language: currentLanguage)
-                    .tag(1)
-                
-                ConjugationPracticeTab(language: currentLanguage)
-                    .tag(2)
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
+        TabView(selection: $selectedTab) {
+            ConjugationExplorerTab(language: currentLanguage)
+                .environmentObject(env)
+                .tabItem {
+                    Label("Explorer", systemImage: "magnifyingglass")
+                }
+                .tag(0)
+
+            ConjugationTensesTab(language: currentLanguage)
+                .environmentObject(env)
+                .tabItem {
+                    Label("Catégories", systemImage: "square.grid.2x2.fill")
+                }
+                .tag(1)
+
+            ConjugationPracticeTab(language: currentLanguage)
+                .environmentObject(env)
+                .tabItem {
+                    Label("Pratiquer", systemImage: "gamecontroller")
+                }
+                .tag(2)
         }
-        .navigationTitle("Conjugaison")
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                LanguagePicker(currentLanguage: $currentLanguage)
-            }
-        }
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        .navigationTitle("📝 Conjugaison")
     }
 }
 
@@ -43,7 +37,7 @@ struct ConjugationExplorerTab: View {
     let language: String
     @EnvironmentObject var env: AppEnvironment
     @State private var searchText = ""
-    @State private var selectedFilter: String? = nil
+    @State private var selectedFilter: String = "Tous"
     
     private let grammarData = GrammarData()
     
@@ -55,10 +49,10 @@ struct ConjugationExplorerTab: View {
             verb.translation.localizedCaseInsensitiveContains(searchText)
         }
         
-        if let filter = selectedFilter {
+        if selectedFilter != "Tous" {
             filtered = filtered.filter { verb in
                 let labels = getVerbLabels(verb.verb)
-                switch filter {
+                switch selectedFilter {
                 case "aux": return labels.contains("auxiliaire") || labels.contains("verbe clé")
                 case "modal": return labels.contains("modal")
                 case "movement": return labels.contains("mouvement")
@@ -70,43 +64,76 @@ struct ConjugationExplorerTab: View {
         return filtered
     }
     
-    private let verbChips: [ChipItem] = [
-        .init(id: "aux", label: "Auxiliaires", icon: "bolt.circle"),
-        .init(id: "modal", label: "Modaux", icon: "questionmark.circle"),
-        .init(id: "movement", label: "Mouvement", icon: "figure.walk")
-    ]
+    private let verbChips: [String] = ["Tous", "Auxiliaires", "Modaux", "Mouvement"]
     
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: UI.Spacing.md, pinnedViews: [.sectionHeaders]) {
-                Section {
-                    if filteredVerbs.isEmpty {
-                        EmptyState(
-                            title: "Aucun verbe trouvé",
-                            message: "Essaie un autre filtre ou une autre recherche",
-                            icon: "book.closed"
-                        )
-                        .padding(.top, 40)
-                    } else {
-                        ForEach(filteredVerbs, id: \.verb) { verb in
-                            VerbCard(verb: verb)
-                                .padding(.horizontal, UI.Spacing.lg)
+        VStack(spacing: 0) {
+            VStack(spacing: UI.Spacing.md) {
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.gray)
+                    TextField("Rechercher un verbe...", text: $searchText)
+                        .textFieldStyle(.plain)
+                    
+                    if !searchText.isEmpty {
+                        Button(action: { searchText = "" }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.gray)
                         }
                     }
-                } header: {
-                    StickyHeader(
-                        title: "Explorer",
-                        subtitle: "\(language == "it" ? "Italien" : "Espagnol")",
-                        searchText: $searchText,
-                        chips: verbChips,
-                        selectedChipId: selectedFilter,
-                        onSelectChip: { selectedFilter = $0 },
-                        countText: "\(filteredVerbs.count) verbes trouvés"
-                    )
+                }
+                .padding(UI.Spacing.md)
+                .background(UI.Surface.searchBackground)
+                .cornerRadius(UI.Radius.r12)
+                .padding(.horizontal)
+                
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: UI.Spacing.md) {
+                        ForEach(verbChips, id: \.self) { chip in
+                            EmojiStyleFilterButton(
+                                title: chip,
+                                isSelected: selectedFilter == chip
+                            ) {
+                                selectedFilter = chip
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
                 }
             }
+            .padding(.vertical, UI.Spacing.md)
+            .background(UI.Surface.background)
+            
+            ScrollView {
+                if filteredVerbs.isEmpty {
+                    EmptyState(
+                        title: "Aucun verbe trouvé",
+                        message: "Essaie un autre filtre ou une autre recherche",
+                        icon: "book.closed"
+                    )
+                    .padding(.top, UI.Spacing.huge)
+                } else {
+                    LazyVStack(spacing: UI.Spacing.md) {
+                        ForEach(filteredVerbs, id: \.verb) { verb in
+                            VerbCard(verb: verb)
+                                .padding(.horizontal, UI.Spacing.md)
+                        }
+                    }
+                }
+            }
+            .background(UI.Surface.groupedBackground)
+            
+            HStack {
+                Image(systemName: "book.fill")
+                    .foregroundColor(.blue)
+                Text("\(filteredVerbs.count) verbes")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.vertical, UI.Spacing.sm)
+            .frame(maxWidth: .infinity)
+            .background(UI.Surface.background)
         }
-        .background(Color(.systemGroupedBackground))
     }
     
     private func getVerbLabels(_ verb: String) -> [String] {
@@ -129,47 +156,145 @@ struct ConjugationTensesTab: View {
     let language: String
     private let grammarData = GrammarData()
     @State private var searchText = ""
-    
+
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: UI.Spacing.md, pinnedViews: [.sectionHeaders]) {
-                Section {
-                    let filteredTenses = grammarData.getTenses(language: language).filter {
-                        searchText.isEmpty || $0.name.localizedCaseInsensitiveContains(searchText)
+            LazyVStack(spacing: UI.Spacing.lg) {
+                ForEach(filteredTenses) { tense in
+                    NavigationLink(destination: ConjugationTenseDetailView(tense: tense, language: language)) {
+                        OnykrouaCategoryRow(
+                            icon: .sfSymbol("clock"),
+                            accent: .blue,
+                            title: tense.name,
+                            subtitle: tense.description,
+                            countText: "Temps verbal"
+                        )
                     }
-                    
-                    if filteredTenses.isEmpty {
-                        EmptyState(title: "Aucun temps trouvé", message: "Essayez une autre recherche", icon: "clock")
-                            .padding(.top, 40)
-                    } else {
-                        ForEach(filteredTenses) { tense in
-                            OnykrouaCard(isInteractive: true) {
-                                VStack(alignment: .leading, spacing: UI.Spacing.sm) {
-                                    Text(tense.name)
-                                        .font(.headline)
-                                        .foregroundColor(.primary)
-                                    
-                                    Text(tense.description)
-                                        .font(.subheadline)
-                                        .foregroundColor(.secondary)
-                                        .lineLimit(2)
-                                }
-                                .padding(UI.Spacing.md)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, UI.Spacing.lg)
+            .padding(.top, UI.Spacing.md)
+            .padding(.bottom, 96)
+        }
+        .background(UI.Surface.groupedBackground)
+        .overlay(alignment: .top) {
+            if !searchText.isEmpty {
+                VStack(spacing: 0) {
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.gray)
+                        TextField("Rechercher un temps...", text: $searchText)
+                            .textFieldStyle(.plain)
+
+                        if !searchText.isEmpty {
+                            Button(action: { searchText = "" }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.gray)
                             }
-                            .padding(.horizontal, UI.Spacing.lg)
                         }
                     }
-                } header: {
-                    StickyHeader(
-                        title: "Temps",
-                        subtitle: "Maîtrisez les conjugaisons",
-                        searchText: $searchText
-                    )
+                    .padding(UI.Spacing.md)
+                    .background(UI.Surface.searchBackground)
+                    .cornerRadius(UI.Radius.r12)
+                    .padding(.horizontal)
+                    .padding(.vertical, UI.Spacing.md)
+                    .background(UI.Surface.background)
+
+                    Divider()
+                        .opacity(0.35)
                 }
             }
         }
-        .background(Color(.systemGroupedBackground))
+    }
+
+    private var filteredTenses: [TenseInfo] {
+        grammarData.getTenses(language: language).filter {
+            searchText.isEmpty || $0.name.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+}
+
+struct ConjugationTenseDetailView: View {
+    let tense: TenseInfo
+    let language: String
+    @EnvironmentObject var env: AppEnvironment
+
+    var body: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: UI.Spacing.lg) {
+                // Description card
+                OnykrouaCard {
+                    VStack(alignment: .leading, spacing: UI.Spacing.md) {
+                        HStack {
+                            Image(systemName: "clock")
+                                .font(.title2)
+                                .foregroundColor(.blue)
+                            Text(tense.name)
+                                .font(.title2.weight(.semibold))
+                                .foregroundColor(.primary)
+                        }
+
+                        Text(tense.description)
+                            .font(.body)
+                            .foregroundColor(.secondary)
+                            .lineLimit(nil)
+                    }
+                    .padding(UI.Spacing.lg)
+                }
+                .padding(.horizontal, UI.Spacing.lg)
+
+                // Example card
+                OnykrouaCard {
+                    VStack(alignment: .leading, spacing: UI.Spacing.md) {
+                        HStack {
+                            Image(systemName: "quote.bubble")
+                                .font(.title2)
+                                .foregroundColor(.purple)
+                            Text("Exemple")
+                                .font(.headline.weight(.semibold))
+                                .foregroundColor(.primary)
+
+                            Spacer()
+
+                            Button(action: {
+                                env.speechService.speak(tense.example, language: language == "it" ? "it-IT" : "es-ES")
+                            }) {
+                                Image(systemName: "speaker.wave.2.fill")
+                                    .font(.title3)
+                                    .foregroundColor(.blue)
+                            }
+                        }
+
+                        Text(tense.example)
+                            .font(.body)
+                            .foregroundColor(.primary)
+                            .italic()
+                    }
+                    .padding(UI.Spacing.lg)
+                }
+                .padding(.horizontal, UI.Spacing.lg)
+
+                // Related verbs section
+                SectionHeader(title: "Verbes fréquents")
+                    .padding(.horizontal, UI.Spacing.lg)
+
+                ForEach(getRelatedVerbs().prefix(5)) { verb in
+                    VerbCard(verb: verb)
+                        .padding(.horizontal, UI.Spacing.lg)
+                }
+            }
+            .padding(.vertical, UI.Spacing.lg)
+        }
+        .background(UI.Surface.groupedBackground)
+        .navigationTitle(tense.name)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func getRelatedVerbs() -> [Verb] {
+        let grammarData = GrammarData()
+        let allVerbs = grammarData.getVerbs(language: language)
+        return allVerbs.shuffled()
     }
 }
 
@@ -177,7 +302,7 @@ struct VerbCard: View {
     let verb: Verb
     
     var body: some View {
-        OnykrouaCard(isInteractive: true) {
+        EmojiStyleCard {
             VStack(alignment: .leading, spacing: UI.Spacing.sm) {
                 HStack {
                     Text(verb.verb)
@@ -202,39 +327,62 @@ struct ConjugationPracticeTab: View {
     let language: String
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: UI.Spacing.lg) {
-                PracticeModeCard(
+        VStack(spacing: UI.Spacing.xxl) {
+            VStack(spacing: UI.Spacing.md) {
+                Text("🎮 Mode Pratique")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                
+                Text("Choisis ton type d'entraînement")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.top, UI.Spacing.huge)
+            
+            VStack(spacing: UI.Spacing.md) {
+                EmojiStylePracticeButton(
+                    icon: "✏️",
                     title: "Quiz de Conjugaison",
                     subtitle: "Maîtrise les terminaisons",
-                    icon: "pencil.and.outline",
-                    color: .blue,
-                    badge: "5 min"
+                    color: .blue
                 ) {
                     // Start quiz
                 }
                 
-                PracticeModeCard(
+                EmojiStylePracticeButton(
+                    icon: "⚠️",
                     title: "Verbes Irréguliers",
                     subtitle: "Pratique les formes spéciales",
-                    icon: "exclamationmark.circle.fill",
                     color: .orange
                 ) {
                     // Start irregular review
                 }
                 
-                PracticeModeCard(
+                EmojiStylePracticeButton(
+                    icon: "🔄",
                     title: "Mix de Temps",
                     subtitle: "Passé, Présent, Futur",
-                    icon: "clock.arrow.2.circlepath",
                     color: .purple
                 ) {
                     // Start tenses mix
                 }
             }
-            .padding(UI.Spacing.lg)
+            .padding(.horizontal, UI.Spacing.xxxl)
+            
+            Spacer()
+            
+            NavigationLink(destination: Text("Practice View")) {
+                EmojiStyleCTAButton(
+                    title: "Commencer",
+                    icon: "play.fill"
+                ) {
+                    
+                }
+            }
+            .padding(.horizontal, UI.Spacing.xxxl)
+            .padding(.bottom, UI.Spacing.huge)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(UI.Surface.groupedBackground)
     }
 }
 

@@ -15,7 +15,7 @@ struct VocabularyLearnedTab: View {
             } else if learnedWords.isEmpty {
                 emptyState
             } else {
-                VStack(spacing: 16) {
+                VStack(spacing: UI.Spacing.md) {
                     // Bouton de pratique ciblée
                     Button(action: { showPractice = true }) {
                         HStack {
@@ -24,22 +24,22 @@ struct VocabularyLearnedTab: View {
                                 .fontWeight(.bold)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding()
+                        .padding(UI.Spacing.md)
                         .background(Color.green)
                         .foregroundColor(.white)
-                        .cornerRadius(12)
+                        .cornerRadius(UI.Radius.r12)
                         .shadow(color: .green.opacity(0.3), radius: 5, x: 0, y: 3)
                     }
-                    .padding(.horizontal)
-                    .padding(.top)
+                    .padding(.horizontal, UI.Spacing.md)
+                    .padding(.top, UI.Spacing.md)
                     
                     ScrollView {
-                        LazyVStack(spacing: 12) {
+                        LazyVStack(spacing: UI.Spacing.md) {
                             ForEach(learnedWords, id: \.word) { word in
                                 LearnedWordRow(word: word)
                             }
                         }
-                        .padding()
+                        .padding(UI.Spacing.md)
                     }
                     .refreshable {
                         await refreshLearnedWords()
@@ -59,7 +59,7 @@ struct VocabularyLearnedTab: View {
     }
     
     private var emptyState: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: UI.Spacing.xl) {
             Image(systemName: "checkmark.seal")
                 .font(.system(size: 80))
                 .foregroundColor(.gray.opacity(0.5))
@@ -72,7 +72,7 @@ struct VocabularyLearnedTab: View {
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
+                .padding(.horizontal, UI.Spacing.xxl)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -100,7 +100,7 @@ struct LearnedWordRow: View {
     var body: some View {
         Button(action: { showDetail = true }) {
             HStack {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: UI.Spacing.xs) {
                     Text(word.word)
                         .font(.headline)
                         .foregroundColor(.primary)
@@ -122,9 +122,9 @@ struct LearnedWordRow: View {
                 }
                 .buttonStyle(PlainButtonStyle())
             }
-            .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(10)
+            .padding(UI.Spacing.md)
+            .background(UI.Surface.background)
+            .cornerRadius(UI.Radius.r12)
             .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
         }
         .buttonStyle(PlainButtonStyle())

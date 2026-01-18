@@ -15,14 +15,12 @@
 		E02D54D82F16BFD500F31467 /* ProgressTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54D52F16BFD500F31467 /* ProgressTracker.swift */; };
 		E02D54D92F16BFD500F31467 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54D62F16BFD500F31467 /* SpeechService.swift */; };
 		E02D54E42F16C41A00F31467 /* ConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54DB2F16C41A00F31467 /* ConversationView.swift */; };
-		E02D54E52F16C41A00F31467 /* EmojiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54DC2F16C41A00F31467 /* EmojiView.swift */; };
 		E02D54E62F16C41A00F31467 /* GrammarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54DF2F16C41A00F31467 /* GrammarView.swift */; };
 		E02D54E72F16C41A00F31467 /* GeminiLiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54DE2F16C41A00F31467 /* GeminiLiveView.swift */; };
 		E02D54E82F16C41A00F31467 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54E12F16C41A00F31467 /* ProfileView.swift */; };
 		E02D54E92F16C41A00F31467 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54DD2F16C41A00F31467 /* FeedView.swift */; };
 		E02D54EA2F16C41A00F31467 /* ConjugationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54DA2F16C41A00F31467 /* ConjugationView.swift */; };
 		E02D54EB2F16C41A00F31467 /* PhoneticView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54E02F16C41A00F31467 /* PhoneticView.swift */; };
-		E02D54EC2F16C41A00F31467 /* VocabularyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54E22F16C41A00F31467 /* VocabularyView.swift */; };
 		E02D54EE2F16C9E200F31467 /* FeedService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54ED2F16C9E200F31467 /* FeedService.swift */; };
 		E02D54F22F16C9EF00F31467 /* ConversationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54EF2F16C9EF00F31467 /* ConversationModels.swift */; };
 		E02D54F32F16C9EF00F31467 /* FeedModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02D54F12F16C9EF00F31467 /* FeedModels.swift */; };
@@ -140,13 +138,11 @@
 		E02D54D62F16BFD500F31467 /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
 		E02D54DA2F16C41A00F31467 /* ConjugationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConjugationView.swift; sourceTree = "<group>"; };
 		E02D54DB2F16C41A00F31467 /* ConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationView.swift; sourceTree = "<group>"; };
-		E02D54DC2F16C41A00F31467 /* EmojiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiView.swift; sourceTree = "<group>"; };
 		E02D54DD2F16C41A00F31467 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
 		E02D54DE2F16C41A00F31467 /* GeminiLiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiLiveView.swift; sourceTree = "<group>"; };
 		E02D54DF2F16C41A00F31467 /* GrammarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrammarView.swift; sourceTree = "<group>"; };
 		E02D54E02F16C41A00F31467 /* PhoneticView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneticView.swift; sourceTree = "<group>"; };
 		E02D54E12F16C41A00F31467 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
-		E02D54E22F16C41A00F31467 /* VocabularyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyView.swift; sourceTree = "<group>"; };
 		E02D54ED2F16C9E200F31467 /* FeedService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedService.swift; sourceTree = "<group>"; };
 		E02D54EF2F16C9EF00F31467 /* ConversationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationModels.swift; sourceTree = "<group>"; };
 		E02D54F02F16C9EF00F31467 /* EmojiModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojiModels.swift; sourceTree = "<group>"; };
@@ -376,7 +372,6 @@
 				A1000004000000000000001 /* ContentView.swift */,
 				E02D54DA2F16C41A00F31467 /* ConjugationView.swift */,
 				E02D54DB2F16C41A00F31467 /* ConversationView.swift */,
-				E02D54DC2F16C41A00F31467 /* EmojiView.swift */,
 				E02D55AB2F1A525400F31467 /* EmojiView_Enhanced.swift */,
 				E02D54DD2F16C41A00F31467 /* FeedView.swift */,
 				E02D54DE2F16C41A00F31467 /* GeminiLiveView.swift */,
@@ -388,7 +383,6 @@
 				E02D54E12F16C41A00F31467 /* ProfileView.swift */,
 				E02D55FB2F1A99A600F31467 /* TodayContentView.swift */,
 				E02D55942F186B0B00F31467 /* VocabularyView_Enhanced.swift */,
-				E02D54E22F16C41A00F31467 /* VocabularyView.swift */,
 				E02D55E52F1A63E300F31467 /* Analytics */,
 				E02D55E92F1A63F300F31467 /* Quiz */,
 			);
@@ -668,7 +662,6 @@
 				E02D54E42F16C41A00F31467 /* ConversationView.swift in Sources */,
 				E02D54F62F16CBAF00F31467 /* GrammarData.swift in Sources */,
 				E02D55032F16D00400F31467 /* VerbData.swift in Sources */,
-				E02D54E52F16C41A00F31467 /* EmojiView.swift in Sources */,
 				E02D552B2F18520700F31467 /* AppEnvironment.swift in Sources */,
 				E02D54E62F16C41A00F31467 /* GrammarView.swift in Sources */,
 				E02D54E72F16C41A00F31467 /* GeminiLiveView.swift in Sources */,
@@ -750,7 +743,6 @@
 				E02D560A2F1AB32E00F31467 /* CloudSyncEngine.swift in Sources */,
 				E02D560B2F1AB32E00F31467 /* ProgressRepository.swift in Sources */,
 				E02D560C2F1AB32E00F31467 /* VocabRepository.swift in Sources */,
-				E02D54EC2F16C41A00F31467 /* VocabularyView.swift in Sources */,
 				A1000001000000000000001 /* onykrouaApp.swift in Sources */,
 				E02D55C72F1A62DE00F31467 /* DashboardComponents.swift in Sources */,
 				E02D56162F1ADD5600F31467 /* OnykrouaUI.swift in Sources */,

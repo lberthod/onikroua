@@ -43,8 +43,8 @@ public struct DictionaryTab: View {
                     }
                 }
             }
-            .padding()
-            .background(Color(.systemBackground))
+            .padding(UI.Spacing.md)
+            .background(UI.Surface.background)
 
             Divider()
 
@@ -67,11 +67,11 @@ public struct DictionaryTab: View {
                     } else {
                         // Display filtered results
                         if filteredWords.isEmpty {
-                            VStack(spacing: 8) {
+                            VStack(spacing: UI.Spacing.sm) {
                                 Text("Aucun résultat trouvé")
                                     .font(.body)
                                     .foregroundColor(.secondary)
-                                    .padding(32)
+                                    .padding(UI.Spacing.xxl)
                             }
                         } else {
                             ForEach(filteredWords) { word in
@@ -98,8 +98,8 @@ struct LetterHeader: View {
                 .foregroundColor(.blue)
             Spacer()
         }
-        .padding(.horizontal, 24)
-        .padding(.vertical, 12)
+        .padding(.horizontal, UI.Spacing.xl)
+        .padding(.vertical, UI.Spacing.md)
         .background(Color.blue.opacity(0.1))
     }
 }
@@ -113,7 +113,7 @@ struct WordCard: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: UI.Spacing.sm) {
                 // Word + Icon + Speaker
                 HStack(alignment: .top) {
                     HStack(spacing: 4) {
@@ -171,12 +171,12 @@ struct WordCard: View {
                                 .italic()
                         }
                     }
-                    .padding(.top, 4)
+                    .padding(.top, UI.Spacing.xs)
                 }
             }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 16)
-            .background(Color(.systemBackground))
+            .padding(.horizontal, UI.Spacing.xl)
+            .padding(.vertical, UI.Spacing.md)
+            .background(UI.Surface.background)
             .contentShape(Rectangle())
             .onTapGesture {
                 let lang = language == "it" ? "it-IT" : "es-ES"

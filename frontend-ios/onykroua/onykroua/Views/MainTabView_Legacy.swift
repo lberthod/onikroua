@@ -140,120 +140,112 @@ struct HomeView: View {
     }
     
     private func welcomeSection(progress: UserProgress) -> some View {
-        VStack(spacing: 16) {
-            HStack {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Ciao! 👋")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    
-                    Text("Prêt à apprendre l'italien?")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                
-                Spacer()
-                
-                VStack(spacing: 4) {
-                    Text(progress.level.displayName)
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(
-                            Capsule()
-                                .fill(Color.blue.opacity(0.2))
-                        )
-                        .foregroundColor(.blue)
-                    
-                    Text("Niveau \(progress.levelNumber)")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                }
-            }
-            
-            HStack(spacing: 16) {
-                StatItem(
-                    icon: "star.fill",
-                    value: "\(progress.currentXP)",
-                    label: "XP",
-                    color: .yellow
-                )
-                
-                StatItem(
-                    icon: "flame.fill",
-                    value: "\(progress.streak)",
-                    label: "Série",
-                    color: .orange
-                )
-                
-                StatItem(
-                    icon: "book.fill",
-                    value: "\(progress.wordsLearned)",
-                    label: "Mots",
-                    color: .blue
-                )
-            }
-        }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color(.systemGray6))
-        )
-    }
-    
-    private func streakSection(progress: UserProgress) -> some View {
-        VStack(spacing: 12) {
-            HStack {
-                Image(systemName: "flame.fill")
-                    .foregroundColor(.orange)
-                    .font(.title2)
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Série de \(progress.streak) jours")
-                        .font(.headline)
-                    
-                    if progress.streak > 0 {
-                        Text("Continue comme ça! 🎯")
+        OnykrouaCard {
+            VStack(spacing: UI.Spacing.lg) {
+                HStack {
+                    VStack(alignment: .leading, spacing: UI.Spacing.sm) {
+                        Text("Ciao! 👋")
+                            .font(.title2)
+                            .fontWeight(.bold)
+
+                        Text("Prêt à apprendre l'italien?")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Spacer()
+
+                    VStack(spacing: UI.Spacing.xs) {
+                        Text(progress.level.displayName)
                             .font(.caption)
-                            .foregroundColor(.secondary)
-                    } else {
-                        Text("Commence aujourd'hui!")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                            .fontWeight(.semibold)
+                            .padding(.horizontal, UI.Spacing.sm)
+                            .padding(.vertical, UI.Spacing.xs)
+                            .background(
+                                Capsule()
+                                    .fill(Color.blue.opacity(0.2))
+                            )
+                            .foregroundColor(.blue)
+
+                        Text("Niveau \(progress.levelNumber)")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
                     }
                 }
-                
-                Spacer()
-                
-                if progress.streak >= progress.longestStreak {
-                    Text("🏆")
-                        .font(.title)
+
+                HStack(spacing: UI.Spacing.md) {
+                    StatItem(
+                        icon: "star.fill",
+                        value: "\(progress.currentXP)",
+                        label: "XP",
+                        color: .yellow
+                    )
+
+                    StatItem(
+                        icon: "flame.fill",
+                        value: "\(progress.streak)",
+                        label: "Série",
+                        color: .orange
+                    )
+
+                    StatItem(
+                        icon: "book.fill",
+                        value: "\(progress.wordsLearned)",
+                        label: "Mots",
+                        color: .blue
+                    )
                 }
             }
-            
-            ProgressView(value: progress.streak > 0 ? 1.0 : 0.0)
-                .tint(.orange)
+            .padding(UI.Spacing.lg)
         }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.orange.opacity(0.1))
-        )
     }
-    
-    private var quickActionsSection: some View {
-        VStack(spacing: 16) {
-            HStack {
-                Text("⚡ Actions Rapides")
-                    .font(.headline)
-                Spacer()
+
+    private func streakSection(progress: UserProgress) -> some View {
+        OnykrouaCard {
+            VStack(spacing: UI.Spacing.md) {
+                HStack {
+                    Image(systemName: "flame.fill")
+                        .foregroundStyle(.orange)
+                        .font(.title2)
+
+                    VStack(alignment: .leading, spacing: UI.Spacing.xs) {
+                        Text("Série de \(progress.streak) jours")
+                            .font(.headline)
+
+                        if progress.streak > 0 {
+                            Text("Continue comme ça! 🎯")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        } else {
+                            Text("Commence aujourd'hui!")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    Spacer()
+
+                    if progress.streak >= progress.longestStreak {
+                        Text("🏆")
+                            .font(.title)
+                    }
+                }
+
+                ProgressView(value: progress.streak > 0 ? 1.0 : 0.0)
+                    .tint(.orange)
             }
-            
+            .padding(UI.Spacing.lg)
+        }
+    }
+
+    private var quickActionsSection: some View {
+        VStack(spacing: UI.Spacing.md) {
+            SectionHeader(title: "⚡ Actions Rapides")
+
             LazyVGrid(columns: [
                 GridItem(.flexible()),
                 GridItem(.flexible())
-            ], spacing: 12) {
+            ], spacing: UI.Spacing.md) {
                 QuickActionCard(
                     icon: "pencil.circle.fill",
                     title: "Quiz",
@@ -261,7 +253,7 @@ struct HomeView: View {
                     color: .blue,
                     action: { showQuizSelection = true }
                 )
-                
+
                 QuickActionCard(
                     icon: "arrow.clockwise.circle.fill",
                     title: "Révision",
@@ -269,7 +261,7 @@ struct HomeView: View {
                     color: .purple,
                     action: { showReviewSession = true }
                 )
-                
+
                 QuickActionCard(
                     icon: "rectangle.stack.fill",
                     title: "Flashcards",
@@ -277,7 +269,7 @@ struct HomeView: View {
                     color: .green,
                     action: {}
                 )
-                
+
                 QuickActionCard(
                     icon: "bubble.left.and.bubble.right.fill",
                     title: "Conversation",
@@ -288,56 +280,50 @@ struct HomeView: View {
             }
         }
     }
-    
+
     private func todayGoalSection(progress: UserProgress) -> some View {
-        VStack(spacing: 12) {
-            HStack {
-                Text("🎯 Objectif du Jour")
-                    .font(.headline)
-                Spacer()
-                Text("0/5")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.blue)
+        OnykrouaCard {
+            VStack(spacing: UI.Spacing.md) {
+                HStack {
+                    Text("🎯 Objectif du Jour")
+                        .font(.headline)
+                    Spacer()
+                    Text("0/5")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.blue)
+                }
+
+                ProgressView(value: 0.0, total: 5.0)
+                    .tint(.blue)
+
+                Text("Complete 5 activités pour atteindre ton objectif")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
-            
-            ProgressView(value: 0.0, total: 5.0)
-                .tint(.blue)
-            
-            Text("Complete 5 activités pour atteindre ton objectif")
-                .font(.caption)
-                .foregroundColor(.secondary)
+            .padding(UI.Spacing.lg)
         }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.blue.opacity(0.1))
-        )
     }
-    
+
     private var recentActivitySection: some View {
-        VStack(spacing: 16) {
-            HStack {
-                Text("📊 Activité Récente")
-                    .font(.headline)
-                Spacer()
-            }
-            
-            VStack(spacing: 8) {
+        VStack(spacing: UI.Spacing.md) {
+            SectionHeader(title: "📊 Activité Récente")
+
+            VStack(spacing: UI.Spacing.sm) {
                 ActivityRow(
                     icon: "checkmark.circle.fill",
                     title: "Quiz de vocabulaire complété",
                     subtitle: "Il y a 2 heures",
                     color: .green
                 )
-                
+
                 ActivityRow(
                     icon: "star.fill",
                     title: "50 XP gagnés",
                     subtitle: "Aujourd'hui",
                     color: .yellow
                 )
-                
+
                 ActivityRow(
                     icon: "trophy.fill",
                     title: "Badge 'Débutant' débloqué",

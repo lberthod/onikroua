@@ -3,32 +3,29 @@ import SwiftUI
 struct ConversationView: View {
     @EnvironmentObject var env: AppEnvironment
     @State private var selectedTab = 0
-    
+
     var body: some View {
-        VStack(spacing: 0) {
-            Picker("", selection: $selectedTab) {
-                Text("📖 Explorer").tag(0)
-                Text("🎯 Pratique").tag(1)
-                Text("🕒 Historique").tag(2)
-            }
-            .pickerStyle(.segmented)
-            .padding()
-            .background(Color(.systemGroupedBackground))
-            
-            TabView(selection: $selectedTab) {
-                ConversationExplorerTab()
-                    .tag(0)
-                
-                ConversationPracticeTab()
-                    .tag(1)
-                
-                Text("Historique (Bientôt disponible)")
-                    .tag(2)
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
+        TabView(selection: $selectedTab) {
+            ConversationExplorerTab()
+                .environmentObject(env)
+                .tabItem {
+                    Label("Explorer", systemImage: "magnifyingglass")
+                }
+                .tag(0)
+
+            Text("Catégories View") // TODO: Implement Categories Tab
+                .tabItem {
+                    Label("Catégories", systemImage: "square.grid.2x2.fill")
+                }
+                .tag(1)
+
+            ConversationPracticeTab()
+                .tabItem {
+                    Label("Pratiquer", systemImage: "gamecontroller")
+                }
+                .tag(2)
         }
-        .navigationTitle("Conversation")
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        .navigationTitle("💬 Conversation")
     }
 }
 

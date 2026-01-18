@@ -4,42 +4,43 @@ import SwiftData
 struct VocabularyView_Enhanced: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject var env: AppEnvironment
-    
+
     @State private var selectedTab = 0
     @State private var currentLanguage = "it"
     @State private var gamificationManager: GamificationManager?
-    
+
     var body: some View {
-        VStack(spacing: 0) {
-            // Main Tabs
-            Picker("", selection: $selectedTab) {
-                Text("📖 Explorer").tag(0)
-                Text("🗂️ Catégories").tag(1)
-                Text("🎯 Pratique").tag(2)
-            }
-            .pickerStyle(.segmented)
-            .padding()
-            .background(Color(.systemGroupedBackground))
-            
-            TabView(selection: $selectedTab) {
-                VocabularyExplorerTab(language: currentLanguage, gamificationManager: gamificationManager)
-                    .tag(0)
-                
-                CategoriesTab(language: currentLanguage)
-                    .tag(1)
-                
-                VocabularyPracticeTab(language: currentLanguage)
-                    .tag(2)
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
+        TabView(selection: $selectedTab) {
+            VocabularyExplorerTab(language: currentLanguage, gamificationManager: gamificationManager)
+                .tabItem {
+                    Label("Dictionnaire", systemImage: "book.fill")
+                }
+                .tag(0)
+
+            Text("Apprentissage View") // TODO: Implement Learning Tab
+                .tabItem {
+                    Label("Apprentissage", systemImage: "graduationcap.fill")
+                }
+                .tag(1)
+
+            CategoriesTab(language: currentLanguage)
+                .tabItem {
+                    Label("Catégories", systemImage: "square.grid.2x2.fill")
+                }
+                .tag(2)
+
+            VocabularyPracticeTab(language: currentLanguage)
+                .tabItem {
+                    Label("Pratiquer", systemImage: "gamecontroller.fill")
+                }
+                .tag(3)
         }
-        .navigationTitle("Vocabulaire")
+        .navigationTitle("📚 Vocabulaire")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 LanguagePicker(currentLanguage: $currentLanguage)
             }
         }
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .onAppear {
             env.vocabularyManager.loadVocabularyAsync(language: currentLanguage)
             if gamificationManager == nil {
@@ -52,31 +53,33 @@ struct VocabularyView_Enhanced: View {
     }
 }
 
+// MARK: - Vocabulary Explorer Tab
+
 struct VocabularyExplorerTab: View {
     let language: String
     let gamificationManager: GamificationManager?
-    
+
     @EnvironmentObject var env: AppEnvironment
     @State private var searchText = ""
     @State private var selectedLevel: String? = nil
-    
+
     private var filteredWords: [VocabularyWord] {
         var words = env.vocabularyManager.getAllWords(language: language)
-        
+
         if let level = selectedLevel {
             words = words.filter { getCEFRLevel(for: $0).rawValue == level }
         }
-        
+
         if !searchText.isEmpty {
-            words = words.filter { 
-                $0.word.localizedCaseInsensitiveContains(searchText) || 
+            words = words.filter {
+                $0.word.localizedCaseInsensitiveContains(searchText) ||
                 $0.translation.localizedCaseInsensitiveContains(searchText)
             }
         }
-        
+
         return words.sorted { $0.word.localizedCaseInsensitiveCompare($1.word) == .orderedAscending }
     }
-    
+
     private let levelChips: [ChipItem] = [
         .init(id: "A1", label: "A1", icon: "gauge.low"),
         .init(id: "A2", label: "A2", icon: "gauge.medium"),
@@ -85,7 +88,7 @@ struct VocabularyExplorerTab: View {
         .init(id: "C1", label: "C1", icon: "chart.bar.fill"),
         .init(id: "C2", label: "C2", icon: "star.fill")
     ]
-    
+
     var body: some View {
         ScrollView {
             LazyVStack(spacing: UI.Spacing.md, pinnedViews: [.sectionHeaders]) {
@@ -124,53 +127,18 @@ struct VocabularyExplorerTab: View {
         }
         .background(Color(.systemGroupedBackground))
     }
-    
+
     private func getCEFRLevel(for word: VocabularyWord) -> CEFRLevel {
         let words = env.vocabularyManager.getAllWords(language: language)
         let wordIndex = words.firstIndex(where: { $0.word == word.word }) ?? 0
         let percentage = Double(wordIndex) / Double(max(1, words.count))
-        
+
         if percentage < 0.15 { return .a1 }
         if percentage < 0.35 { return .a2 }
         if percentage < 0.55 { return .b1 }
         if percentage < 0.75 { return .b2 }
         if percentage < 0.90 { return .c1 }
         return .c2
-    }
-}
-
-struct LevelFilterButton: View {
-    let level: CEFRLevel?
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 6) {
-                if let level = level {
-                    Text(level.icon)
-                        .font(.caption)
-                    Text(level.rawValue)
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                } else {
-                    Text("Tous")
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .background(
-                Capsule()
-                    .fill(isSelected ? (level?.color ?? .blue) : Color(.systemBackground))
-            )
-            .foregroundColor(isSelected ? .white : .primary)
-            .overlay(
-                Capsule()
-                    .stroke(isSelected ? Color.clear : Color.gray.opacity(0.3), lineWidth: 1)
-            )
-        }
     }
 }
 

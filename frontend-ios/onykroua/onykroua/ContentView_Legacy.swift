@@ -60,9 +60,7 @@ struct ContentView: View {
                                 CategoryCard(icon: "book.fill", title: "Conjugaison", color: .blue)
                             }
                             
-                            NavigationLink(destination: VocabularyView()) {
-                                CategoryCard(icon: "text.book.closed.fill", title: "Vocabulaire", color: .green)
-                            }
+                    
                             
                             NavigationLink(destination: EmojiView()) {
                                 CategoryCard(icon: "face.smiling.fill", title: "Emoji", color: .orange)

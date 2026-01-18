@@ -4,37 +4,31 @@ struct GrammarView: View {
     @EnvironmentObject var env: AppEnvironment
     @State private var selectedTab = 0
     @State private var currentLanguage = "it"
-    
+
     var body: some View {
-        VStack(spacing: 0) {
-            Picker("", selection: $selectedTab) {
-                Text("📖 Explorer").tag(0)
-                Text("🗂️ Catégories").tag(1)
-                Text("🎯 Pratique").tag(2)
-            }
-            .pickerStyle(.segmented)
-            .padding()
-            .background(Color(.systemGroupedBackground))
-            
-            TabView(selection: $selectedTab) {
-                GrammarExplorerTab(language: currentLanguage)
-                    .tag(0)
-                
-                GrammarCategoriesTab(language: currentLanguage)
-                    .tag(1)
-                
-                GrammarPracticeTab(language: currentLanguage)
-                    .tag(2)
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
+        TabView(selection: $selectedTab) {
+            GrammarExplorerTab(language: currentLanguage)
+                .environmentObject(env)
+                .tabItem {
+                    Label("Explorer", systemImage: "magnifyingglass")
+                }
+                .tag(0)
+
+            GrammarCategoriesTab(language: currentLanguage)
+                .environmentObject(env)
+                .tabItem {
+                    Label("Catégories", systemImage: "square.grid.2x2.fill")
+                }
+                .tag(1)
+
+            GrammarPracticeTab(language: currentLanguage)
+                .environmentObject(env)
+                .tabItem {
+                    Label("Pratiquer", systemImage: "gamecontroller")
+                }
+                .tag(2)
         }
-        .navigationTitle("Grammaire")
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                LanguagePicker(currentLanguage: $currentLanguage)
-            }
-        }
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        .navigationTitle("📖 Grammaire")
     }
 }
 
@@ -42,13 +36,13 @@ struct GrammarExplorerTab: View {
     let language: String
     @EnvironmentObject var env: AppEnvironment
     @State private var searchText = ""
-    @State private var selectedLevel: String? = nil
+    @State private var selectedLevel: String = "Tous"
     
     private var filteredRules: [GrammarRule] {
         var rules = env.grammarManager.getGrammarRules(language: language)
         
-        if let level = selectedLevel {
-            rules = rules.filter { $0.difficulty == level }
+        if selectedLevel != "Tous" {
+            rules = rules.filter { $0.difficulty == selectedLevel }
         }
         
         if !searchText.isEmpty {
@@ -61,43 +55,76 @@ struct GrammarExplorerTab: View {
         return rules
     }
     
-    private let levelChips: [ChipItem] = [
-        .init(id: "débutant", label: "A1-A2", icon: "gauge.low"),
-        .init(id: "intermédiaire", label: "B1-B2", icon: "gauge.medium"),
-        .init(id: "avancé", label: "C1-C2", icon: "gauge.high")
-    ]
+    private let levelChips: [String] = ["Tous", "A1-A2", "B1-B2", "C1-C2"]
     
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: UI.Spacing.md, pinnedViews: [.sectionHeaders]) {
-                Section {
-                    if filteredRules.isEmpty {
-                        EmptyState(
-                            title: "Aucune règle trouvée",
-                            message: "Essaie un autre filtre ou une autre recherche",
-                            icon: "book.closed"
-                        )
-                        .padding(.top, 40)
-                    } else {
-                        ForEach(filteredRules) { rule in
-                            GrammarRuleCard(rule: rule)
-                                .padding(.horizontal, UI.Spacing.lg)
+        VStack(spacing: 0) {
+            VStack(spacing: UI.Spacing.md) {
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.gray)
+                    TextField("Rechercher une règle...", text: $searchText)
+                        .textFieldStyle(.plain)
+                    
+                    if !searchText.isEmpty {
+                        Button(action: { searchText = "" }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.gray)
                         }
                     }
-                } header: {
-                    StickyHeader(
-                        title: "Explorer",
-                        subtitle: "\(language == "it" ? "Italien" : "Espagnol")",
-                        searchText: $searchText,
-                        chips: levelChips,
-                        selectedChipId: selectedLevel,
-                        onSelectChip: { selectedLevel = $0 },
-                        countText: "\(filteredRules.count) règles trouvées"
-                    )
+                }
+                .padding(UI.Spacing.md)
+                .background(UI.Surface.searchBackground)
+                .cornerRadius(UI.Radius.r12)
+                .padding(.horizontal)
+                
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: UI.Spacing.md) {
+                        ForEach(levelChips, id: \.self) { chip in
+                            EmojiStyleFilterButton(
+                                title: chip,
+                                isSelected: selectedLevel == chip
+                            ) {
+                                selectedLevel = chip
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
                 }
             }
+            .padding(.vertical, UI.Spacing.md)
+            .background(UI.Surface.background)
+            
+            ScrollView {
+                if filteredRules.isEmpty {
+                    EmptyState(
+                        title: "Aucune règle trouvée",
+                        message: "Essaie un autre filtre ou une autre recherche",
+                        icon: "book.closed"
+                    )
+                    .padding(.top, UI.Spacing.huge)
+                } else {
+                    LazyVStack(spacing: UI.Spacing.md) {
+                        ForEach(filteredRules) { rule in
+                            GrammarRuleCard(rule: rule)
+                                .padding(.horizontal, UI.Spacing.md)
+                        }
+                    }
+                }
+            }
+            .background(UI.Surface.groupedBackground)
+            
+            HStack {
+                Image(systemName: "book.fill")
+                    .foregroundColor(.blue)
+                Text("\(filteredRules.count) règles")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.vertical, UI.Spacing.sm)
+            .frame(maxWidth: .infinity)
+            .background(UI.Surface.background)
         }
-        .background(Color(.systemGroupedBackground))
     }
 }
 
@@ -106,7 +133,7 @@ struct GrammarRuleCard: View {
     @State private var isExpanded = false
     
     var body: some View {
-        OnykrouaCard(isInteractive: true) {
+        EmojiStyleCard {
             VStack(alignment: .leading, spacing: UI.Spacing.sm) {
                 HStack {
                     Text(rule.rule)
@@ -134,13 +161,13 @@ struct GrammarRuleCard: View {
                 
                 if isExpanded {
                     if let example = rule.example, !example.isEmpty {
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: UI.Spacing.sm) {
                             HStack(alignment: .top) {
                                 Image(systemName: "quote.bubble")
                                     .font(.caption)
                                     .foregroundColor(.accentColor)
                                 
-                                VStack(alignment: .leading, spacing: 2) {
+                                VStack(alignment: .leading, spacing: UI.Spacing.xs) {
                                     Text(example)
                                         .font(.subheadline)
                                         .italic()
@@ -169,9 +196,9 @@ struct GrammarRuleCard: View {
     
     private func getDifficultyColor(_ diff: String) -> Color {
         switch diff.lowercased() {
-        case "débutant": return .green
-        case "intermédiaire": return .orange
-        case "avancé": return .red
+        case "débutant", "a1-a2": return .green
+        case "intermédiaire", "b1-b2": return .orange
+        case "avancé", "c1-c2": return .red
         default: return .blue
         }
     }
@@ -185,7 +212,7 @@ struct GrammarCategoriesTab: View {
         ScrollView {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: UI.Spacing.md) {
                 ForEach(env.grammarManager.getCategories()) { category in
-                    OnykrouaCard(isInteractive: true) {
+                    EmojiStyleCategoryRow {
                         VStack(spacing: UI.Spacing.md) {
                             Text(category.icon)
                                 .font(.system(size: 40))
@@ -199,9 +226,9 @@ struct GrammarCategoriesTab: View {
                     }
                 }
             }
-            .padding(UI.Spacing.lg)
+            .padding(UI.Spacing.md)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(UI.Surface.groupedBackground)
     }
 }
 
@@ -209,39 +236,62 @@ struct GrammarPracticeTab: View {
     let language: String
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: UI.Spacing.lg) {
-                PracticeModeCard(
+        VStack(spacing: UI.Spacing.xxl) {
+            VStack(spacing: UI.Spacing.md) {
+                Text("🎮 Mode Pratique")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                
+                Text("Choisis ton type d'entraînement")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.top, UI.Spacing.huge)
+            
+            VStack(spacing: UI.Spacing.md) {
+                EmojiStylePracticeButton(
+                    icon: "⚡",
                     title: "Quiz Rapide",
                     subtitle: "10 questions sur les règles de base",
-                    icon: "bolt.fill",
-                    color: .orange,
-                    badge: "3 min"
+                    color: .orange
                 ) {
                     // Start quiz
                 }
                 
-                PracticeModeCard(
+                EmojiStylePracticeButton(
+                    icon: "🎯",
                     title: "Défis de Niveau",
                     subtitle: "Pratique ciblée par niveau CEFR",
-                    icon: "target",
                     color: .blue
                 ) {
                     // Start level challenge
                 }
                 
-                PracticeModeCard(
+                EmojiStylePracticeButton(
+                    icon: "⚠️",
                     title: "Erreurs fréquentes",
                     subtitle: "Travaille tes points faibles",
-                    icon: "exclamationmark.triangle.fill",
                     color: .red
                 ) {
                     // Start error review
                 }
             }
-            .padding(UI.Spacing.lg)
+            .padding(.horizontal, UI.Spacing.xxxl)
+            
+            Spacer()
+            
+            NavigationLink(destination: Text("Practice View")) {
+                EmojiStyleCTAButton(
+                    title: "Commencer",
+                    icon: "play.fill"
+                ) {
+                    
+                }
+            }
+            .padding(.horizontal, UI.Spacing.xxxl)
+            .padding(.bottom, UI.Spacing.huge)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(UI.Surface.groupedBackground)
     }
 }
 

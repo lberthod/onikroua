@@ -3,35 +3,38 @@ import SwiftUI
 struct PhoneticView: View {
     @EnvironmentObject var env: AppEnvironment
     @State private var selectedTab = 0
-    
+
     var body: some View {
-        VStack(spacing: 0) {
-            Picker("", selection: $selectedTab) {
-                Text("📖 Explorer").tag(0)
-                Text("🎯 Pratique").tag(1)
-            }
-            .pickerStyle(.segmented)
-            .padding()
-            .background(Color(.systemGroupedBackground))
-            
-            TabView(selection: $selectedTab) {
-                PhoneticExplorerTab()
-                    .tag(0)
-                
-                PhoneticPracticeTab()
-                    .tag(1)
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
+        TabView(selection: $selectedTab) {
+            PhoneticExplorerTab()
+                .environmentObject(env)
+                .tabItem {
+                    Label("Explorer", systemImage: "magnifyingglass")
+                }
+                .tag(0)
+
+            PhoneticCategoriesTab()
+                .environmentObject(env)
+                .tabItem {
+                    Label("Catégories", systemImage: "square.grid.2x2.fill")
+                }
+                .tag(1)
+
+            PhoneticPracticeTab()
+                .environmentObject(env)
+                .tabItem {
+                    Label("Pratiquer", systemImage: "gamecontroller")
+                }
+                .tag(2)
         }
-        .navigationTitle("Phonétique")
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+        .navigationTitle("🔊 Phonétique")
     }
 }
 
 struct PhoneticExplorerTab: View {
     @EnvironmentObject var env: AppEnvironment
     @State private var searchText = ""
-    @State private var selectedFilter: String? = nil
+    @State private var selectedFilter: String = "Tous"
     
     let phoneticData = [
         PhoneticData(letter: "A E I O U", pronunciation: "Voyelles - prononciation claire", example: "amore, vero, vino", type: "voyelle"),
@@ -59,49 +62,82 @@ struct PhoneticExplorerTab: View {
                 item.pronunciation.localizedCaseInsensitiveContains(searchText) || 
                 item.example.localizedCaseInsensitiveContains(searchText)
             
-            let matchesFilter = selectedFilter == nil || item.type == selectedFilter
+            let matchesFilter = selectedFilter == "Tous" || item.type == selectedFilter
             
             return matchesSearch && matchesFilter
         }
     }
     
-    private let chips: [ChipItem] = [
-        .init(id: "voyelle", label: "Voyelles", icon: "a.circle"),
-        .init(id: "consonne", label: "Consonnes", icon: "c.circle"),
-        .init(id: "accent", label: "Accents", icon: "italic")
-    ]
+    private let chips: [String] = ["Tous", "Voyelles", "Consonnes", "Accents"]
     
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: UI.Spacing.md, pinnedViews: [.sectionHeaders]) {
-                Section {
-                    if filteredData.isEmpty {
-                        EmptyState(
-                            title: "Aucun son trouvé",
-                            message: "Essaie un autre filtre ou une autre recherche",
-                            icon: "mouth"
-                        )
-                        .padding(.top, 40)
-                    } else {
-                        ForEach(filteredData) { data in
-                            PhoneticCard(data: data)
-                                .padding(.horizontal, UI.Spacing.lg)
+        VStack(spacing: 0) {
+            VStack(spacing: UI.Spacing.md) {
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.gray)
+                    TextField("Rechercher un son...", text: $searchText)
+                        .textFieldStyle(.plain)
+                    
+                    if !searchText.isEmpty {
+                        Button(action: { searchText = "" }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.gray)
                         }
                     }
-                } header: {
-                    StickyHeader(
-                        title: "Explorer les sons",
-                        subtitle: "Maîtrise la prononciation italienne",
-                        searchText: $searchText,
-                        chips: chips,
-                        selectedChipId: selectedFilter,
-                        onSelectChip: { selectedFilter = $0 },
-                        countText: "\(filteredData.count) sons listés"
-                    )
+                }
+                .padding(UI.Spacing.md)
+                .background(UI.Surface.searchBackground)
+                .cornerRadius(UI.Radius.r12)
+                .padding(.horizontal)
+                
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: UI.Spacing.md) {
+                        ForEach(chips, id: \.self) { chip in
+                            EmojiStyleFilterButton(
+                                title: chip,
+                                isSelected: selectedFilter == chip
+                            ) {
+                                selectedFilter = chip
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
                 }
             }
+            .padding(.vertical, UI.Spacing.md)
+            .background(UI.Surface.background)
+            
+            ScrollView {
+                if filteredData.isEmpty {
+                    EmptyState(
+                        title: "Aucun son trouvé",
+                        message: "Essaie un autre filtre ou une autre recherche",
+                        icon: "mouth"
+                    )
+                    .padding(.top, UI.Spacing.huge)
+                } else {
+                    LazyVStack(spacing: UI.Spacing.md) {
+                        ForEach(filteredData) { data in
+                            PhoneticCard(data: data)
+                                .padding(.horizontal, UI.Spacing.md)
+                        }
+                    }
+                }
+            }
+            .background(UI.Surface.groupedBackground)
+            
+            HStack {
+                Image(systemName: "speaker.wave.2.fill")
+                    .foregroundColor(.blue)
+                Text("\(filteredData.count) sons")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.vertical, UI.Spacing.sm)
+            .frame(maxWidth: .infinity)
+            .background(UI.Surface.background)
         }
-        .background(Color(.systemGroupedBackground))
     }
 }
 
@@ -118,7 +154,7 @@ struct PhoneticCard: View {
     @EnvironmentObject var env: AppEnvironment
     
     var body: some View {
-        OnykrouaCard(isInteractive: true) {
+        EmojiStyleCard {
             HStack(spacing: UI.Spacing.lg) {
                 Text(data.letter)
                     .font(.system(size: 24, weight: .bold))
@@ -127,7 +163,7 @@ struct PhoneticCard: View {
                     .background(Color.pink)
                     .cornerRadius(UI.Radius.r12)
                 
-                VStack(alignment: .leading, spacing: UI.Spacing.xs) {
+                VStack(alignment: .leading, spacing: UI.Spacing.sm) {
                     Text(data.pronunciation)
                         .font(.headline)
                         .foregroundColor(.primary)
@@ -152,31 +188,106 @@ struct PhoneticCard: View {
 
 struct PhoneticPracticeTab: View {
     var body: some View {
-        ScrollView {
-            VStack(spacing: UI.Spacing.lg) {
-                PracticeModeCard(
+        VStack(spacing: UI.Spacing.xxl) {
+            VStack(spacing: UI.Spacing.md) {
+                Text("🎮 Mode Pratique")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                
+                Text("Choisis ton type d'entraînement")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.top, UI.Spacing.huge)
+            
+            VStack(spacing: UI.Spacing.md) {
+                EmojiStylePracticeButton(
+                    icon: "👂",
                     title: "Dictée de sons",
                     subtitle: "Écoute et identifie le son correct",
-                    icon: "ear",
-                    color: .pink,
-                    badge: "3 min"
+                    color: .pink
                 ) {
                     // Start practice
                 }
-                
-                PracticeModeCard(
+
+                EmojiStylePracticeButton(
+                    icon: "🎤",
                     title: "Reconnaissance vocale",
                     subtitle: "Prononce les mots correctement",
-                    icon: "mic.fill",
                     color: .indigo
                 ) {
                     // Start mic practice
                 }
             }
-            .padding(UI.Spacing.lg)
+            .padding(.horizontal, UI.Spacing.xxxl)
+            
+            Spacer()
+            
+            NavigationLink(destination: Text("Practice View")) {
+                EmojiStyleCTAButton(
+                    title: "Commencer",
+                    icon: "play.fill"
+                ) {
+                    
+                }
+            }
+            .padding(.horizontal, UI.Spacing.xxxl)
+            .padding(.bottom, UI.Spacing.huge)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(UI.Surface.groupedBackground)
     }
+}
+
+struct PhoneticCategoriesTab: View {
+    @EnvironmentObject var env: AppEnvironment
+
+    let categories = [
+        PhoneticCategory(id: "voyelles", name: "Voyelles", icon: "a.circle.fill", color: .blue, count: 5),
+        PhoneticCategory(id: "consonnes", name: "Consonnes", icon: "c.circle.fill", color: .green, count: 10),
+        PhoneticCategory(id: "accents", name: "Accents", icon: "italic", color: .orange, count: 2),
+        PhoneticCategory(id: "doubles", name: "Doubles", icon: "textformat", color: .purple, count: 3),
+        PhoneticCategory(id: "special", name: "Spéciaux", icon: "star.fill", color: .pink, count: 4)
+    ]
+
+    var body: some View {
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: UI.Spacing.md) {
+                ForEach(categories) { category in
+                    EmojiStyleCategoryRow {
+                        VStack(spacing: UI.Spacing.md) {
+                            Image(systemName: category.icon)
+                                .font(.system(size: 32))
+                                .foregroundColor(.white)
+                                .frame(width: 56, height: 56)
+                                .background(category.color)
+                                .cornerRadius(UI.Radius.r12)
+
+                            VStack(spacing: UI.Spacing.sm) {
+                                Text(category.name)
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+
+                                Text("\(category.count) sons")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                }
+            }
+            .padding(UI.Spacing.md)
+        }
+        .background(UI.Surface.groupedBackground)
+    }
+}
+
+struct PhoneticCategory: Identifiable {
+    let id: String
+    let name: String
+    let icon: String
+    let color: Color
+    let count: Int
 }
 
 #Preview {

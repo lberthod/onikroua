@@ -41,7 +41,18 @@ public struct VocabularyPracticeTab: View {
     
     // MARK: - View
     public var body: some View {
-        ZStack(alignment: .topTrailing) {
+        VStack(spacing: 0) {
+            // Stats Header (integrated and discreet)
+            HStack(spacing: 20) {
+                StatItem(icon: "✅", value: "\(score)/\(total)", label: "Score")
+                StatItem(icon: "🔥", value: "\(streak)", label: "Série")
+                StatItem(icon: "📊", value: total > 0 ? "\(Int(Double(score) / Double(total) * 100))%" : "0%", label: "Réussite")
+            }
+            .padding(.vertical, 10)
+            .padding(.horizontal)
+            .background(Color(.systemBackground))
+            .overlay(Divider(), alignment: .bottom)
+
             VStack(spacing: 0) {
                 // Contrôles compacts en une seule ligne
                 HStack(spacing: 8) {
@@ -259,96 +270,29 @@ public struct VocabularyPracticeTab: View {
                     .padding(.vertical, 8)
                 }
             }
-            
-            // Bouton Stats en overlay
-            Button(action: { showStatsOverlay.toggle() }) {
-                Image(systemName: "chart.bar.fill")
-                    .font(.title3)
-                    .foregroundColor(.white)
-                    .frame(width: 44, height: 44)
-                    .background(Color.blue)
-                    .clipShape(Circle())
-                    .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
-            }
-            .padding(.top, 12)
-            .padding(.trailing, 12)
-            
-            // Stats Overlay
-            if showStatsOverlay {
-                VStack(spacing: 0) {
-                    HStack {
-                        Spacer()
-                        VStack(spacing: 12) {
-                            HStack {
-                                Text("Statistiques")
-                                    .font(.headline)
-                                    .fontWeight(.bold)
-                                Spacer()
-                                Button(action: { showStatsOverlay = false }) {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundColor(.gray)
-                                        .font(.title3)
-                                }
-                            }
-                            
-                            Divider()
-                            
-                            HStack(spacing: 20) {
-                                VStack(spacing: 4) {
-                                    Text("✅")
-                                        .font(.title2)
-                                    Text("\(score)/\(total)")
-                                        .font(.title3)
-                                        .fontWeight(.bold)
-                                    Text("Score")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-                                
-                                VStack(spacing: 4) {
-                                    Text("🔥")
-                                        .font(.title2)
-                                    Text("\(streak)")
-                                        .font(.title3)
-                                        .fontWeight(.bold)
-                                    Text("Série")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-                                
-                                VStack(spacing: 4) {
-                                    Text("📊")
-                                        .font(.title2)
-                                    Text(total > 0 ? "\(Int(Double(score) / Double(total) * 100))%" : "0%")
-                                        .font(.title3)
-                                        .fontWeight(.bold)
-                                    Text("Réussite")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
-                            }
-                            .padding(.vertical, 8)
-                        }
-                        .padding(16)
-                        .frame(width: 280)
-                        .background(Color(.systemBackground))
-                        .cornerRadius(16)
-                        .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 4)
-                    }
-                    .padding(.top, 60)
-                    .padding(.trailing, 12)
-                    Spacer()
-                }
-                .background(
-                    Color.black.opacity(0.001)
-                        .onTapGesture { showStatsOverlay = false }
-                )
-                .transition(.opacity)
-                .animation(.easeInOut(duration: 0.2), value: showStatsOverlay)
-            }
         }
         .onAppear {
             generateQuestion()
+        }
+    }
+    
+    // Supporting Stat Item
+    struct StatItem: View {
+        let icon: String
+        let value: String
+        let label: String
+        
+        var body: some View {
+            HStack(spacing: 6) {
+                Text(icon)
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(value)
+                        .font(.subheadline.bold())
+                    Text(label)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+            }
         }
     }
         

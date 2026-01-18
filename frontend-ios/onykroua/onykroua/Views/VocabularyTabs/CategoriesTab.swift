@@ -1,6 +1,6 @@
 import SwiftUI
 
-// MARK: - CategoriesTab (matching Android CategoriesFragment.kt)
+// MARK: - CategoriesTab (matching EmojiView_Enhanced design)
 
 public struct CategoriesTab: View {
 
@@ -8,295 +8,105 @@ public struct CategoriesTab: View {
     let language: String
     @EnvironmentObject var env: AppEnvironment
 
-    // MARK: - State
-    @State private var expandedMainCategories = Set<String>()
-    @State private var selectedSubCategory: String? = nil
-
     public init(language: String) {
         self.language = language
     }
 
     // MARK: - Computed
 
-    private var categoriesGrouped: [String: [VocabCategory]] {
-        env.vocabularyManager.getCategoriesGroupedByMain(language: language)
-    }
-
-    private var categoriesWithoutMain: [VocabCategory] {
-        env.vocabularyManager.getCategories(language: language).filter { $0.mainCategory == nil }
+    private var allCategories: [VocabCategory] {
+        env.vocabularyManager.getCategories(language: language)
     }
 
     // MARK: - View
     public var body: some View {
         ScrollView {
-            LazyVStack(spacing: 16) {
-
-                // Categories without main_category first
-                if !categoriesWithoutMain.isEmpty {
-                    ForEach(categoriesWithoutMain) { category in
-                        LegacyCategoryCard(
-                            category: category,
-                            selectedSubCategory: $selectedSubCategory,
-                            speechService: env.speechService,
-                            language: language
+            LazyVStack(spacing: UI.Spacing.lg) {
+                ForEach(allCategories) { category in
+                    NavigationLink(destination: VocabularyCategoryDetailView(category: category, language: language).environmentObject(env)) {
+                        OnykrouaCategoryRow(
+                            icon: .emoji(category.icon),
+                            accent: .blue,
+                            title: category.name,
+                            subtitle: nil,
+                            countText: "\(category.words.count) mots"
                         )
                     }
-                }
-
-                // Categories grouped by main_category
-                ForEach(categoriesGrouped.keys.sorted(), id: \.self) { mainCategory in
-                    if let subCategories = categoriesGrouped[mainCategory] {
-                        MainCategoryCard(
-                            mainCategory: mainCategory,
-                            subCategories: subCategories,
-                            isExpanded: expandedMainCategories.contains(mainCategory),
-                            selectedSubCategory: $selectedSubCategory,
-                            speechService: env.speechService,
-                            language: language,
-                            onToggle: {
-                                if expandedMainCategories.contains(mainCategory) {
-                                    expandedMainCategories.remove(mainCategory)
-                                } else {
-                                    expandedMainCategories.insert(mainCategory)
-                                }
-                            }
-                        )
-                    }
+                    .buttonStyle(.plain)
                 }
             }
-            .padding()
+            .padding(.horizontal, UI.Spacing.lg)
+            .padding(.top, UI.Spacing.md)
+            .padding(.bottom, 96)
         }
+        .background(UI.Surface.groupedBackground)
     }
 }
 
-// MARK: - Main Category Card (Expandable)
+// MARK: - Category Detail View (matching EmojiView_Enhanced EmojiCategoryDetailView)
 
-struct MainCategoryCard: View {
-    let mainCategory: String
-    let subCategories: [VocabCategory]
-    let isExpanded: Bool
-    @Binding var selectedSubCategory: String?
-    @ObservedObject var speechService: SpeechService
-    let language: String
-    let onToggle: () -> Void
-
-    private var totalWords: Int {
-        subCategories.reduce(0) { $0 + $1.words.count }
-    }
-
-    var body: some View {
-        VStack(spacing: 0) {
-
-            // Header
-            Button(action: onToggle) {
-                HStack(spacing: 16) {
-                    Text(isExpanded ? "▼" : "▶")
-                        .font(.body)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-
-                    Text(mainCategory)
-                        .font(.title3)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-
-                    Spacer()
-
-                    Text("\(subCategories.count) catégories · \(totalWords) mots")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.8))
-                }
-                .padding(20)
-                .background(Color.blue)
-                .cornerRadius(12)
-            }
-            .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
-
-            // Sub-categories
-            if isExpanded {
-                VStack(spacing: 12) {
-                    ForEach(subCategories) { subCategory in
-                        SubCategoryCard(
-                            category: subCategory,
-                            isSelected: selectedSubCategory == subCategory.name,
-                            selectedSubCategory: $selectedSubCategory,
-                            speechService: speechService,
-                            language: language
-                        )
-                    }
-                }
-                .padding(12)
-                .background(Color.blue.opacity(0.05))
-                .cornerRadius(12)
-            }
-        }
-    }
-}
-
-// MARK: - Sub Category Card
-
-struct SubCategoryCard: View {
+struct VocabularyCategoryDetailView: View {
+    @EnvironmentObject var env: AppEnvironment
     let category: VocabCategory
-    let isSelected: Bool
-    @Binding var selectedSubCategory: String?
-    @ObservedObject var speechService: SpeechService
     let language: String
-    @State private var isExpanded = false
 
     var body: some View {
-        VStack(spacing: 0) {
-            Button(action: {
-                withAnimation {
-                    isExpanded.toggle()
-                    selectedSubCategory = isExpanded ? category.name : nil
+        ScrollView {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: UI.Spacing.md) {
+                ForEach(category.words) { word in
+                    VocabularyCategoryCard(word: word, speechService: env.speechService, language: language)
                 }
-            }) {
-                HStack(spacing: 12) {
-                    Text(category.icon)
-                        .font(.title2)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(category.name)
-                            .font(.headline)
-                            .foregroundColor(.primary)
-
-                        Text("\(category.words.count) mots")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-
-                    Spacer()
-
-                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
-                .padding(16)
-                .background(isSelected ? Color.blue.opacity(0.1) : Color(.systemBackground))
-                .cornerRadius(12)
             }
-            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
-
-            // Words list when expanded
-            if isExpanded {
-                VStack(spacing: 8) {
-                    ForEach(category.words) { word in
-                        CategoryWordRow(
-                            word: word,
-                            speechService: speechService,
-                            language: language
-                        )
-                    }
-                }
-                .padding(.top, 8)
-            }
+            .padding(.horizontal, UI.Spacing.lg)
+            .padding(.vertical, UI.Spacing.md)
         }
+        .navigationTitle(category.name)
+        .background(UI.Surface.groupedBackground)
     }
 }
 
-// MARK: - Legacy Category Card (for categories without main_category)
+// MARK: - Vocabulary Category Card (matching EmojiView_Enhanced EmojiDictionaryCard)
 
-struct LegacyCategoryCard: View {
-    let category: VocabCategory
-    @Binding var selectedSubCategory: String?
-    @ObservedObject var speechService: SpeechService
-    let language: String
-    @State private var isExpanded = false
-
-    var body: some View {
-        VStack(spacing: 0) {
-            Button(action: {
-                withAnimation {
-                    isExpanded.toggle()
-                    selectedSubCategory = isExpanded ? category.name : nil
-                }
-            }) {
-                HStack(spacing: 12) {
-                    Text(category.icon)
-                        .font(.largeTitle)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(category.name)
-                            .font(.title3)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-
-                        Text("\(category.words.count) mots")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-
-                    Spacer()
-
-                    Image(systemName: isExpanded ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(.blue)
-                }
-                .padding(20)
-                .background(Color(.systemBackground))
-                .cornerRadius(16)
-            }
-            .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
-
-            // Words list when expanded
-            if isExpanded {
-                VStack(spacing: 8) {
-                    ForEach(category.words) { word in
-                        CategoryWordRow(
-                            word: word,
-                            speechService: speechService,
-                            language: language
-                        )
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.top, 12)
-            }
-        }
-    }
-}
-
-// MARK: - Category Word Row
-
-struct CategoryWordRow: View {
+struct VocabularyCategoryCard: View {
     let word: VocabWord
     @ObservedObject var speechService: SpeechService
     let language: String
+    @State private var isPressed = false
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(word.word)
-                    .font(.body)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
+        VStack(spacing: UI.Spacing.sm) {
+            Text(word.word)
+                .font(.subheadline)
+                .fontWeight(.bold)
+                .foregroundColor(.blue)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
 
-                Text(word.translation)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+            Text(word.translation)
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .lineLimit(1)
 
-                if let example = word.example, !example.isEmpty {
-                    Text(example)
-                        .font(.caption2)
-                        .foregroundColor(.blue)
-                        .italic()
-                        .lineLimit(1)
-                }
-            }
-
-            Spacer()
-
-            Button(action: {
-                let lang = language == "it" ? "it-IT" : "es-ES"
-                speechService.speak(word.word, language: lang)
-            }) {
-                Image(systemName: "speaker.wave.2.fill")
-                    .font(.body)
-                    .foregroundColor(.blue)
+            Image(systemName: "speaker.wave.2.fill")
+                .font(.caption2)
+                .foregroundColor(.blue.opacity(0.6))
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: UI.Size.cardHeight)
+        .background(UI.Surface.background)
+        .cornerRadius(UI.Radius.r12)
+        .shadow(color: UI.Shadow.card.color, radius: UI.Shadow.card.radius, x: UI.Shadow.card.x, y: UI.Shadow.card.y)
+        .scaleEffect(isPressed ? 0.95 : 1.0)
+        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
+        .onTapGesture {
+            isPressed = true
+            let lang = language == "it" ? "it-IT" : "es-ES"
+            speechService.speak(word.word, language: lang)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                isPressed = false
             }
         }
-        .padding(12)
-        .background(Color(.systemGray6).opacity(0.5))
-        .cornerRadius(8)
     }
 }
